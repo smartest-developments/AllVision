@@ -55,3 +55,8 @@ Justification: Sourcing request transition guard implemented with unit test cove
 Date: 2026-02-21
 Score: 61/100
 Justification: Admin report artifact upload endpoint now persists artifacts and marks requests REPORT_READY with integration coverage.
+
+---
+Date: 2026-02-21
+Score: 64/100
+Justification: Report retrieval endpoint now enforces owner-only access with integration coverage.

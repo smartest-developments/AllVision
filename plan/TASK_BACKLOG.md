@@ -34,12 +34,7 @@ Completion signal: CI blocks merges on lint/typecheck/test/build and migration/s
 
 ### P0 (3 tasks, MVP blockers)
 
-1. [AT-P0-06] Implement secure report retrieval endpoint for request owner.
-- Size: 1-2h
-- DoD: only owner can retrieve report artifact metadata/link.
-- Evidence: integration tests for authorized and forbidden access.
-
-2. [AT-P0-07] Persist status-change audit trail (`SourcingStatusEvent`) and trigger report-ready email notification stub (merged from lifecycle + delivery tasks).
+1. [AT-P0-07] Persist status-change audit trail (`SourcingStatusEvent`) and trigger report-ready email notification stub (merged from lifecycle + delivery tasks).
 - Size: 2-3h
 - DoD: every status change writes event record; report-ready transition enqueues mocked email notification.
 - Evidence: integration tests for event creation and notification trigger.
@@ -125,6 +120,8 @@ Completion signal: CI blocks merges on lint/typecheck/test/build and migration/s
 
 ## COMPLETED
 
+- [AT-P0-06] Implement secure report retrieval endpoint for request owner.
+  - Evidence: integration tests for authorized and forbidden access.
 - [AT-P0-01] Implement email/password registration + login/logout with secure session handling (merged from Identity tasks).
   - Evidence: integration tests for register/login/logout flow and session invalidation.
 - [AT-P0-02] Define and harden prescription schema validation.
