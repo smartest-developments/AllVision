@@ -15,3 +15,9 @@
 - task: Backlog recomposition to autonomous format
 - result: P0<=7, required sections added
 - next: Re-run pre-automation structural verification
+
+## 2026-02-21T16:42:43Z
+
+- task: AT-P0-01 Implement email/password registration + login/logout with secure session handling
+- result: Auth service, in-memory store, and integration tests added; quality gates green
+- next: AT-P0-02 Define and harden prescription schema validation

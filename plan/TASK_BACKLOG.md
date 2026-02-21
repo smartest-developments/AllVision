@@ -32,14 +32,9 @@ Completion signal: CI blocks merges on lint/typecheck/test/build and migration/s
 
 ## ACTIVE_TASKS
 
-### P0 (7 tasks, MVP blockers)
+### P0 (6 tasks, MVP blockers)
 
-1. [AT-P0-01] Implement email/password registration + login/logout with secure session handling (merged from Identity tasks).
-- Size: 2-3h
-- DoD: account creation, duplicate-email rejection, secure session creation/revocation, secure cookie flags.
-- Evidence: integration tests for register/login/logout flow and session invalidation.
-
-2. [AT-P0-02] Define and harden prescription schema validation.
+1. [AT-P0-02] Define and harden prescription schema validation.
 - Size: 1-2h
 - DoD: required optical fields, boundary checks, and EU+CH scope validation are enforced.
 - Evidence: unit tests for valid/invalid payload matrix.
@@ -64,7 +59,7 @@ Completion signal: CI blocks merges on lint/typecheck/test/build and migration/s
 - DoD: only owner can retrieve report artifact metadata/link.
 - Evidence: integration tests for authorized and forbidden access.
 
-7. [AT-P0-07] Persist status-change audit trail (`SourcingStatusEvent`) and trigger report-ready email notification stub (merged from lifecycle + delivery tasks).
+6. [AT-P0-07] Persist status-change audit trail (`SourcingStatusEvent`) and trigger report-ready email notification stub (merged from lifecycle + delivery tasks).
 - Size: 2-3h
 - DoD: every status change writes event record; report-ready transition enqueues mocked email notification.
 - Evidence: integration tests for event creation and notification trigger.
@@ -147,6 +142,11 @@ Completion signal: CI blocks merges on lint/typecheck/test/build and migration/s
 - Size: 2-3h
 - DoD: admin can start from standard report templates.
 - Evidence: integration tests for template load/save behavior.
+
+## COMPLETED
+
+- [AT-P0-01] Implement email/password registration + login/logout with secure session handling (merged from Identity tasks).
+  - Evidence: integration tests for register/login/logout flow and session invalidation.
 
 ## AUTO_DISCOVERED
 
