@@ -32,24 +32,19 @@ Completion signal: CI blocks merges on lint/typecheck/test/build and migration/s
 
 ## ACTIVE_TASKS
 
-### P0 (5 tasks, MVP blockers)
+### P0 (4 tasks, MVP blockers)
 
-1. [AT-P0-04] Implement `SourcingRequest` transition guard service (`SUBMITTED -> IN_REVIEW -> REPORT_READY`).
-- Size: 1-2h
-- DoD: invalid transitions are blocked and valid transitions succeed.
-- Evidence: unit tests for transition rules.
-
-2. [AT-P0-05] Implement admin report artifact upload metadata endpoint and status move to `REPORT_READY`.
+1. [AT-P0-05] Implement admin report artifact upload metadata endpoint and status move to `REPORT_READY`.
 - Size: 2-3h
 - DoD: authorized admin can attach artifact and mark request ready.
 - Evidence: integration test asserting status + artifact persistence.
 
-3. [AT-P0-06] Implement secure report retrieval endpoint for request owner.
+2. [AT-P0-06] Implement secure report retrieval endpoint for request owner.
 - Size: 1-2h
 - DoD: only owner can retrieve report artifact metadata/link.
 - Evidence: integration tests for authorized and forbidden access.
 
-4. [AT-P0-07] Persist status-change audit trail (`SourcingStatusEvent`) and trigger report-ready email notification stub (merged from lifecycle + delivery tasks).
+3. [AT-P0-07] Persist status-change audit trail (`SourcingStatusEvent`) and trigger report-ready email notification stub (merged from lifecycle + delivery tasks).
 - Size: 2-3h
 - DoD: every status change writes event record; report-ready transition enqueues mocked email notification.
 - Evidence: integration tests for event creation and notification trigger.
@@ -141,6 +136,8 @@ Completion signal: CI blocks merges on lint/typecheck/test/build and migration/s
   - Evidence: unit tests for valid/invalid payload matrix with EU+CH scope checks.
 - [AT-P0-03] Build prescription intake endpoint + form contract with persistence.
   - Evidence: integration tests for submit + reject + persistence path.
+- [AT-P0-04] Implement `SourcingRequest` transition guard service (`SUBMITTED -> IN_REVIEW -> REPORT_READY`).
+  - Evidence: unit tests for transition rules.
 
 ## AUTO_DISCOVERED
 

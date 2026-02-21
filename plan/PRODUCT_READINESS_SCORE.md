@@ -45,3 +45,8 @@ Justification: Prescription validation now enforces EU+CH scope and optical cons
 Date: 2026-02-21
 Score: 55/100
 Justification: Prescription intake endpoint persists validated payloads with integration coverage.
+
+---
+Date: 2026-02-21
+Score: 58/100
+Justification: Sourcing request transition guard implemented with unit test coverage for valid/invalid paths.
