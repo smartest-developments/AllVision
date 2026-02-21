@@ -2,68 +2,70 @@
 
 ## Principles
 
-- Secure by default with least privilege.
-- Defense in depth for account and request lifecycle.
-- Traceability for all admin actions.
+- Secure by default and least privilege.
+- Defense in depth for identity, data handling, and admin operations.
+- Full traceability of user/admin actions affecting sourcing reports.
 
 ## Authentication and Session
 
-- Email + password authentication in MVP.
-- Password hashing with Argon2id (or bcrypt with strong work factor if Argon2 unavailable).
+- Email/password authentication in MVP.
+- Password hashing with Argon2id (fallback bcrypt with strong cost only if needed).
 - HttpOnly, Secure, SameSite=Lax session cookies.
-- Session rotation on login and privilege change.
-- Role-based authorization (`USER`, `ADMIN`) on all protected routes.
+- Server-side session invalidation and rotation on login/privilege changes.
+- RBAC (`USER`, `ADMIN`) across protected routes and admin workflows.
 
 ## Authorization Model
 
-- User can only access own quote requests/reports.
-- Admin can access review queue and update request status.
-- Server-side checks are mandatory; client checks are non-authoritative.
+- Users can access only their own prescriptions, sourcing requests, and report artifacts.
+- Admins can review and update sourcing request lifecycle.
+- Authorization checks are server-enforced on every sensitive action.
 
 ## Rate Limiting
 
-- Apply rate limit to auth endpoints (login/register/reset).
-- Apply rate limit to quote creation and report download endpoints.
-- Block abusive IP/session patterns and log security events.
+- Strict limits on registration/login/reset endpoints.
+- Limits on prescription intake and report retrieval endpoints.
+- Abuse detection for repeated failed auth and high-frequency request patterns.
 
 ## Audit Trail
 
-Capture immutable audit events for:
+Capture immutable audit records for:
 
-- account sign-up/login/logout,
-- quote status transitions,
-- admin report uploads/edits/delivery actions,
-- GDPR operations (export/deletion request lifecycle).
+- identity/session events,
+- sourcing status transitions,
+- report uploads/edits/delivery actions,
+- GDPR operations (export/deletion requests and completion).
 
-Audit event fields:
+Audit fields:
 
-- actor ID (nullable for system actions),
-- action name,
-- target entity and ID,
+- actor ID (nullable for system),
+- action,
+- entity type/ID,
 - timestamp,
-- request metadata (IP, user-agent hash, request ID).
+- request metadata (request ID, IP hash, user-agent hash).
+
+## Medical Boundary Controls
+
+- Product and API copy must consistently state informational-only scope.
+- No component may output medical recommendations or treatment guidance.
+- Validation and workflow logic handle prescription as input data only, not clinical interpretation.
+- Security reviews must flag wording that implies medical advice or supplier endorsement.
 
 ## Data Protection Controls
 
-- Encrypt data in transit (TLS required in production).
-- Encrypt sensitive storage and backups at rest.
-- Use secret management for keys and DSNs.
-- Restrict production database network access.
+- TLS in transit and encryption at rest for primary storage/backups.
+- Secret management for credentials/keys.
+- Restricted network access to production data stores.
+- Principle of least privilege for admin and operational accounts.
 
 ## Application Security Controls
 
-- Input validation with Zod.
-- Centralized error handling without leaking internals.
-- CSRF protections on state-changing routes.
-- Security headers (CSP, HSTS, X-Content-Type-Options, Referrer-Policy).
+- Schema validation (Zod) for all input.
+- Centralized error handling with non-sensitive client errors.
+- CSRF protection for state-changing requests.
+- Security headers: CSP, HSTS, X-Content-Type-Options, Referrer-Policy.
 
-## Dependency and Pipeline Controls
+## SDLC Controls
 
-- Pin and review critical dependencies.
-- Run lint, typecheck, tests, and build in CI on every PR.
-- Add dependency vulnerability scanning in CI.
-
-## Incident Readiness
-
-- Document incident severity, triage, and communication flow.
-- Keep audit/event logs for forensic analysis within retention policy.
+- Lint/typecheck/test/build required in CI for each PR.
+- Dependency and vulnerability scanning in CI.
+- Security-sensitive changes require reviewer sign-off.

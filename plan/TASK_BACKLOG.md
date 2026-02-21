@@ -1,120 +1,132 @@
 # Task Backlog
 
-Task sizing target: each item fits in 1-3 hours.
-Definition style: each task includes clear DoD and Evidence.
+Task size target: 1-3 hours each.
+Each task includes DoD and Evidence.
 
 ## P0
 
-### Epic A) Identity & Session
+### Epic A) Identity
 
 1. Implement email/password registration endpoint and persistence.
 - DoD: valid account creation, duplicate-email rejection, password hash at rest.
-- Evidence: unit tests for validation + integration test for persistence path.
+- Evidence: unit tests for validation and integration test for persistence.
 
-2. Implement login/logout with secure session cookie.
-- DoD: authenticated session creation and invalidation with secure cookie flags.
-- Evidence: integration tests for auth flow and cookie behavior.
+2. Implement login/logout with secure session handling.
+- DoD: session created, rotated, and revoked with secure cookie settings.
+- Evidence: integration tests for login/logout and session invalidation.
 
-3. Add RBAC middleware for `USER` and `ADMIN` routes.
-- DoD: admin routes blocked for non-admin users server-side.
+3. Enforce RBAC middleware (`USER`, `ADMIN`).
+- DoD: admin routes blocked server-side for non-admin users.
 - Evidence: integration tests for allow/deny matrix.
 
-### Epic B) Prescription Intake + Validation
+### Epic B) Prescription Intake
 
-1. Define prescription schema and shared validator package.
-- DoD: strict schema for required optical fields and constraints.
-- Evidence: unit tests for valid/invalid payload examples.
+1. Define and harden prescription schema validation.
+- DoD: required optical fields, boundary checks, and EU+CH scope checks are enforced.
+- Evidence: unit tests for valid/invalid payload variants.
 
-2. Build user intake form and submit API contract.
-- DoD: form submits normalized payload; server rejects invalid data.
-- Evidence: integration test for request submission and stored payload shape.
+2. Build prescription intake endpoint + form contract.
+- DoD: valid submissions persist and invalid submissions return deterministic error codes.
+- Evidence: integration tests for submit and rejection paths.
 
-3. Add EU+CH country scope validation.
-- DoD: non-EU/non-CH requests rejected with clear error code.
-- Evidence: unit tests for country whitelist.
+3. Add sensitive-data access restrictions for prescription records.
+- DoD: only owner/admin with role checks can read prescription payload.
+- Evidence: authorization integration tests and audit-event assertions.
 
-### Epic C) Quote Lifecycle + Admin Review
+### Epic C) Sourcing Report Lifecycle
 
-1. Create quote request entity and state transition service.
-- DoD: allowed transitions enforced (`SUBMITTED` -> `IN_REVIEW` -> `REPORT_READY` -> `DELIVERED` -> `PAID`).
+1. Implement `SourcingRequest` entity and transition guard service.
+- DoD: only allowed transitions (`SUBMITTED -> IN_REVIEW -> REPORT_READY -> DELIVERED`) are accepted.
 - Evidence: unit tests for transition guards.
 
-2. Build admin quote queue endpoint/page (manual review).
-- DoD: admin can list and open pending requests only with auth.
-- Evidence: integration tests + screenshot evidence in PR.
+2. Implement `SourcingStatusEvent` persistence on each transition.
+- DoD: every transition writes event record atomically.
+- Evidence: integration tests for transition + event creation.
 
-3. Implement admin status update action with audit event.
-- DoD: every status change writes an audit event atomically.
-- Evidence: integration tests asserting event creation.
+3. Expose user-facing sourcing request status endpoint.
+- DoD: users can view only their own request timeline and current state.
+- Evidence: integration tests for owner/non-owner access.
 
-### Epic D) Report Delivery (download/link/email stub)
+### Epic D) Admin Review + Report Upload
 
-1. Add report metadata model and attachment endpoint.
-- DoD: admin can attach report URL/token to quote.
-- Evidence: integration test for endpoint + persisted metadata.
+1. Build admin queue for pending and in-review sourcing requests.
+- DoD: admin-only list and detail retrieval with filtering.
+- Evidence: integration tests for admin visibility and filters.
 
-2. Build user report retrieval endpoint with authorization checks.
-- DoD: only owner can retrieve report link/download details.
-- Evidence: integration tests for owner vs non-owner access.
+2. Implement admin report artifact upload metadata endpoint.
+- DoD: admin can attach report artifact record and change state to `REPORT_READY`.
+- Evidence: integration tests and created artifact assertions.
 
-3. Add email notification stub for report-ready event.
-- DoD: notification job/log entry created when report becomes ready.
+3. Add admin action logging for review decisions and report uploads.
+- DoD: all admin review/report actions emit immutable audit events.
+- Evidence: integration test asserting audit payload.
+
+### Epic E) Report Delivery
+
+1. Implement secure report retrieval endpoint.
+- DoD: only owner can retrieve active artifact link/metadata.
+- Evidence: integration tests for authorized and blocked access.
+
+2. Add report delivery acknowledgment endpoint.
+- DoD: retrieval/acknowledgment writes delivery audit event.
+- Evidence: integration tests for ack state/evidence.
+
+3. Implement email notification stub for report-ready.
+- DoD: report-ready transition enqueues mocked email notification.
 - Evidence: integration test with mocked provider.
 
-### Epic F) Compliance: disclaimers, GDPR ops, audit events
+### Epic F) Compliance + Audit
 
-1. Centralize legal disclaimer content and render in key surfaces.
-- DoD: disclaimer appears on intake, checkout, and report pages.
-- Evidence: UI tests/snapshots and copy review checklist.
+1. Centralize legal disclaimer and informational-only copy blocks.
+- DoD: disclaimer rendered on intake, request, and report-delivery surfaces.
+- Evidence: UI snapshot tests and copy checklist.
 
-2. Implement GDPR export request endpoint + worker stub.
-- DoD: authenticated user can request export; request logged and queued.
-- Evidence: integration test and sample exported JSON contract.
+2. Implement GDPR export request flow.
+- DoD: authenticated user can submit export request and receive queued status.
+- Evidence: integration test and sample JSON contract.
 
-3. Implement GDPR deletion request workflow (soft-delete first).
-- DoD: request recorded, account soft-deleted, audit event emitted.
-- Evidence: integration tests for deletion lifecycle.
+3. Implement GDPR deletion flow (soft-delete then purge/anonymize workflow).
+- DoD: request lifecycle logged; protected legal-hold checks supported.
+- Evidence: integration tests for lifecycle transitions and audit evidence.
 
-### Epic G) Quality gates + CI
+### Epic G) Quality Gates
 
-1. Add CI workflow for lint/typecheck/test/build on pull requests.
-- DoD: PR pipeline fails on any red gate.
-- Evidence: CI config committed + passing run link.
+1. Add CI workflow for lint/typecheck/test/build.
+- DoD: pull requests fail if any gate is red.
+- Evidence: CI config committed and passing run evidence.
 
-2. Enforce branch protections and required checks policy.
-- DoD: merge requires green checks and at least one review.
-- Evidence: repository settings screenshot/record.
+2. Add schema drift and migration checks in CI.
+- DoD: migration integrity check fails on drift or missing migrations.
+- Evidence: CI step output with green baseline.
 
-3. Add dependency vulnerability scan to CI.
-- DoD: critical/high vulnerabilities fail pipeline (tunable).
-- Evidence: CI run output with security scan step.
+3. Add dependency vulnerability scanning.
+- DoD: high/critical findings fail CI unless explicitly waived.
+- Evidence: CI run artifact for vulnerability scan.
 
 ## P1
 
-### Epic E) Payments (as info product) - may be deferred if MVP free
+1. Add optional report fee collection as informational-service payment.
+- DoD: payment state is tied to report service product only, not physical goods.
+- Evidence: integration tests for payment-required toggle.
 
-1. Integrate checkout session creation for report service fee.
-- DoD: quote links to provider checkout session with idempotency key.
-- Evidence: integration test with provider mock.
+2. Build admin SLA dashboard for sourcing request throughput.
+- DoD: queue age and delivery time metrics available for admin.
+- Evidence: dashboard screenshot and metric tests.
 
-2. Implement payment webhook handler with signature verification.
-- DoD: verified events update quote payment status safely.
-- Evidence: integration tests for valid/invalid signatures.
-
-3. Add payment-required gate before report download (toggleable).
-- DoD: when enabled, unpaid report access blocked with clear UX state.
-- Evidence: integration test for paid/unpaid paths.
+3. Add template library for report generation quality consistency.
+- DoD: admins can start from standard report templates.
+- Evidence: integration tests for template loading and save behavior.
 
 ## P2
 
-1. Add observability dashboard for lifecycle metrics.
-- DoD: baseline metrics for request volume, turnaround time, delivery rate.
-- Evidence: dashboard export/screenshot + instrumentation tests.
+1. Add social login option with secure account linking.
+- DoD: verified email can link to existing account safely.
+- Evidence: integration tests for linking edge cases.
 
-2. Add social login (optional).
-- DoD: OAuth login links to existing account by verified email.
-- Evidence: integration tests for account linking edge cases.
+2. Add scoped localization for legal disclaimers by country/language.
+- DoD: disclaimer variants selected by locale with legal copy fallback.
+- Evidence: tests for locale fallback matrix.
 
-3. Prepare E2E suite for core happy path (after core flow stable).
-- DoD: CI smoke E2E for signup -> submit -> admin review -> report delivery.
-- Evidence: recorded run artifact and green CI job.
+3. Add E2E smoke suite after core lifecycle stabilizes.
+- DoD: smoke flow covers signup -> intake -> admin review -> report delivery.
+- Evidence: CI E2E run artifact.

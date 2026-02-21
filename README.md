@@ -1,14 +1,16 @@
 # AllVision
 
-AllVision is an informational service for eyeglass lens buyers in the EU + Switzerland.
-Users submit lens prescription data and receive a manual price-comparison + sourcing report.
+AllVision is an informational service for users in the EU + Switzerland.
+Users submit eyeglasses prescription data and receive an offshore sourcing report with comparative pricing and sourcing guidance.
 
 ## Product Goal
 
-- Sell an information product (report + guidance), not lenses.
-- No brokerage, no order placement, no medical advice.
-- Account required for request lifecycle and report delivery.
-- MVP flow: request submitted -> quote in progress -> admin review -> report delivered -> payment handling (paid-ready, may be free initially).
+- Sell an informational sourcing report, not lenses.
+- No sale of medical devices.
+- No brokerage, mediation, or purchase execution.
+- No medical advice.
+- Account-required workflow: prescription intake -> sourcing report in progress -> report delivered.
+- Paid-ready for report service fees (MVP can run free).
 
 ## Tech Stack
 
@@ -22,7 +24,7 @@ Users submit lens prescription data and receive a manual price-comparison + sour
 
 - Node.js 20+
 - npm 10+
-- PostgreSQL (for future DB tasks)
+- PostgreSQL (for DB-backed features)
 
 ### Setup
 
@@ -61,3 +63,4 @@ Open `http://localhost:3000`.
 - `/plan/TASK_BACKLOG.md`
 - `/plan/PROGRESS_LOG.md`
 - `/plan/HEALTH_SCORE.md`
+- `/plan/PRODUCT_READINESS_SCORE.md`

@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { validatePrescription } from "@/server/placeholders";
 
-describe("quote intake placeholder flow", () => {
+describe("sourcing request intake placeholder flow", () => {
   it("validates and returns canonical payload", () => {
     const payload = validatePrescription({
       leftEye: { sphere: -2.0 },

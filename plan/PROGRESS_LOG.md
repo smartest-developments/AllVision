@@ -3,8 +3,9 @@
 ## 2026-02-21
 
 - Initialized repository and baseline stack configuration (Next.js App Router, TypeScript, Tailwind, Prisma).
-- Added initial Prisma schema for user, quote request, and audit events.
-- Added unit/integration test harness and starter tests.
-- Authored documentation baseline: PRD, legal positioning, security, GDPR, architecture, API spec, and ADR-0001.
-- Created delivery planning artifacts: backlog, progress log, health score scaffold.
-- Next milestone: implement Epic A/B P0 tasks while maintaining green quality gates.
+- Added initial test harness and starter unit/integration tests.
+- Authored initial documentation and planning artifacts.
+- Realigned product language and domain model to informational offshore sourcing report service.
+- Hardened legal/security/GDPR documentation for informational-only and non-medical boundaries.
+- Updated Prisma schema to include `Session`, `Prescription`, `SourcingRequest`, `SourcingStatusEvent`, `ReportArtifact`, and `AuditEvent`.
+- Updated API spec and backlog to remove sales/brokering implications.

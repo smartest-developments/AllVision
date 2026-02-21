@@ -2,60 +2,70 @@
 
 ## Scope and Roles
 
-- AllVision acts as data controller for account and report-service operations.
-- Data subjects are users located in EU + Switzerland.
+- AllVision acts as data controller for account and informational report-service operations.
+- Data subjects are users in EU + Switzerland.
 
 ## Lawful Basis (MVP)
 
-- Contract performance: process quote requests and deliver report.
-- Legitimate interests: security logging, abuse prevention, service reliability.
+- Contract performance: process sourcing requests and deliver informational reports.
+- Legitimate interests: service security, abuse prevention, and operational reliability.
+- Where required by jurisdictional interpretation, obtain explicit consent for processing prescription data.
+
+## Sensitive Data Handling
+
+Prescription data may be treated as health-related or special-category personal data depending on context and regulatory interpretation.
+Controls:
+
+- collect only fields necessary to generate the report,
+- segregate access and restrict to authorized personnel,
+- log access and changes with audit events,
+- apply stricter retention and deletion controls,
+- avoid secondary use unrelated to report generation.
 
 ## Data Minimization
 
-Collect only what is needed:
+Collect only what is required:
 
-- account: email, password hash, auth metadata,
-- request: prescription data, country, status,
-- operations: audit logs needed for compliance and security.
-
-Do not collect unnecessary health context or unrelated personal profile data.
+- account: email, password hash, authentication metadata,
+- prescription intake: optical values and sourcing scope fields,
+- service operations: request lifecycle and audit records.
 
 ## Purpose Limitation
 
-- Data is used to generate and deliver the informational report service.
-- Data is not sold to third parties.
-- Data is not used for medical decisions.
+- Data is processed solely to prepare and deliver comparative sourcing reports.
+- Data is not sold.
+- Data is not used for medical treatment decisions.
 
 ## Retention Baseline
 
-- Active account data retained while account is active.
-- Quote/report records retained for service history and compliance.
-- Define concrete retention schedule before production launch (for example: inactive accounts reviewed after 24 months).
+- Keep account and request data while service relationship remains active.
+- Define production retention schedule before launch (including sensitive-data windows).
+- Periodically review stale accounts/requests and purge or anonymize per policy.
 
 ## Data Subject Rights
 
-Support rights workflows:
+Support authenticated workflows for:
 
-- access/export request,
+- access/export,
 - rectification,
-- deletion request,
+- deletion,
 - objection/restriction where applicable.
 
-Implement authenticated requests and log request handling timeline.
+Track request timestamps, status, and completion evidence.
 
 ## Deletion and Export Operations
 
-- Export: machine-readable JSON package containing account + quote history.
-- Deletion: soft-delete workflow first, then hard-delete or irreversible anonymization after legal hold checks.
-- Retain minimal audit evidence that deletion/export was executed.
+- Export: machine-readable package containing account, prescription, request lifecycle, and report metadata.
+- Deletion: soft-delete first, then hard-delete or irreversible anonymization after legal-hold checks.
+- Preserve minimal audit evidence for compliance proof.
 
 ## Processor and Transfer Controls
 
-- Maintain processor inventory (hosting, email, payments).
-- Ensure DPAs with processors.
-- Use approved transfer safeguards for non-EU processing locations.
+- Maintain processor inventory (hosting, email, optional payment provider).
+- Ensure signed DPAs.
+- Apply valid transfer safeguards for non-EU processing locations.
 
-## Security and Privacy by Design
+## Privacy by Design
 
-- Access controls, encryption, least privilege, and auditability are required.
-- Privacy checks are part of backlog definition-of-done for relevant tasks.
+- Privacy checks are required in definition-of-done for relevant changes.
+- New features require review for minimization, lawful basis, and user transparency.

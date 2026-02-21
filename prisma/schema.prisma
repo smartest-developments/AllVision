@@ -12,52 +12,131 @@ enum UserRole {
   ADMIN
 }
 
-enum QuoteStatus {
+enum SourcingRequestStatus {
   SUBMITTED
   IN_REVIEW
   REPORT_READY
   DELIVERED
-  PAID
+  PAYMENT_PENDING
+  PAYMENT_SETTLED
   CANCELLED
 }
 
 model User {
-  id             String         @id @default(cuid())
-  email          String         @unique
-  passwordHash   String
-  role           UserRole       @default(USER)
-  createdAt      DateTime       @default(now())
-  updatedAt      DateTime       @updatedAt
-  quoteRequests  QuoteRequest[]
-  auditEvents    AuditEvent[]   @relation("ActorEvents")
+  id           String   @id @default(cuid())
+  email        String   @unique
+  passwordHash String
+  role         UserRole @default(USER)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  sessions             Session[]
+  prescriptions        Prescription[]
+  sourcingRequests     SourcingRequest[]
+  auditEvents          AuditEvent[]          @relation("ActorEvents")
+  statusEventsAuthored SourcingStatusEvent[] @relation("StatusEventActor")
+  reportsAuthored      ReportArtifact[]      @relation("ReportAuthor")
 }
 
-model QuoteRequest {
-  id                  String       @id @default(cuid())
-  userId              String
-  countryCode         String
-  prescriptionPayload Json
-  status              QuoteStatus  @default(SUBMITTED)
-  reportUrl           String?
-  paymentRequired     Boolean      @default(true)
-  createdAt           DateTime     @default(now())
-  updatedAt           DateTime     @updatedAt
-  user                User         @relation(fields: [userId], references: [id])
-  auditEvents         AuditEvent[] @relation("QuoteEvents")
+model Session {
+  id            String    @id @default(cuid())
+  userId        String
+  tokenHash     String    @unique
+  expiresAt     DateTime
+  revokedAt     DateTime?
+  ipHash        String?
+  userAgentHash String?
+  createdAt     DateTime  @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, expiresAt])
+}
+
+model Prescription {
+  id             String   @id @default(cuid())
+  userId         String
+  countryCode    String
+  payload        Json
+  consentVersion String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  user             User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  sourcingRequests SourcingRequest[]
+
+  @@index([userId, createdAt])
+}
+
+model SourcingRequest {
+  id                    String                @id @default(cuid())
+  userId                String
+  prescriptionId        String
+  status                SourcingRequestStatus @default(SUBMITTED)
+  reportPaymentRequired Boolean               @default(true)
+  reportFeeCents        Int?
+  currency              String                @default("EUR")
+  createdAt             DateTime              @default(now())
+  updatedAt             DateTime              @updatedAt
+
+  user            User                  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  prescription    Prescription          @relation(fields: [prescriptionId], references: [id], onDelete: Restrict)
+  statusEvents    SourcingStatusEvent[]
+  reportArtifacts ReportArtifact[]
+  auditEvents     AuditEvent[]          @relation("RequestAuditEvents")
+
+  @@index([userId, createdAt])
+  @@index([status, createdAt])
+  @@index([prescriptionId])
+}
+
+model SourcingStatusEvent {
+  id                String                 @id @default(cuid())
+  sourcingRequestId String
+  fromStatus        SourcingRequestStatus?
+  toStatus          SourcingRequestStatus
+  actorUserId       String?
+  note              String?
+  createdAt         DateTime               @default(now())
+
+  sourcingRequest SourcingRequest @relation(fields: [sourcingRequestId], references: [id], onDelete: Cascade)
+  actor           User?           @relation("StatusEventActor", fields: [actorUserId], references: [id], onDelete: SetNull)
+
+  @@index([sourcingRequestId, createdAt])
+  @@index([actorUserId])
+}
+
+model ReportArtifact {
+  id                String    @id @default(cuid())
+  sourcingRequestId String
+  createdByAdminId  String?
+  storageKey        String
+  checksumSha256    String?
+  deliveryChannel   String?
+  deliveredAt       DateTime?
+  createdAt         DateTime  @default(now())
+
+  sourcingRequest SourcingRequest @relation(fields: [sourcingRequestId], references: [id], onDelete: Cascade)
+  createdByAdmin  User?           @relation("ReportAuthor", fields: [createdByAdminId], references: [id], onDelete: SetNull)
+
+  @@index([sourcingRequestId, createdAt])
+  @@index([createdByAdminId])
 }
 
 model AuditEvent {
-  id            String       @id @default(cuid())
-  actorUserId   String?
-  quoteRequestId String?
-  action        String
-  context       Json
-  createdAt     DateTime     @default(now())
+  id                String   @id @default(cuid())
+  actorUserId       String?
+  sourcingRequestId String?
+  entityType        String
+  entityId          String?
+  action            String
+  context           Json
+  createdAt         DateTime @default(now())
 
-  actor         User?        @relation("ActorEvents", fields: [actorUserId], references: [id])
-  quoteRequest  QuoteRequest? @relation("QuoteEvents", fields: [quoteRequestId], references: [id])
+  actor           User?            @relation("ActorEvents", fields: [actorUserId], references: [id], onDelete: SetNull)
+  sourcingRequest SourcingRequest? @relation("RequestAuditEvents", fields: [sourcingRequestId], references: [id], onDelete: SetNull)
 
-  @@index([quoteRequestId])
+  @@index([sourcingRequestId])
   @@index([actorUserId])
   @@index([createdAt])
 }

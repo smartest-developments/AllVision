@@ -2,59 +2,64 @@
 
 ## System Context
 
-AllVision is a web application where authenticated users submit prescription data and receive a manual informational report prepared by admins.
+AllVision is an account-based web application that converts user prescription input into a manual offshore sourcing report.
+The platform provides comparative information only; it does not execute purchases.
 
 ## High-Level Modules
 
 1. `Web App (Next.js App Router)`
-   - Public/legal pages
-   - Auth pages
-   - User dashboard and quote request flow
-   - Admin panel
+   - public/legal content
+   - identity and session flows
+   - prescription intake and sourcing request dashboard
+   - admin review workspace
 2. `Application Services`
-   - Auth/session service
-   - Quote lifecycle service
-   - Report delivery service
-   - Audit/GDPR operations service
+   - identity/session service
+   - prescription intake/validation service
+   - sourcing request lifecycle service
+   - report artifact and delivery service
+   - compliance and audit service
 3. `Data Layer`
    - PostgreSQL
    - Prisma ORM
 4. `External Integrations`
-   - Email provider (delivery notifications)
-   - Payment provider (report purchase)
+   - email provider (delivery notifications)
+   - optional payment provider for informational report fee
 
 ## Boundaries and Rules
 
-- UI layer cannot access database directly; use server services.
-- Admin actions require explicit role checks and audit event emission.
-- Legal and disclaimer text is centralized and reused across UI and API responses.
-- Payment concerns are isolated from quote-state core to support free MVP launch.
+- UI does not query DB directly; all writes flow through server services.
+- Admin actions require role checks and audit-event emission.
+- Legal disclaimer content is centralized and reused across surfaces.
+- No domain service may include supplier brokering or purchase execution logic.
+- Prescription data is treated as sensitive and governed by stricter access controls.
 
 ## Domain Model (MVP)
 
 - `User`
-- `QuoteRequest`
+- `Session`
+- `Prescription`
+- `SourcingRequest`
+- `SourcingStatusEvent`
+- `ReportArtifact`
 - `AuditEvent`
-- `ReportArtifact` (URL/path metadata, modeled in quote for now)
 
-## Quote Lifecycle
+## Sourcing Report Lifecycle
 
-1. User submits prescription -> status `SUBMITTED`.
-2. Admin picks up request -> status `IN_REVIEW` (quote in progress).
-3. Admin generates report -> status `REPORT_READY`.
-4. Report delivered (email/link) -> status `DELIVERED`.
-5. Payment captured (if enabled) -> status `PAID`.
+1. User submits prescription and sourcing scope -> `SUBMITTED`.
+2. Admin starts review -> `IN_REVIEW`.
+3. Report prepared and uploaded -> `REPORT_READY`.
+4. Report delivered to user -> `DELIVERED`.
 
 ## Deployment Shape
 
 - Next.js server runtime
 - PostgreSQL managed instance
-- Object storage for report files (future)
+- object storage for report artifacts (planned)
 - CI pipeline enforcing quality gates
 
 ## Non-Functional Baseline
 
-- Security: RBAC, rate limit, audit trails.
-- Privacy: GDPR workflows and minimization.
-- Reliability: transactional updates for quote state transitions.
+- Security: RBAC, rate limits, immutable audit trail.
+- Privacy: GDPR workflows and sensitive-data controls.
+- Reliability: guarded status transitions with event history.
 - Observability: structured logs and request IDs.

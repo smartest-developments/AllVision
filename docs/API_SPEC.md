@@ -1,11 +1,11 @@
 # API Specification (MVP Draft)
 
-Status: endpoint contract draft. Unimplemented routes may return `501 Not Implemented` during bootstrap.
+Status: contract draft. Unimplemented endpoints may return `501 Not Implemented` during bootstrap.
 
 ## Conventions
 
 - Base path: `/api/v1`
-- Auth: session cookie (MVP)
+- Auth: session cookie
 - Content type: `application/json`
 - Error shape:
 
@@ -18,20 +18,21 @@ Status: endpoint contract draft. Unimplemented routes may return `501 Not Implem
 }
 ```
 
+## Legal Contract
+
+All API surfaces must maintain these constraints:
+
+- informational service only,
+- no sale of medical devices,
+- no brokering or transaction execution,
+- no medical advice,
+- user is responsible for final purchase decisions.
+
 ## Auth
 
 ### `POST /api/v1/auth/register`
 
-- Purpose: create account using email/password.
-- Request:
-
-```json
-{
-  "email": "user@example.com",
-  "password": "StrongPass123!"
-}
-```
-
+- Purpose: create account with email/password.
 - Responses: `201`, `400`, `409`, `429`, `501`.
 
 ### `POST /api/v1/auth/login`
@@ -41,70 +42,72 @@ Status: endpoint contract draft. Unimplemented routes may return `501 Not Implem
 
 ### `POST /api/v1/auth/logout`
 
-- Purpose: invalidate session.
+- Purpose: revoke authenticated session.
 - Responses: `204`, `401`, `501`.
 
-## Quote Requests
+## Prescription Intake
 
-### `POST /api/v1/quotes`
+### `POST /api/v1/prescriptions`
 
-- Purpose: submit prescription for quote/report generation.
-- Request fields:
-  - `countryCode` (EU/CH scope)
-  - `prescription` (left/right eye values, PD, optional notes)
+- Purpose: submit prescription payload and scope for sourcing analysis.
 - Responses: `201`, `400`, `401`, `429`, `501`.
 
-### `GET /api/v1/quotes`
+### `GET /api/v1/prescriptions/:prescriptionId`
 
-- Purpose: list authenticated user quote requests.
-- Responses: `200`, `401`, `501`.
-
-### `GET /api/v1/quotes/:quoteId`
-
-- Purpose: fetch quote status and report metadata.
+- Purpose: retrieve submitted prescription metadata for owner.
 - Responses: `200`, `401`, `403`, `404`, `501`.
 
-## Report Delivery
+## Sourcing Requests
 
-### `GET /api/v1/quotes/:quoteId/report`
+### `POST /api/v1/sourcing-requests`
 
-- Purpose: get secure report link or download payload.
+- Purpose: create offshore sourcing report request from a prescription.
+- Responses: `201`, `400`, `401`, `409`, `501`.
+
+### `GET /api/v1/sourcing-requests`
+
+- Purpose: list authenticated user sourcing requests.
+- Responses: `200`, `401`, `501`.
+
+### `GET /api/v1/sourcing-requests/:requestId`
+
+- Purpose: fetch request status timeline and report metadata.
+- Responses: `200`, `401`, `403`, `404`, `501`.
+
+## Report Delivery Flow
+
+### `GET /api/v1/sourcing-requests/:requestId/report`
+
+- Purpose: retrieve secure report link/download metadata for owner.
 - Responses: `200`, `401`, `403`, `404`, `429`, `501`.
 
-## Payments (Paid-ready)
+### `POST /api/v1/sourcing-requests/:requestId/report/ack`
 
-### `POST /api/v1/payments/checkout-session`
+- Purpose: acknowledge report delivery/receipt event.
+- Responses: `200`, `401`, `403`, `404`, `501`.
 
-- Purpose: start payment for report service product.
-- Responses: `200`, `400`, `401`, `409`, `501`.
+## Admin Review and Report Upload
 
-### `POST /api/v1/payments/webhook`
+### `GET /api/v1/admin/sourcing-requests`
 
-- Purpose: receive provider payment events.
-- Responses: `200`, `400`, `401`, `501`.
-
-## Admin
-
-### `GET /api/v1/admin/quotes`
-
-- Purpose: list queued/in-review quotes for admins.
+- Purpose: list queued/in-review sourcing requests.
 - Responses: `200`, `401`, `403`, `501`.
 
-### `PATCH /api/v1/admin/quotes/:quoteId/status`
+### `PATCH /api/v1/admin/sourcing-requests/:requestId/status`
 
-- Purpose: update quote lifecycle status.
+- Purpose: perform lifecycle status transition.
 - Responses: `200`, `400`, `401`, `403`, `404`, `409`, `501`.
 
-### `POST /api/v1/admin/quotes/:quoteId/report`
+### `POST /api/v1/admin/sourcing-requests/:requestId/report-artifacts`
 
-- Purpose: attach report artifact and mark as ready/delivered.
+- Purpose: attach report artifact metadata and mark request as report-ready/delivered.
 - Responses: `200`, `400`, `401`, `403`, `404`, `501`.
 
 ## Compliance/GDPR
 
 ### `POST /api/v1/gdpr/export`
 
-- Purpose: create personal data export request.
+- Purpose: create personal-data export request.
 - Responses: `202`, `401`, `429`, `501`.
 
 ### `POST /api/v1/gdpr/delete`
