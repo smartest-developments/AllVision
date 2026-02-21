@@ -50,3 +50,8 @@ Justification: Prescription intake endpoint persists validated payloads with int
 Date: 2026-02-21
 Score: 58/100
 Justification: Sourcing request transition guard implemented with unit test coverage for valid/invalid paths.
+
+---
+Date: 2026-02-21
+Score: 61/100
+Justification: Admin report artifact upload endpoint now persists artifacts and marks requests REPORT_READY with integration coverage.
