@@ -24,18 +24,21 @@ Users submit eyeglasses prescription data and receive an offshore sourcing repor
 
 - Node.js 20+
 - npm 10+
-- PostgreSQL (for DB-backed features)
+- Docker (for local PostgreSQL via Docker Compose)
 
 ### Setup
 
 ```bash
 npm install
+docker compose up -d
 cp .env.example .env
 npm run prisma:generate
 npm run dev
 ```
 
 Open `http://localhost:3000`.
+
+Run all compose commands from the repository root (where `docker-compose.yml` is located).
 
 ## Scripts
 
