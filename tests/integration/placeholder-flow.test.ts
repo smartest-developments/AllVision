@@ -4,6 +4,7 @@ import { validatePrescription } from "@/server/placeholders";
 describe("sourcing request intake placeholder flow", () => {
   it("validates and returns canonical payload", () => {
     const payload = validatePrescription({
+      countryCode: "NL",
       leftEye: { sphere: -2.0 },
       rightEye: { sphere: -1.75 },
       pupillaryDistance: 62

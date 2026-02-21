@@ -35,3 +35,8 @@ Model: Offshore informational sourcing report service (EU + Switzerland)
 Date: 2026-02-21
 Score: 46/100
 Justification: Completed MVP auth/session flow with integration tests; core feature readiness remains limited.
+
+---
+Date: 2026-02-21
+Score: 50/100
+Justification: Prescription validation now enforces EU+CH scope and optical constraints with test coverage.

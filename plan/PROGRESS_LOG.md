@@ -21,3 +21,9 @@
 - task: AT-P0-01 Implement email/password registration + login/logout with secure session handling
 - result: Auth service, in-memory store, and integration tests added; quality gates green
 - next: AT-P0-02 Define and harden prescription schema validation
+
+## 2026-02-21T16:49:02Z
+
+- task: AT-P0-02 Define and harden prescription schema validation
+- result: Added EU+CH country scope checks, axis/cylinder rules, and expanded unit tests; quality gates green
+- next: AT-P0-03 Build prescription intake endpoint + form contract with persistence
