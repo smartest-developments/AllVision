@@ -34,27 +34,22 @@ Completion signal: CI blocks merges on lint/typecheck/test/build and migration/s
 
 ### P0 (5 tasks, MVP blockers)
 
-1. [AT-P0-03] Build prescription intake endpoint + form contract with persistence.
-- Size: 2-3h
-- DoD: valid submissions persist; invalid submissions return deterministic errors.
-- Evidence: integration tests for submit + reject + persistence path.
-
-2. [AT-P0-04] Implement `SourcingRequest` transition guard service (`SUBMITTED -> IN_REVIEW -> REPORT_READY`).
+1. [AT-P0-04] Implement `SourcingRequest` transition guard service (`SUBMITTED -> IN_REVIEW -> REPORT_READY`).
 - Size: 1-2h
 - DoD: invalid transitions are blocked and valid transitions succeed.
 - Evidence: unit tests for transition rules.
 
-3. [AT-P0-05] Implement admin report artifact upload metadata endpoint and status move to `REPORT_READY`.
+2. [AT-P0-05] Implement admin report artifact upload metadata endpoint and status move to `REPORT_READY`.
 - Size: 2-3h
 - DoD: authorized admin can attach artifact and mark request ready.
 - Evidence: integration test asserting status + artifact persistence.
 
-4. [AT-P0-06] Implement secure report retrieval endpoint for request owner.
+3. [AT-P0-06] Implement secure report retrieval endpoint for request owner.
 - Size: 1-2h
 - DoD: only owner can retrieve report artifact metadata/link.
 - Evidence: integration tests for authorized and forbidden access.
 
-5. [AT-P0-07] Persist status-change audit trail (`SourcingStatusEvent`) and trigger report-ready email notification stub (merged from lifecycle + delivery tasks).
+4. [AT-P0-07] Persist status-change audit trail (`SourcingStatusEvent`) and trigger report-ready email notification stub (merged from lifecycle + delivery tasks).
 - Size: 2-3h
 - DoD: every status change writes event record; report-ready transition enqueues mocked email notification.
 - Evidence: integration tests for event creation and notification trigger.
@@ -144,6 +139,8 @@ Completion signal: CI blocks merges on lint/typecheck/test/build and migration/s
   - Evidence: integration tests for register/login/logout flow and session invalidation.
 - [AT-P0-02] Define and harden prescription schema validation.
   - Evidence: unit tests for valid/invalid payload matrix with EU+CH scope checks.
+- [AT-P0-03] Build prescription intake endpoint + form contract with persistence.
+  - Evidence: integration tests for submit + reject + persistence path.
 
 ## AUTO_DISCOVERED
 

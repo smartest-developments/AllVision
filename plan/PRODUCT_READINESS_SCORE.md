@@ -40,3 +40,8 @@ Justification: Completed MVP auth/session flow with integration tests; core feat
 Date: 2026-02-21
 Score: 50/100
 Justification: Prescription validation now enforces EU+CH scope and optical constraints with test coverage.
+
+---
+Date: 2026-02-21
+Score: 55/100
+Justification: Prescription intake endpoint persists validated payloads with integration coverage.
