@@ -1,132 +1,177 @@
 # Task Backlog
 
-Task size target: 1-3 hours each.
-Each task includes DoD and Evidence.
+## STRATEGIC_EPICS
 
-## P0
+- Epic A) Identity
+Goal: reliable account access with secure sessions for users and admins.
+Completion signal: registration/login/logout plus RBAC checks pass in integration tests.
 
-### Epic A) Identity
+- Epic B) Prescription Intake
+Goal: capture valid prescription input safely and persist it for sourcing analysis.
+Completion signal: schema validation and intake persistence pass with owner-only access rules.
 
-1. Implement email/password registration endpoint and persistence.
-- DoD: valid account creation, duplicate-email rejection, password hash at rest.
-- Evidence: unit tests for validation and integration test for persistence.
+- Epic C) Sourcing Report Lifecycle
+Goal: move sourcing requests through controlled states with traceable history.
+Completion signal: transition guard + status-event records are enforced and test-covered.
 
-2. Implement login/logout with secure session handling.
-- DoD: session created, rotated, and revoked with secure cookie settings.
-- Evidence: integration tests for login/logout and session invalidation.
+- Epic D) Admin Review + Report Upload
+Goal: enable admins to review requests and attach report artifacts.
+Completion signal: admin queue and report upload actions work with authorization and auditability.
 
-3. Enforce RBAC middleware (`USER`, `ADMIN`).
+- Epic E) Report Delivery
+Goal: deliver sourcing report artifacts securely to the requesting user.
+Completion signal: authorized retrieval path and one notification/acknowledgment path are operational.
+
+- Epic F) Compliance + Audit
+Goal: enforce legal positioning, GDPR operations, and immutable action traces.
+Completion signal: disclaimers are surfaced and GDPR export/deletion flows are test-covered.
+
+- Epic G) Quality Gates
+Goal: keep repository continuously green and deployment-safe.
+Completion signal: CI blocks merges on lint/typecheck/test/build and migration/security checks.
+
+## ACTIVE_TASKS
+
+### P0 (7 tasks, MVP blockers)
+
+1. [AT-P0-01] Implement email/password registration + login/logout with secure session handling (merged from Identity tasks).
+- Size: 2-3h
+- DoD: account creation, duplicate-email rejection, secure session creation/revocation, secure cookie flags.
+- Evidence: integration tests for register/login/logout flow and session invalidation.
+
+2. [AT-P0-02] Define and harden prescription schema validation.
+- Size: 1-2h
+- DoD: required optical fields, boundary checks, and EU+CH scope validation are enforced.
+- Evidence: unit tests for valid/invalid payload matrix.
+
+3. [AT-P0-03] Build prescription intake endpoint + form contract with persistence.
+- Size: 2-3h
+- DoD: valid submissions persist; invalid submissions return deterministic errors.
+- Evidence: integration tests for submit + reject + persistence path.
+
+4. [AT-P0-04] Implement `SourcingRequest` transition guard service (`SUBMITTED -> IN_REVIEW -> REPORT_READY`).
+- Size: 1-2h
+- DoD: invalid transitions are blocked and valid transitions succeed.
+- Evidence: unit tests for transition rules.
+
+5. [AT-P0-05] Implement admin report artifact upload metadata endpoint and status move to `REPORT_READY`.
+- Size: 2-3h
+- DoD: authorized admin can attach artifact and mark request ready.
+- Evidence: integration test asserting status + artifact persistence.
+
+6. [AT-P0-06] Implement secure report retrieval endpoint for request owner.
+- Size: 1-2h
+- DoD: only owner can retrieve report artifact metadata/link.
+- Evidence: integration tests for authorized and forbidden access.
+
+7. [AT-P0-07] Persist status-change audit trail (`SourcingStatusEvent`) and trigger report-ready email notification stub (merged from lifecycle + delivery tasks).
+- Size: 2-3h
+- DoD: every status change writes event record; report-ready transition enqueues mocked email notification.
+- Evidence: integration tests for event creation and notification trigger.
+
+### P1 (12 tasks)
+
+1. [AT-P1-01] Enforce RBAC middleware (`USER`, `ADMIN`).
+- Size: 1-2h
 - DoD: admin routes blocked server-side for non-admin users.
 - Evidence: integration tests for allow/deny matrix.
 
-### Epic B) Prescription Intake
+2. [AT-P1-02] Add sensitive-data access restrictions for prescription records.
+- Size: 1-2h
+- DoD: only owner/admin can read prescription payload.
+- Evidence: authorization integration tests and audit assertions.
 
-1. Define and harden prescription schema validation.
-- DoD: required optical fields, boundary checks, and EU+CH scope checks are enforced.
-- Evidence: unit tests for valid/invalid payload variants.
-
-2. Build prescription intake endpoint + form contract.
-- DoD: valid submissions persist and invalid submissions return deterministic error codes.
-- Evidence: integration tests for submit and rejection paths.
-
-3. Add sensitive-data access restrictions for prescription records.
-- DoD: only owner/admin with role checks can read prescription payload.
-- Evidence: authorization integration tests and audit-event assertions.
-
-### Epic C) Sourcing Report Lifecycle
-
-1. Implement `SourcingRequest` entity and transition guard service.
-- DoD: only allowed transitions (`SUBMITTED -> IN_REVIEW -> REPORT_READY -> DELIVERED`) are accepted.
-- Evidence: unit tests for transition guards.
-
-2. Implement `SourcingStatusEvent` persistence on each transition.
-- DoD: every transition writes event record atomically.
-- Evidence: integration tests for transition + event creation.
-
-3. Expose user-facing sourcing request status endpoint.
-- DoD: users can view only their own request timeline and current state.
+3. [AT-P1-03] Expose user-facing sourcing request status endpoint.
+- Size: 1-2h
+- DoD: users view only own request timeline and current state.
 - Evidence: integration tests for owner/non-owner access.
 
-### Epic D) Admin Review + Report Upload
+4. [AT-P1-04] Build admin queue for pending and in-review sourcing requests.
+- Size: 2-3h
+- DoD: admin-only list/detail retrieval with basic filters.
+- Evidence: integration tests for visibility and filters.
 
-1. Build admin queue for pending and in-review sourcing requests.
-- DoD: admin-only list and detail retrieval with filtering.
-- Evidence: integration tests for admin visibility and filters.
-
-2. Implement admin report artifact upload metadata endpoint.
-- DoD: admin can attach report artifact record and change state to `REPORT_READY`.
-- Evidence: integration tests and created artifact assertions.
-
-3. Add admin action logging for review decisions and report uploads.
-- DoD: all admin review/report actions emit immutable audit events.
+5. [AT-P1-05] Add admin action logging for review decisions and report uploads.
+- Size: 1-2h
+- DoD: admin review/upload actions emit immutable audit events.
 - Evidence: integration test asserting audit payload.
 
-### Epic E) Report Delivery
+6. [AT-P1-06] Add report delivery acknowledgment endpoint.
+- Size: 1-2h
+- DoD: retrieval acknowledgment writes delivery audit evidence.
+- Evidence: integration tests for ack behavior.
 
-1. Implement secure report retrieval endpoint.
-- DoD: only owner can retrieve active artifact link/metadata.
-- Evidence: integration tests for authorized and blocked access.
+7. [AT-P1-07] Centralize legal disclaimer and informational-only copy blocks.
+- Size: 1-2h
+- DoD: disclaimer appears on intake, request, and report-delivery surfaces.
+- Evidence: snapshot/copy checklist in tests.
 
-2. Add report delivery acknowledgment endpoint.
-- DoD: retrieval/acknowledgment writes delivery audit event.
-- Evidence: integration tests for ack state/evidence.
+8. [AT-P1-08] Implement GDPR export request flow.
+- Size: 2-3h
+- DoD: authenticated export request is queued and tracked.
+- Evidence: integration test and sample export contract.
 
-3. Implement email notification stub for report-ready.
-- DoD: report-ready transition enqueues mocked email notification.
-- Evidence: integration test with mocked provider.
+9. [AT-P1-09] Implement GDPR deletion flow (soft-delete then purge/anonymize workflow).
+- Size: 2-3h
+- DoD: deletion lifecycle recorded with legal-hold checks.
+- Evidence: integration tests for lifecycle and audit evidence.
 
-### Epic F) Compliance + Audit
+10. [AT-P1-10] Add CI workflow for lint/typecheck/test/build.
+- Size: 1-2h
+- DoD: PRs fail on red gate.
+- Evidence: CI config + passing run artifact.
 
-1. Centralize legal disclaimer and informational-only copy blocks.
-- DoD: disclaimer rendered on intake, request, and report-delivery surfaces.
-- Evidence: UI snapshot tests and copy checklist.
+11. [AT-P1-11] Add schema drift and migration checks in CI.
+- Size: 1-2h
+- DoD: CI fails on drift or missing migration.
+- Evidence: CI step output.
 
-2. Implement GDPR export request flow.
-- DoD: authenticated user can submit export request and receive queued status.
-- Evidence: integration test and sample JSON contract.
+12. [AT-P1-12] Add dependency vulnerability scanning.
+- Size: 1-2h
+- DoD: high/critical findings fail CI unless waived.
+- Evidence: CI run artifact.
 
-3. Implement GDPR deletion flow (soft-delete then purge/anonymize workflow).
-- DoD: request lifecycle logged; protected legal-hold checks supported.
-- Evidence: integration tests for lifecycle transitions and audit evidence.
+### P2 (3 tasks, execution-ready but non-urgent)
 
-### Epic G) Quality Gates
-
-1. Add CI workflow for lint/typecheck/test/build.
-- DoD: pull requests fail if any gate is red.
-- Evidence: CI config committed and passing run evidence.
-
-2. Add schema drift and migration checks in CI.
-- DoD: migration integrity check fails on drift or missing migrations.
-- Evidence: CI step output with green baseline.
-
-3. Add dependency vulnerability scanning.
-- DoD: high/critical findings fail CI unless explicitly waived.
-- Evidence: CI run artifact for vulnerability scan.
-
-## P1
-
-1. Add optional report fee collection as informational-service payment.
-- DoD: payment state is tied to report service product only, not physical goods.
+1. [AT-P2-01] Add optional report-fee collection for informational service.
+- Size: 2-3h
+- DoD: payment state links to report service product only.
 - Evidence: integration tests for payment-required toggle.
 
-2. Build admin SLA dashboard for sourcing request throughput.
-- DoD: queue age and delivery time metrics available for admin.
-- Evidence: dashboard screenshot and metric tests.
+2. [AT-P2-02] Build admin SLA dashboard for sourcing request throughput.
+- Size: 2-3h
+- DoD: queue age and delivery-time metrics visible to admin.
+- Evidence: dashboard screenshot + metric tests.
 
-3. Add template library for report generation quality consistency.
-- DoD: admins can start from standard report templates.
-- Evidence: integration tests for template loading and save behavior.
+3. [AT-P2-03] Add template library for report-generation consistency.
+- Size: 2-3h
+- DoD: admin can start from standard report templates.
+- Evidence: integration tests for template load/save behavior.
 
-## P2
+## AUTO_DISCOVERED
 
-1. Add social login option with secure account linking.
-- DoD: verified email can link to existing account safely.
-- Evidence: integration tests for linking edge cases.
+- Placeholder for automation-generated tasks discovered during implementation/testing.
+- Rules for future entries: must include source signal, proposed priority, DoD, and evidence target before promotion to ACTIVE_TASKS.
 
-2. Add scoped localization for legal disclaimers by country/language.
-- DoD: disclaimer variants selected by locale with legal copy fallback.
-- Evidence: tests for locale fallback matrix.
+## TECH_DEBT
 
-3. Add E2E smoke suite after core lifecycle stabilizes.
-- DoD: smoke flow covers signup -> intake -> admin review -> report delivery.
-- Evidence: CI E2E run artifact.
+- TD-01: CI hardening follow-up tracked by [AT-P1-11] and [AT-P1-12] to reduce migration/security regressions.
+- TD-02: Operational visibility maturity tracked by [AT-P2-02] (useful but not MVP-blocking).
+- TD-03: Report authoring consistency improvements tracked by [AT-P2-03].
+
+## RISK_ITEMS
+
+- R-01 Legal misclassification risk (service perceived as seller/broker).
+Mitigation refs: [AT-P1-07], [AT-P1-05].
+
+- R-02 Sensitive prescription data exposure risk.
+Mitigation refs: [AT-P1-02], [AT-P1-08], [AT-P1-09], [AT-P0-07].
+
+- R-03 Delivery reliability risk (report readiness without successful user delivery signal).
+Mitigation refs: [AT-P0-05], [AT-P0-06], [AT-P0-07], [AT-P1-06].
+
+## PARKED
+
+- PK-01: Add social login option with secure account linking (from prior P2).
+- PK-02: Add scoped localization for legal disclaimers by country/language (from prior P2).
+- PK-03: Add E2E smoke suite after core lifecycle stabilizes (from prior P2, intentionally deferred until core flow is stable).

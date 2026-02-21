@@ -9,3 +9,9 @@
 - Hardened legal/security/GDPR documentation for informational-only and non-medical boundaries.
 - Updated Prisma schema to include `Session`, `Prescription`, `SourcingRequest`, `SourcingStatusEvent`, `ReportArtifact`, and `AuditEvent`.
 - Updated API spec and backlog to remove sales/brokering implications.
+
+## 2026-02-21T16:37:33Z
+
+- task: Backlog recomposition to autonomous format
+- result: P0<=7, required sections added
+- next: Re-run pre-automation structural verification
