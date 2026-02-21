@@ -1,0 +1,63 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  USER
+  ADMIN
+}
+
+enum QuoteStatus {
+  SUBMITTED
+  IN_REVIEW
+  REPORT_READY
+  DELIVERED
+  PAID
+  CANCELLED
+}
+
+model User {
+  id             String         @id @default(cuid())
+  email          String         @unique
+  passwordHash   String
+  role           UserRole       @default(USER)
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+  quoteRequests  QuoteRequest[]
+  auditEvents    AuditEvent[]   @relation("ActorEvents")
+}
+
+model QuoteRequest {
+  id                  String       @id @default(cuid())
+  userId              String
+  countryCode         String
+  prescriptionPayload Json
+  status              QuoteStatus  @default(SUBMITTED)
+  reportUrl           String?
+  paymentRequired     Boolean      @default(true)
+  createdAt           DateTime     @default(now())
+  updatedAt           DateTime     @updatedAt
+  user                User         @relation(fields: [userId], references: [id])
+  auditEvents         AuditEvent[] @relation("QuoteEvents")
+}
+
+model AuditEvent {
+  id            String       @id @default(cuid())
+  actorUserId   String?
+  quoteRequestId String?
+  action        String
+  context       Json
+  createdAt     DateTime     @default(now())
+
+  actor         User?        @relation("ActorEvents", fields: [actorUserId], references: [id])
+  quoteRequest  QuoteRequest? @relation("QuoteEvents", fields: [quoteRequestId], references: [id])
+
+  @@index([quoteRequestId])
+  @@index([actorUserId])
+  @@index([createdAt])
+}
