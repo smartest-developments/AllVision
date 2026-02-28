@@ -14,7 +14,7 @@ Checks executed:
 Per guarded-mode hard rules:
 - No stub `DATABASE_URL`
 - No in-memory DB fallback
-- If DB is unavailable → STOP
+- If DB is unavailable -> STOP
 
 ## Required action
-Create repository `.env` with a valid non-fake `DATABASE_URL` that targets the Dockerized Postgres instance (or another reachable DB), then rerun automation.
+Create repository `.env` with a valid non-fake `DATABASE_URL` that targets a reachable database, then rerun automation.
