@@ -1,17 +1,20 @@
 # DB Blocked
 
-- Timestamp (UTC): 2026-02-27T06:13:00Z
-- Phase: PHASE 0 - INFRA ENFORCEMENT
-- Blocking condition: `.env` is missing at repository root, so `DATABASE_URL` cannot be validated.
+Date: 2026-02-28
+Phase: PHASE 0 — Infra Enforcement
 
-## Evidence
-- `docker-compose.yml` exists.
-- `.env` is missing.
+## Blocking condition
+Repository root contains `docker-compose.yml`, but `.env` is missing.
 
-## Hard-rule impact
-- `DATABASE_URL` cannot be verified.
-- `docker compose up -d` must not proceed without validated env.
-- `npx prisma validate` / `npx prisma generate` cannot run in guarded mode.
+Checks executed:
+- `docker-compose.yml`: present
+- `.env`: missing
+- `DATABASE_URL`: cannot be resolved because `.env` is absent
 
-## Required unblock action
-Create `.env` with a real `DATABASE_URL` pointing to the compose DB service (no stub/fake value), then rerun automation.
+Per guarded-mode hard rules:
+- No stub `DATABASE_URL`
+- No in-memory DB fallback
+- If DB is unavailable → STOP
+
+## Required action
+Create repository `.env` with a valid non-fake `DATABASE_URL` that targets the Dockerized Postgres instance (or another reachable DB), then rerun automation.
