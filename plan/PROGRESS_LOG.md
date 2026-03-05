@@ -1,5 +1,11 @@
 # Progress Log
 
+## 2026-03-05T23:58:00+0100
+
+- task: AT-P1-13 Build authenticated sourcing-request timeline UI surface
+- result: Converted home page into an authenticated timeline surface with owner user-id lookup, legal copy, request status cards, timeline event rendering, and empty states; added integration coverage for timeline rendering and no-user guidance.
+- next: AT-P1-01 Enforce RBAC middleware (`USER`, `ADMIN`)
+
 ## 2026-03-05T22:30:00+0100
 
 - task: AT-P1-03 Expose user-facing sourcing request status endpoint

@@ -96,7 +96,7 @@ Completion signal: CI blocks merges on lint/typecheck/test/build and migration/s
 - DoD: high/critical findings fail CI unless waived.
 - Evidence: CI run artifact.
 
-13. [AT-P1-13] Build authenticated sourcing-request timeline UI surface.
+13. [AT-P1-13] Build authenticated sourcing-request timeline UI surface. ✅ DONE
 - Size: 2-3h
 - DoD: authenticated users can see request status history cards with timestamps and legal copy.
 - Evidence: UI component/page tests plus API consumption contract assertions.
@@ -138,11 +138,21 @@ Completion signal: CI blocks merges on lint/typecheck/test/build and migration/s
   - Evidence: shared legal copy module + request/intake/report-delivery wiring with unit coverage.
 - [AT-P1-03] Expose user-facing sourcing request status endpoint.
   - Evidence: owner-only route/service wired with integration coverage for unauthorized and cross-user access.
+- [AT-P1-13] Build authenticated sourcing-request timeline UI surface.
+  - Evidence: `app/page.tsx`, `tests/integration/sourcing-request-timeline-page.test.ts`.
 
 ## AUTO_DISCOVERED
 
-- Placeholder for automation-generated tasks discovered during implementation/testing.
-- Rules for future entries: must include source signal, proposed priority, DoD, and evidence target before promotion to ACTIVE_TASKS.
+- [AT-AUTO-UI-01] Add dedicated authenticated timeline route with request detail deep-linking.
+  - Priority: P1
+  - Source signal: timeline UI now lives on root page and needs dedicated navigation/URL semantics as auth surfaces expand.
+  - DoD: `/timeline` route lists owner requests and supports `requestId` focus state without exposing other users' data.
+  - Evidence target: route/page tests plus API contract references.
+- [AT-AUTO-BE-01] Replace `x-user-id` header auth shim with session-derived identity for sourcing status APIs.
+  - Priority: P1
+  - Source signal: current UI/API integration depends on manual user-id input and header-based identity.
+  - DoD: sourcing-request APIs resolve authenticated user from session cookie and reject identity spoofing.
+  - Evidence target: integration tests for session-authenticated allow/deny matrix.
 
 ## TECH_DEBT
 
