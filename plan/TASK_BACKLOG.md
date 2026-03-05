@@ -34,7 +34,7 @@ Completion signal: CI blocks merges on lint/typecheck/test/build and migration/s
 
 ### P0 (0 tasks, MVP blockers)
 
-### P1 (12 tasks)
+### P1 (13 tasks)
 
 1. [AT-P1-01] Enforce RBAC middleware (`USER`, `ADMIN`).
 - Size: 1-2h
@@ -46,10 +46,10 @@ Completion signal: CI blocks merges on lint/typecheck/test/build and migration/s
 - DoD: only owner/admin can read prescription payload.
 - Evidence: authorization integration tests and audit assertions.
 
-3. [AT-P1-03] Expose user-facing sourcing request status endpoint.
+3. [AT-P1-03] Expose user-facing sourcing request status endpoint. ✅ DONE
 - Size: 1-2h
 - DoD: users view only own request timeline and current state.
-- Evidence: integration tests for owner/non-owner access.
+- Evidence: `app/api/v1/sourcing-requests/route.ts`, `src/server/sourcing-request-status.ts`, `tests/integration/sourcing-request-status.test.ts`, `tests/integration/sourcing-request-status-route.test.ts`.
 
 4. [AT-P1-04] Build admin queue for pending and in-review sourcing requests.
 - Size: 2-3h
@@ -96,6 +96,11 @@ Completion signal: CI blocks merges on lint/typecheck/test/build and migration/s
 - DoD: high/critical findings fail CI unless waived.
 - Evidence: CI run artifact.
 
+13. [AT-P1-13] Build authenticated sourcing-request timeline UI surface.
+- Size: 2-3h
+- DoD: authenticated users can see request status history cards with timestamps and legal copy.
+- Evidence: UI component/page tests plus API consumption contract assertions.
+
 ### P2 (3 tasks, execution-ready but non-urgent)
 
 1. [AT-P2-01] Add optional report-fee collection for informational service.
@@ -131,6 +136,8 @@ Completion signal: CI blocks merges on lint/typecheck/test/build and migration/s
   - Evidence: integration test asserts status-event persistence and `REPORT_READY_EMAIL_ENQUEUED` audit marker.
 - [AT-P1-07] Centralize legal disclaimer and informational-only copy blocks.
   - Evidence: shared legal copy module + request/intake/report-delivery wiring with unit coverage.
+- [AT-P1-03] Expose user-facing sourcing request status endpoint.
+  - Evidence: owner-only route/service wired with integration coverage for unauthorized and cross-user access.
 
 ## AUTO_DISCOVERED
 

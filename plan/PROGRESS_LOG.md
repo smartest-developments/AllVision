@@ -1,5 +1,11 @@
 # Progress Log
 
+## 2026-03-05T22:30:00+0100
+
+- task: AT-P1-03 Expose user-facing sourcing request status endpoint
+- result: Added `GET /api/v1/sourcing-requests` owner-only route backed by status timeline query service, added route/service integration tests for unauthorized and cross-user visibility constraints, and promoted UI follow-up task `AT-P1-13` for authenticated timeline rendering.
+- next: AT-P1-01 Enforce RBAC middleware (`USER`, `ADMIN`)
+
 ## 2026-03-05T21:05:00+0100
 
 - task: AT-P1-07 Centralize legal disclaimer and informational-only copy blocks

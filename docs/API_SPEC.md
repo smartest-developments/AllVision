@@ -68,7 +68,8 @@ All API surfaces must maintain these constraints:
 ### `GET /api/v1/sourcing-requests`
 
 - Purpose: list authenticated user sourcing requests.
-- Responses: `200`, `401`, `501`.
+- Notes: returns owner-only request timeline entries (`requestId`, `status`, `createdAt`, `updatedAt`, `latestEventAt`, `timeline[]`) and includes `legal` copy for request-surface consistency.
+- Responses: `200`, `401`.
 
 ### `GET /api/v1/sourcing-requests/:requestId`
 
