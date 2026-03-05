@@ -140,19 +140,26 @@ Completion signal: CI blocks merges on lint/typecheck/test/build and migration/s
   - Evidence: owner-only route/service wired with integration coverage for unauthorized and cross-user access.
 - [AT-P1-13] Build authenticated sourcing-request timeline UI surface.
   - Evidence: `app/page.tsx`, `tests/integration/sourcing-request-timeline-page.test.ts`.
+- [AT-AUTO-UI-01] Add dedicated authenticated timeline route with request detail deep-linking.
+  - Evidence: `app/timeline/page.tsx`, `app/page.tsx`, `tests/integration/sourcing-timeline-route-page.test.ts`.
 
 ## AUTO_DISCOVERED
 
-- [AT-AUTO-UI-01] Add dedicated authenticated timeline route with request detail deep-linking.
+- [AT-AUTO-UI-01] Add dedicated authenticated timeline route with request detail deep-linking. ✅ DONE
   - Priority: P1
   - Source signal: timeline UI now lives on root page and needs dedicated navigation/URL semantics as auth surfaces expand.
   - DoD: `/timeline` route lists owner requests and supports `requestId` focus state without exposing other users' data.
-  - Evidence target: route/page tests plus API contract references.
+  - Evidence target: `app/timeline/page.tsx`, `app/page.tsx`, `tests/integration/sourcing-timeline-route-page.test.ts`.
 - [AT-AUTO-BE-01] Replace `x-user-id` header auth shim with session-derived identity for sourcing status APIs.
   - Priority: P1
   - Source signal: current UI/API integration depends on manual user-id input and header-based identity.
   - DoD: sourcing-request APIs resolve authenticated user from session cookie and reject identity spoofing.
   - Evidence target: integration tests for session-authenticated allow/deny matrix.
+- [AT-AUTO-UI-02] Add authenticated navigation entry and empty-state UX polish for timeline deep-linking.
+  - Priority: P1
+  - Source signal: `/timeline` now exists but remains disconnected from authenticated shell and lacks error recovery affordances.
+  - DoD: authenticated surfaces link to `/timeline`, request-focus miss state includes reset CTA, and component tests cover navigation + reset behavior.
+  - Evidence target: app-shell/nav tests plus timeline page interaction coverage.
 
 ## TECH_DEBT
 

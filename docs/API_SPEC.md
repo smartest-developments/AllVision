@@ -69,6 +69,7 @@ All API surfaces must maintain these constraints:
 
 - Purpose: list authenticated user sourcing requests.
 - Notes: returns owner-only request timeline entries (`requestId`, `status`, `createdAt`, `updatedAt`, `latestEventAt`, `timeline[]`) and includes `legal` copy for request-surface consistency.
+- UI consumption note: `/timeline` supports optional client-side `requestId` focus against this owner-scoped payload.
 - Responses: `200`, `401`.
 
 ### `GET /api/v1/sourcing-requests/:requestId`

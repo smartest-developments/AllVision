@@ -1,5 +1,11 @@
 # Progress Log
 
+## 2026-03-06T00:51:26+0100
+
+- task: AT-AUTO-UI-01 Add dedicated authenticated timeline route with request detail deep-linking
+- result: Added `/timeline` page with owner-scoped timeline rendering, optional `requestId` deep-link focus, and focused-card highlighting; linked from home page and added integration coverage for focused request rendering and cross-user requestId non-disclosure.
+- next: AT-AUTO-BE-01 Replace `x-user-id` header auth shim with session-derived identity for sourcing status APIs
+
 ## 2026-03-05T23:58:00+0100
 
 - task: AT-P1-13 Build authenticated sourcing-request timeline UI surface

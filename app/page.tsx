@@ -1,4 +1,5 @@
 import React from "react";
+import Link from "next/link";
 import { getLegalCopy } from "@/legal/disclaimers";
 import { listSourcingRequestStatusesForUser } from "@/server/sourcing-request-status";
 
@@ -30,6 +31,13 @@ export default async function HomePage({ searchParams }: HomePageProps) {
         Documentation-first bootstrap. This service provides informational
         price-comparison and sourcing reports for eyeglass lenses in the EU and
         Switzerland.
+      </p>
+      <p className="text-sm text-neutral-700">
+        View the dedicated timeline page at{" "}
+        <Link className="underline" href="/timeline">
+          /timeline
+        </Link>{" "}
+        for deep-link request focus.
       </p>
       <ul className="list-disc pl-6 text-sm">
         {legal.bullets.map((bullet) => (
