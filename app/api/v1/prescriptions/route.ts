@@ -1,7 +1,9 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { createPrescription, PrescriptionIntakeError } from "@/server/prescriptions";
+import { getLegalCopy } from "@/legal/disclaimers";
 
 export async function POST(request: NextRequest) {
+  const legal = getLegalCopy("intake");
   const userId = request.headers.get("x-user-id");
   if (!userId) {
     return NextResponse.json(
@@ -30,7 +32,8 @@ export async function POST(request: NextRequest) {
       {
         id: record.id,
         createdAt: record.createdAt,
-        countryCode: record.countryCode
+        countryCode: record.countryCode,
+        legal
       },
       { status: 201 }
     );

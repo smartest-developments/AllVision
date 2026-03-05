@@ -1,5 +1,11 @@
 # Progress Log
 
+## 2026-03-05T21:05:00+0100
+
+- task: AT-P1-07 Centralize legal disclaimer and informational-only copy blocks
+- result: Added shared legal-copy module and reused it on request surface (`app/page.tsx`) plus intake/report-delivery API success payloads; added unit tests and API spec note.
+- next: AT-P1-01 Enforce RBAC middleware (`USER`, `ADMIN`)
+
 ## 2026-02-21
 
 - Initialized repository and baseline stack configuration (Next.js App Router, TypeScript, Tailwind, Prisma).

@@ -1,4 +1,8 @@
+import { getLegalCopy } from "@/legal/disclaimers";
+
 export default function HomePage() {
+  const legal = getLegalCopy("request");
+
   return (
     <main className="mx-auto flex min-h-screen max-w-3xl flex-col gap-6 px-6 py-16">
       <h1 className="text-4xl font-semibold">AllVision</h1>
@@ -8,9 +12,10 @@ export default function HomePage() {
         Switzerland.
       </p>
       <ul className="list-disc pl-6 text-sm">
-        <li>No sale or brokerage of lenses.</li>
-        <li>No medical advice.</li>
-        <li>Account-based workflow with manual admin review in MVP.</li>
+        {legal.bullets.map((bullet) => (
+          <li key={bullet}>{bullet}</li>
+        ))}
+        <li>{legal.surfaceNote}</li>
       </ul>
     </main>
   );

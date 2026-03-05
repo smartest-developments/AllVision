@@ -50,6 +50,7 @@ All API surfaces must maintain these constraints:
 ### `POST /api/v1/prescriptions`
 
 - Purpose: submit prescription payload and scope for sourcing analysis.
+- Success payload includes `legal` block (`title`, `bullets[]`, `surfaceNote`) for intake-surface legal copy consistency.
 - Responses: `201`, `400`, `401`, `429`, `501`.
 
 ### `GET /api/v1/prescriptions/:prescriptionId`
@@ -79,6 +80,7 @@ All API surfaces must maintain these constraints:
 ### `GET /api/v1/sourcing-requests/:requestId/report`
 
 - Purpose: retrieve secure report link/download metadata for owner.
+- Success payload includes `legal` block (`title`, `bullets[]`, `surfaceNote`) for report-delivery legal copy consistency.
 - Responses: `200`, `401`, `403`, `404`, `429`, `501`.
 
 ### `POST /api/v1/sourcing-requests/:requestId/report/ack`

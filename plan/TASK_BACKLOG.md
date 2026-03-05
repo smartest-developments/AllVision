@@ -66,10 +66,10 @@ Completion signal: CI blocks merges on lint/typecheck/test/build and migration/s
 - DoD: retrieval acknowledgment writes delivery audit evidence.
 - Evidence: integration tests for ack behavior.
 
-7. [AT-P1-07] Centralize legal disclaimer and informational-only copy blocks.
+7. [AT-P1-07] Centralize legal disclaimer and informational-only copy blocks. ✅ DONE
 - Size: 1-2h
 - DoD: disclaimer appears on intake, request, and report-delivery surfaces.
-- Evidence: snapshot/copy checklist in tests.
+- Evidence: `src/legal/disclaimers.ts`, `app/page.tsx`, `app/api/v1/prescriptions/route.ts`, `app/api/v1/sourcing-requests/[requestId]/report/route.ts`, `tests/unit/legal-disclaimers.test.ts`
 
 8. [AT-P1-08] Implement GDPR export request flow.
 - Size: 2-3h
@@ -129,6 +129,8 @@ Completion signal: CI blocks merges on lint/typecheck/test/build and migration/s
   - Evidence: integration test asserting status + artifact persistence.
 - [AT-P0-07] Persist status-change audit trail (`SourcingStatusEvent`) and trigger report-ready email notification stub.
   - Evidence: integration test asserts status-event persistence and `REPORT_READY_EMAIL_ENQUEUED` audit marker.
+- [AT-P1-07] Centralize legal disclaimer and informational-only copy blocks.
+  - Evidence: shared legal copy module + request/intake/report-delivery wiring with unit coverage.
 
 ## AUTO_DISCOVERED
 
