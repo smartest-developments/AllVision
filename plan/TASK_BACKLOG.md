@@ -32,12 +32,7 @@ Completion signal: CI blocks merges on lint/typecheck/test/build and migration/s
 
 ## ACTIVE_TASKS
 
-### P0 (3 tasks, MVP blockers)
-
-1. [AT-P0-07] Persist status-change audit trail (`SourcingStatusEvent`) and trigger report-ready email notification stub (merged from lifecycle + delivery tasks).
-- Size: 2-3h
-- DoD: every status change writes event record; report-ready transition enqueues mocked email notification.
-- Evidence: integration tests for event creation and notification trigger.
+### P0 (0 tasks, MVP blockers)
 
 ### P1 (12 tasks)
 
@@ -132,6 +127,8 @@ Completion signal: CI blocks merges on lint/typecheck/test/build and migration/s
   - Evidence: unit tests for transition rules.
 - [AT-P0-05] Implement admin report artifact upload metadata endpoint and status move to `REPORT_READY`.
   - Evidence: integration test asserting status + artifact persistence.
+- [AT-P0-07] Persist status-change audit trail (`SourcingStatusEvent`) and trigger report-ready email notification stub.
+  - Evidence: integration test asserts status-event persistence and `REPORT_READY_EMAIL_ENQUEUED` audit marker.
 
 ## AUTO_DISCOVERED
 

@@ -81,5 +81,25 @@ describe("admin report artifact upload", () => {
 
     expect(storedRequest?.status).toBe("REPORT_READY");
     expect(storedRequest?.reportArtifacts).toHaveLength(1);
+
+    const statusEvents = await prisma.sourcingStatusEvent.findMany({
+      where: { sourcingRequestId: request.id },
+      orderBy: { createdAt: "asc" }
+    });
+    expect(statusEvents).toHaveLength(1);
+    expect(statusEvents[0]).toMatchObject({
+      fromStatus: "IN_REVIEW",
+      toStatus: "REPORT_READY",
+      actorUserId: admin.id
+    });
+
+    const emailAudit = await prisma.auditEvent.findFirst({
+      where: {
+        sourcingRequestId: request.id,
+        action: "REPORT_READY_EMAIL_ENQUEUED"
+      }
+    });
+    expect(emailAudit).not.toBeNull();
+    expect(emailAudit?.actorUserId).toBe(admin.id);
   });
 });

@@ -63,6 +63,30 @@ export async function createReportArtifactAndMarkReady(input: {
       }
     });
 
+    await tx.sourcingStatusEvent.create({
+      data: {
+        sourcingRequestId: request.id,
+        fromStatus: request.status,
+        toStatus: SourcingRequestStatus.REPORT_READY,
+        actorUserId: admin.id,
+        note: "Admin uploaded report artifact metadata."
+      }
+    });
+
+    await tx.auditEvent.create({
+      data: {
+        actorUserId: admin.id,
+        sourcingRequestId: request.id,
+        entityType: "SourcingRequest",
+        entityId: request.id,
+        action: "REPORT_READY_EMAIL_ENQUEUED",
+        context: {
+          channel: input.data.deliveryChannel ?? "email",
+          storageKey: input.data.storageKey
+        }
+      }
+    });
+
     return { artifact, request: updatedRequest };
   });
 }
