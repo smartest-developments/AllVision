@@ -271,3 +271,9 @@ Mitigation refs: [AT-P0-05], [AT-P0-06], [AT-P0-07], [AT-P1-06].
   - Priority: P1
   - DoD: authenticated users can view GDPR request history and legal-hold guidance without leaving timeline context.
   - Evidence: app/gdpr/page.tsx, src/server/gdpr-request-history.ts, tests/integration/gdpr-page.test.ts, tests/integration/sourcing-request-timeline-page.test.ts.
+
+## RUN_UPDATE_2026-03-06T17:22:41+0100
+- [AT-AUTO-UI-06B] Add dedicated `/gdpr` status page with request history + legal-hold guidance. ✅ DONE
+  - Priority: P1
+  - DoD: authenticated UI route renders GDPR export/deletion request history with signed-out fallback guidance and explicit legal-hold contract note (`409 GDPR_DELETE_LEGAL_HOLD`).
+  - Evidence: `app/gdpr/page.tsx`, `src/server/gdpr-request-history.ts`, `tests/integration/gdpr-page.test.ts`, `tests/integration/sourcing-request-timeline-page.test.ts`, `plan/PROGRESS_LOG.md`, `docs/GDPR.md`.

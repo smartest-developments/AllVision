@@ -40,23 +40,50 @@ export default async function GdprPage() {
           </p>
         </section>
       ) : (
-        <section className="rounded-md border border-neutral-300 p-4">
-          <h2 className="text-2xl font-semibold">Recent requests</h2>
-          {history.length === 0 ? (
-            <p className="mt-3 text-sm text-neutral-700">No GDPR requests found for this account.</p>
-          ) : (
-            <ul className="mt-3 space-y-2 text-sm">
-              {history.map((entry) => (
-                <li key={entry.requestId} className="rounded-md border border-neutral-200 p-3">
-                  <p>
-                    <strong>{entry.action}</strong> - {entry.status}
-                  </p>
-                  <p className="text-xs text-neutral-600">{new Date(entry.createdAt).toISOString()}</p>
-                </li>
-              ))}
-            </ul>
-          )}
-        </section>
+        <>
+          <section className="rounded-md border border-neutral-300 p-4">
+            <h2 className="text-2xl font-semibold">Request actions</h2>
+            <p className="mt-2 text-sm text-neutral-700">
+              Submit GDPR export/deletion requests directly from this status view.
+            </p>
+            <div className="mt-4 flex flex-wrap gap-3">
+              <form action="/api/v1/gdpr/export" method="post">
+                <button
+                  type="submit"
+                  className="rounded-md bg-neutral-900 px-3 py-2 text-sm text-white"
+                >
+                  Request data export
+                </button>
+              </form>
+              <form action="/api/v1/gdpr/delete" method="post">
+                <button
+                  type="submit"
+                  className="rounded-md border border-neutral-400 px-3 py-2 text-sm text-neutral-900"
+                >
+                  Request account deletion
+                </button>
+              </form>
+            </div>
+          </section>
+
+          <section className="rounded-md border border-neutral-300 p-4">
+            <h2 className="text-2xl font-semibold">Recent requests</h2>
+            {history.length === 0 ? (
+              <p className="mt-3 text-sm text-neutral-700">No GDPR requests found for this account.</p>
+            ) : (
+              <ul className="mt-3 space-y-2 text-sm">
+                {history.map((entry) => (
+                  <li key={entry.requestId} className="rounded-md border border-neutral-200 p-3">
+                    <p>
+                      <strong>{entry.action}</strong> - {entry.status}
+                    </p>
+                    <p className="text-xs text-neutral-600">{new Date(entry.createdAt).toISOString()}</p>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </section>
+        </>
       )}
 
       <section className="rounded-md border border-neutral-300 p-4 text-sm text-neutral-700">

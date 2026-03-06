@@ -216,3 +216,9 @@
 - result: added authenticated GDPR self-service panel on home (`app/page.tsx`) with direct export/deletion request controls (`POST /api/v1/gdpr/export`, `POST /api/v1/gdpr/delete`) plus signed-out guidance copy; expanded integration coverage in `tests/integration/sourcing-request-timeline-page.test.ts` to assert panel visibility and action contract wiring.
 - backlog update: split `AT-AUTO-UI-06` into `06A` (DONE) and `06B` (TODO dedicated `/gdpr` status page).
 - next: AT-AUTO-UI-06B dedicated GDPR status/history page.
+
+## 2026-03-06T17:22:41+0100
+
+- task: AT-AUTO-UI-06B dedicated GDPR status/history page
+- result: added `/gdpr` authenticated UI route with GDPR request history list (export/deletion events), signed-out login/register guidance preserving `next=/gdpr`, and explicit legal-hold copy for deletion conflicts (`409 GDPR_DELETE_LEGAL_HOLD` when sourcing requests are `SUBMITTED|IN_REVIEW`). Updated home navigation/self-service panel to include `/gdpr` entry and added integration coverage for both signed-out and authenticated history rendering.
+- next: AT-P1-10 CI workflow for lint/typecheck/test/build.

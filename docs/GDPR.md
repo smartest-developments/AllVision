@@ -72,3 +72,9 @@ Track request timestamps, status, and completion evidence.
 
 - Privacy checks are required in definition-of-done for relevant changes.
 - New features require review for minimization, lawful basis, and user transparency.
+
+## UI status route (2026-03-06)
+- Added authenticated `/gdpr` page for self-service request visibility.
+- The page lists recent `GDPR_EXPORT_REQUESTED`, `GDPR_DELETE_REQUESTED`, and `GDPR_DELETE_COMPLETED` audit events for the signed-in user.
+- Signed-out users receive deterministic auth CTAs with `next=/gdpr` preservation.
+- Legal-hold guidance is surfaced inline: deletion may return `409 GDPR_DELETE_LEGAL_HOLD` while requests are in `SUBMITTED` or `IN_REVIEW`.

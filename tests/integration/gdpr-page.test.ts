@@ -34,7 +34,7 @@ describe("GDPR status page", () => {
     expect(markup).toContain("GDPR_DELETE_LEGAL_HOLD");
   });
 
-  it("renders GDPR history entries for authenticated user", async () => {
+  it("renders GDPR history entries and action controls for authenticated user", async () => {
     const owner = await prisma.user.create({
       data: {
         email: "gdpr-history@example.com",
@@ -72,5 +72,7 @@ describe("GDPR status page", () => {
     expect(markup).toContain("SOFT_DELETED");
     expect(markup).toContain("GDPR_EXPORT_REQUESTED");
     expect(markup).toContain("QUEUED");
+    expect(markup).toContain('action="/api/v1/gdpr/export"');
+    expect(markup).toContain('action="/api/v1/gdpr/delete"');
   });
 });
