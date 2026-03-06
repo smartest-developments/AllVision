@@ -1,5 +1,13 @@
 # Progress Log
 
+## 2026-03-06T21:51:26+0100
+
+- task: AT-P1-11 Add schema drift and migration checks in CI.
+- result: extended `.github/workflows/ci.yml` with explicit Prisma integrity gates after migration deploy: `npx prisma migrate status --schema prisma/schema.prisma` and `npx prisma migrate diff --from-migrations prisma/migrations --to-schema-datamodel prisma/schema.prisma --exit-code`, so CI fails on pending migration problems or schema/migration drift.
+- backlog update: marked `AT-P1-11` DONE with CI evidence and advanced next priority item to `AT-P1-12`.
+- quality gates: `npm run lint` ✅, `npm run typecheck` ✅, `npm run test` ✅, `npm run build` ✅.
+- next: AT-P1-12 add dependency vulnerability scanning.
+
 ## 2026-03-06T20:32:00+0100
 
 - task: AT-P1-10 Add CI workflow for lint/typecheck/test/build

@@ -47,6 +47,12 @@ jobs:
       - name: Apply Prisma migrations
         run: npx prisma migrate deploy --schema prisma/schema.prisma
 
+      - name: Verify Prisma migration status
+        run: npx prisma migrate status --schema prisma/schema.prisma
+
+      - name: Verify Prisma schema matches migration history
+        run: npx prisma migrate diff --from-migrations prisma/migrations --to-schema-datamodel prisma/schema.prisma --exit-code
+
       - name: Lint
         run: npm run lint
 

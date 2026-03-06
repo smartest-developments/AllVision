@@ -99,10 +99,10 @@ Completion signal: CI blocks merges on lint/typecheck/test/build and migration/s
 - DoD: PRs fail on red gate.
 - Evidence: `.github/workflows/ci.yml` (Node 22 + Postgres service + prisma migrate + lint/typecheck/test/build gate sequence).
 
-11. [AT-P1-11] Add schema drift and migration checks in CI.
+11. [AT-P1-11] Add schema drift and migration checks in CI. ✅ DONE
 - Size: 1-2h
 - DoD: CI fails on drift or missing migration.
-- Evidence: CI step output.
+- Evidence: `.github/workflows/ci.yml` (`prisma migrate status` + `prisma migrate diff --exit-code`).
 
 12. [AT-P1-12] Add dependency vulnerability scanning.
 - Size: 1-2h
