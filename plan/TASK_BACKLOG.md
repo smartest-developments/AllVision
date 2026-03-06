@@ -69,10 +69,10 @@ Completion signal: CI blocks merges on lint/typecheck/test/build and migration/s
 - DoD: admin-only queue page renders pending/in-review requests with filter controls backed by API responses.
 - Evidence: `app/admin/sourcing-requests/page.tsx`, `tests/integration/admin-sourcing-queue-page.test.ts`.
 
-5. [AT-P1-05] Add admin action logging for review decisions and report uploads.
+5. [AT-P1-05] Add admin action logging for review decisions and report uploads. ✅ DONE
 - Size: 1-2h
 - DoD: admin review/upload actions emit immutable audit events.
-- Evidence: integration test asserting audit payload.
+- Evidence: `src/server/report-artifacts.ts`, `src/server/admin-review-decisions.ts`, `app/api/v1/admin/sourcing-requests/[requestId]/route.ts`, `tests/integration/admin-report-artifact.test.ts`, `tests/integration/admin-sourcing-queue-route.test.ts`.
 
 6. [AT-P1-06] Add report delivery acknowledgment endpoint.
 - Size: 1-2h
@@ -235,6 +235,6 @@ Mitigation refs: [AT-P0-05], [AT-P0-06], [AT-P0-07], [AT-P1-06].
 - [AT-P1-05A] Persist immutable `REPORT_ARTIFACT_UPLOADED` audit event on admin report upload/status move. ✅ DONE
   - DoD: report-artifact upload writes dedicated audit row with actor/request/artifact context and transition metadata.
   - Evidence: `src/server/report-artifacts.ts`, `tests/integration/admin-report-artifact.test.ts`.
-- [AT-P1-05B] Add immutable audit event on explicit admin review decision transitions. TODO
+- [AT-P1-05B] Add immutable audit event on explicit admin review decision transitions. ✅ DONE
   - DoD: admin review decision route writes deterministic audit event payload per transition.
-  - Evidence target: admin decision mutation route + integration tests.
+  - Evidence: `src/server/admin-review-decisions.ts`, `app/api/v1/admin/sourcing-requests/[requestId]/route.ts`, `tests/integration/admin-sourcing-queue-route.test.ts`.

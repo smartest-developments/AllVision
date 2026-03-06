@@ -116,7 +116,10 @@ All API surfaces must maintain these constraints:
 ### `PATCH /api/v1/admin/sourcing-requests/:requestId/status`
 
 - Purpose: perform lifecycle status transition.
-- Responses: `200`, `400`, `401`, `403`, `404`, `409`, `501`.
+- Notes:
+  - currently supports explicit admin review decision transition to `IN_REVIEW` (for `SUBMITTED` requests).
+  - writes immutable `ADMIN_REVIEW_DECISION_RECORDED` audit marker with transition context and status-event id.
+- Responses: `200`, `400`, `401`, `403`, `404`, `409`.
 
 ### `POST /api/v1/admin/sourcing-requests/:requestId/report-artifacts`
 
@@ -141,3 +144,8 @@ All API surfaces must maintain these constraints:
   - `REPORT_ARTIFACT_UPLOADED` (`entityType=ReportArtifact`) with upload + transition context.
   - `REPORT_READY_EMAIL_ENQUEUED` (`entityType=SourcingRequest`) for delivery notification pipeline marker.
 - Follow-up (`AT-P1-05B`): add equivalent immutable audit event for explicit admin review decision transitions.
+- `PATCH /api/v1/admin/sourcing-requests/:requestId/status` now emits `ADMIN_REVIEW_DECISION_RECORDED` (`entityType=SourcingRequest`) with deterministic context:
+  - `fromStatus`
+  - `toStatus`
+  - `note`
+  - `statusEventId`

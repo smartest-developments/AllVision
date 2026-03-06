@@ -33,7 +33,8 @@ describe("sourcing request transition guard", () => {
 
   it("returns allowed transitions for a status", () => {
     expect(getAllowedTransitions(SourcingRequestStatus.SUBMITTED)).toEqual([
-      SourcingRequestStatus.IN_REVIEW
+      SourcingRequestStatus.IN_REVIEW,
+      SourcingRequestStatus.CANCELLED
     ]);
     expect(getAllowedTransitions(SourcingRequestStatus.REPORT_READY)).toEqual([]);
   });

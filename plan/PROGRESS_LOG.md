@@ -1,5 +1,13 @@
 # Progress Log
 
+## 2026-03-06T13:25:00+0100
+
+- task: AT-P1-05B Add immutable audit event on explicit admin review decision transitions
+- result: implemented `PATCH /api/v1/admin/sourcing-requests/:requestId` review-decision mutation contract for explicit admin `SUBMITTED -> IN_REVIEW` transitions. Added server-side decision service (`applyAdminReviewDecision`) that enforces transition guard, writes `SourcingStatusEvent`, and persists immutable `ADMIN_REVIEW_DECISION_RECORDED` audit event context (`fromStatus`, `toStatus`, `note`, `statusEventId`).
+- backlog update: marked `AT-P1-05` and `AT-P1-05B` DONE with evidence pointers.
+- quality gates: `npm run lint` ✅, `npm run typecheck` ✅, `npm run build` ✅, `npm run test` ⚠️ blocked in sandbox (no DB connectivity to `localhost:5433`, Docker daemon socket denied).
+- next: AT-P1-06 add report delivery acknowledgment endpoint.
+
 ## 2026-03-06T12:20:00+0100
 
 - task: AT-AUTO-UI-05 Add prescription detail UI panel with owner/admin auth-aware access messaging

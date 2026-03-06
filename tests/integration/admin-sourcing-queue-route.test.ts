@@ -6,6 +6,7 @@ import { hashToken, SESSION_COOKIE_NAME } from "@/server/auth";
 import { prisma } from "@/server/db";
 import { GET as getAdminQueue } from "../../app/api/v1/admin/sourcing-requests/route";
 import { GET as getAdminQueueDetail } from "../../app/api/v1/admin/sourcing-requests/[requestId]/route";
+import { PATCH as patchAdminQueueStatus } from "../../app/api/v1/admin/sourcing-requests/[requestId]/status/route";
 
 describe("GET /api/v1/admin/sourcing-requests", () => {
   beforeEach(async () => {
@@ -258,5 +259,61 @@ describe("GET /api/v1/admin/sourcing-requests", () => {
 
     expect(response.status).toBe(404);
     expect(payload.error.code).toBe("NOT_FOUND");
+  });
+
+  it("applies admin review decision and writes immutable audit event", async () => {
+    const { admin } = await seedQueueData();
+    const adminCookie = await issueSessionCookie(admin.id);
+
+    const submittedRequest = await prisma.sourcingRequest.findFirstOrThrow({
+      where: { status: "SUBMITTED" },
+    });
+
+    const response = await patchAdminQueueStatus(
+      new NextRequest(`http://localhost/api/v1/admin/sourcing-requests/${submittedRequest.id}/status`, {
+        method: "PATCH",
+        headers: { cookie: adminCookie, "content-type": "application/json" },
+        body: JSON.stringify({ toStatus: "IN_REVIEW", note: "Manual review accepted" }),
+      }),
+      { params: Promise.resolve({ requestId: submittedRequest.id }) },
+    );
+
+    const payload = (await response.json()) as { requestId: string; status: string };
+    expect(response.status).toBe(200);
+    expect(payload).toMatchObject({ requestId: submittedRequest.id, status: "IN_REVIEW" });
+
+    const auditEvent = await prisma.auditEvent.findFirst({
+      where: {
+        sourcingRequestId: submittedRequest.id,
+        action: "ADMIN_REVIEW_DECISION_RECORDED",
+      },
+    });
+    expect(auditEvent).not.toBeNull();
+    expect(auditEvent?.actorUserId).toBe(admin.id);
+    expect(auditEvent?.entityType).toBe("SourcingRequest");
+    expect(auditEvent?.context).toMatchObject({
+      fromStatus: "SUBMITTED",
+      toStatus: "IN_REVIEW",
+      note: "Manual review accepted",
+    });
+  });
+
+  it("returns 409 when admin review decision transition is invalid", async () => {
+    const { admin, inReviewRequest } = await seedQueueData();
+    const adminCookie = await issueSessionCookie(admin.id);
+
+    const response = await patchAdminQueueStatus(
+      new NextRequest(`http://localhost/api/v1/admin/sourcing-requests/${inReviewRequest.id}/status`, {
+        method: "PATCH",
+        headers: { cookie: adminCookie, "content-type": "application/json" },
+        body: JSON.stringify({ toStatus: "IN_REVIEW" }),
+      }),
+      { params: Promise.resolve({ requestId: inReviewRequest.id }) },
+    );
+
+    const payload = (await response.json()) as { error: { code: string; allowed: string[] } };
+    expect(response.status).toBe(409);
+    expect(payload.error.code).toBe("INVALID_STATUS_TRANSITION");
+    expect(payload.error.allowed).toContain("REPORT_READY");
   });
 });
