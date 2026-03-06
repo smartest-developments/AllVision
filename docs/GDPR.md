@@ -58,6 +58,9 @@ Track request timestamps, status, and completion evidence.
 - Export: machine-readable package containing account, prescription, request lifecycle, and report metadata.
 - Deletion: soft-delete first, then hard-delete or irreversible anonymization after legal-hold checks.
 - Preserve minimal audit evidence for compliance proof.
+- Current API baseline:
+  - `POST /api/v1/gdpr/export` persists `GDPR_EXPORT_REQUESTED` with queued status context.
+  - `POST /api/v1/gdpr/delete` enforces legal-hold guard (`SUBMITTED|IN_REVIEW` block), records `GDPR_DELETE_REQUESTED` + `GDPR_DELETE_COMPLETED`, revokes sessions, and anonymizes account/prescription fields.
 
 ## Processor and Transfer Controls
 

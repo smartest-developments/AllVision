@@ -144,7 +144,11 @@ All API surfaces must maintain these constraints:
 ### `POST /api/v1/gdpr/delete`
 
 - Purpose: create account deletion request.
-- Responses: `202`, `401`, `429`, `501`.
+- Auth note: requires authenticated session cookie (`401` when missing/invalid).
+- Legal hold note: requests are rejected with `409 GDPR_DELETE_LEGAL_HOLD` while active sourcing work is still in progress (`SUBMITTED|IN_REVIEW`).
+- Contract: returns `{ request: { requestId, status: "ANONYMIZED", requestedAt, completedAt } }`.
+- Tracking note: lifecycle is persisted as immutable audit evidence (`GDPR_DELETE_REQUESTED` then `GDPR_DELETE_COMPLETED`) with anonymization metadata.
+- Responses: `202`, `401`, `409`, `500`.
 
 ## 2026-03-06 Admin Audit Increment
 - Admin report-artifact upload flow now emits two audit markers:

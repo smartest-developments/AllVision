@@ -1,5 +1,13 @@
 # Progress Log
 
+## 2026-03-06T16:05:00+0100
+
+- task: AT-P1-09 Implement GDPR deletion flow
+- result: added authenticated `POST /api/v1/gdpr/delete` endpoint with server-side deletion workflow that enforces legal-hold checks (`SUBMITTED|IN_REVIEW` block), revokes active sessions, anonymizes account/prescription data, and records immutable lifecycle audit events (`GDPR_DELETE_REQUESTED` -> `GDPR_DELETE_COMPLETED`).
+- backlog update: marked `AT-P1-09` DONE with route/service/test/API-spec evidence and advanced next priority item to `AT-P1-10`.
+- quality gates: `npm run lint` ✅, `npm run typecheck` ✅, `npm run test` ✅, `npm run build` ✅ (first build attempt hit transient `.next` ENOENT; immediate rerun passed).
+- next: AT-P1-10 add CI workflow for lint/typecheck/test/build.
+
 ## 2026-03-06T15:10:00+0100
 
 - task: AT-P1-08 Implement GDPR export request flow

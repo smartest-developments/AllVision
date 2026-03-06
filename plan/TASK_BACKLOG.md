@@ -89,10 +89,10 @@ Completion signal: CI blocks merges on lint/typecheck/test/build and migration/s
 - DoD: authenticated export request is queued and tracked.
 - Evidence: `app/api/v1/gdpr/export/route.ts`, `src/server/gdpr-export-requests.ts`, `tests/integration/gdpr-export-route.test.ts`, `docs/API_SPEC.md`.
 
-9. [AT-P1-09] Implement GDPR deletion flow (soft-delete then purge/anonymize workflow).
+9. [AT-P1-09] Implement GDPR deletion flow (soft-delete then purge/anonymize workflow). ✅ DONE
 - Size: 2-3h
 - DoD: deletion lifecycle recorded with legal-hold checks.
-- Evidence: integration tests for lifecycle and audit evidence.
+- Evidence: `app/api/v1/gdpr/delete/route.ts`, `src/server/gdpr-delete-requests.ts`, `tests/integration/gdpr-delete-route.test.ts`, `docs/API_SPEC.md`.
 
 10. [AT-P1-10] Add CI workflow for lint/typecheck/test/build.
 - Size: 1-2h
