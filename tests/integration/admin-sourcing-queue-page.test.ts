@@ -1,0 +1,175 @@
+import { randomUUID } from "node:crypto";
+import { renderToStaticMarkup } from "react-dom/server";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+
+import { SESSION_COOKIE_NAME, hashToken } from "@/server/auth";
+import { prisma } from "@/server/db";
+import { cookies } from "next/headers";
+import AdminSourcingQueuePage from "../../app/admin/sourcing-requests/page";
+
+vi.mock("next/headers", () => ({
+  cookies: vi.fn(),
+}));
+
+const mockedCookies = vi.mocked(cookies);
+
+type MockCookieStore = {
+  getAll: () => Array<{ name: string; value: string }>;
+};
+
+describe("Admin sourcing queue page", () => {
+  beforeEach(async () => {
+    mockedCookies.mockReset();
+    mockedCookies.mockResolvedValue({
+      getAll: () => [],
+    } as unknown as Awaited<ReturnType<typeof cookies>>);
+
+    await prisma.auditEvent.deleteMany();
+    await prisma.reportArtifact.deleteMany();
+    await prisma.sourcingStatusEvent.deleteMany();
+    await prisma.sourcingRequest.deleteMany();
+    await prisma.prescription.deleteMany();
+    await prisma.session.deleteMany();
+    await prisma.user.deleteMany();
+  });
+
+  async function issueSessionCookie(userId: string): Promise<string> {
+    const token = `session-${randomUUID()}`;
+    await prisma.session.create({
+      data: {
+        userId,
+        tokenHash: hashToken(token),
+        expiresAt: new Date(Date.now() + 60 * 60 * 1000),
+        ipHash: null,
+        userAgentHash: null,
+      },
+    });
+
+    return `${SESSION_COOKIE_NAME}=${token}`;
+  }
+
+  function mockCookieHeader(cookieHeader: string) {
+    const [pair] = cookieHeader.split(";");
+    const [name, value] = pair.split("=");
+
+    const cookieStore: MockCookieStore = {
+      getAll: () => [{ name, value }],
+    };
+
+    mockedCookies.mockResolvedValue(
+      cookieStore as unknown as Awaited<ReturnType<typeof cookies>>,
+    );
+  }
+
+  async function seedAdminQueue() {
+    const admin = await prisma.user.create({
+      data: {
+        email: "admin-queue-page@example.com",
+        passwordHash: "hash",
+        role: "ADMIN",
+      },
+    });
+
+    const owner = await prisma.user.create({
+      data: {
+        email: "owner-queue-page@example.com",
+        passwordHash: "hash",
+        role: "USER",
+      },
+    });
+
+    const prescription = await prisma.prescription.create({
+      data: {
+        userId: owner.id,
+        countryCode: "NL",
+        payload: {
+          countryCode: "NL",
+          leftEye: { sphere: -1.5 },
+          rightEye: { sphere: -1.25 },
+          pupillaryDistance: 62,
+        },
+      },
+    });
+
+    const request = await prisma.sourcingRequest.create({
+      data: {
+        userId: owner.id,
+        prescriptionId: prescription.id,
+        status: "IN_REVIEW",
+        reportPaymentRequired: false,
+        currency: "EUR",
+      },
+    });
+
+    await prisma.sourcingStatusEvent.create({
+      data: {
+        sourcingRequestId: request.id,
+        fromStatus: "SUBMITTED",
+        toStatus: "IN_REVIEW",
+        note: "Admin triage",
+        actorUserId: admin.id,
+      },
+    });
+
+    return { admin, owner, request };
+  }
+
+  it("renders API-backed queue cards with filter-bound detail navigation", async () => {
+    const { admin, request } = await seedAdminQueue();
+    const adminCookie = await issueSessionCookie(admin.id);
+    mockCookieHeader(adminCookie);
+
+    const markup = renderToStaticMarkup(
+      await AdminSourcingQueuePage({
+        searchParams: Promise.resolve({
+          status: "IN_REVIEW",
+          countryCode: "nl",
+        }),
+      }),
+    );
+
+    expect(markup).toContain("Admin sourcing queue");
+    expect(markup).toContain(`Request ${request.id}`);
+    expect(markup).toContain("Status: IN_REVIEW");
+    expect(markup).toContain("owner-queue-page@example.com");
+    expect(markup).toContain("requestId=");
+    expect(markup).toContain("Open request detail");
+  });
+
+  it("renders request detail timeline via admin queue detail contract", async () => {
+    const { admin, request } = await seedAdminQueue();
+    const adminCookie = await issueSessionCookie(admin.id);
+    mockCookieHeader(adminCookie);
+
+    const markup = renderToStaticMarkup(
+      await AdminSourcingQueuePage({
+        searchParams: Promise.resolve({
+          requestId: request.id,
+        }),
+      }),
+    );
+
+    expect(markup).toContain("Request detail");
+    expect(markup).toContain(`Request ${request.id} (IN_REVIEW)`);
+    expect(markup).toContain("SUBMITTED -&gt; IN_REVIEW");
+    expect(markup).toContain("No report artifacts attached.");
+  });
+
+  it("shows admin access required message for non-admin session", async () => {
+    const user = await prisma.user.create({
+      data: {
+        email: "user-no-admin@example.com",
+        passwordHash: "hash",
+        role: "USER",
+      },
+    });
+
+    const userCookie = await issueSessionCookie(user.id);
+    mockCookieHeader(userCookie);
+
+    const markup = renderToStaticMarkup(await AdminSourcingQueuePage({}));
+
+    expect(markup).toContain("Admin access required");
+    expect(markup).toContain("Admin access required.");
+  });
+});

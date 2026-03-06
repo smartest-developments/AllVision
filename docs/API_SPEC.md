@@ -103,6 +103,7 @@ All API surfaces must maintain these constraints:
 - Notes:
   - without `status`, queue defaults to pending states (`SUBMITTED|IN_REVIEW`)
   - payload shape: `{ requests: [...] }`
+  - UI binding: `/admin/sourcing-requests` consumes this contract with filter controls (`status`, `countryCode`, `userEmail`) and list-to-detail navigation.
 - Responses: `200`, `400`, `401`, `403`.
 
 ### `GET /api/v1/admin/sourcing-requests/:requestId`

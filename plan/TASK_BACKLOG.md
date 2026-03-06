@@ -63,11 +63,11 @@ Completion signal: CI blocks merges on lint/typecheck/test/build and migration/s
 - DoD: admin-only queue endpoints return deterministic list/detail payloads with validated filter inputs.
 - Evidence: `app/api/v1/admin/sourcing-requests/route.ts`, `app/api/v1/admin/sourcing-requests/[requestId]/route.ts`, `src/server/admin-sourcing-queue.ts`, `tests/integration/admin-sourcing-queue-route.test.ts`, `docs/API_SPEC.md`.
 
-4b. [AT-P1-04B] Add admin queue UI surface bound to API list/detail contract.
+4b. [AT-P1-04B] Add admin queue UI surface bound to API list/detail contract. ✅ DONE
 - Priority: P1
 - Size: 1-2h
 - DoD: admin-only queue page renders pending/in-review requests with filter controls backed by API responses.
-- Evidence: integration tests for queue rendering, filter interactions, and detail navigation.
+- Evidence: `app/admin/sourcing-requests/page.tsx`, `tests/integration/admin-sourcing-queue-page.test.ts`.
 
 5. [AT-P1-05] Add admin action logging for review decisions and report uploads.
 - Size: 1-2h
@@ -155,6 +155,8 @@ Completion signal: CI blocks merges on lint/typecheck/test/build and migration/s
   - Evidence: owner-only route/service wired with integration coverage for unauthorized and cross-user access.
 - [AT-P1-13] Build authenticated sourcing-request timeline UI surface.
   - Evidence: `app/page.tsx`, `tests/integration/sourcing-request-timeline-page.test.ts`.
+- [AT-P1-04B] Add admin queue UI surface bound to API list/detail contract.
+  - Evidence: `app/admin/sourcing-requests/page.tsx`, `tests/integration/admin-sourcing-queue-page.test.ts`.
 - [AT-AUTO-UI-01] Add dedicated authenticated timeline route with request detail deep-linking.
   - Evidence: `app/timeline/page.tsx`, `app/page.tsx`, `tests/integration/sourcing-timeline-route-page.test.ts`.
 - [AT-AUTO-UI-02] Add authenticated navigation entry and empty-state UX polish for timeline deep-linking.

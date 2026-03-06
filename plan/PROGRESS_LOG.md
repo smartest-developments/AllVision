@@ -1,5 +1,12 @@
 # Progress Log
 
+## 2026-03-06T10:21:05+0100
+
+- task: AT-P1-04B Add admin queue UI surface bound to API list/detail contract
+- result: added admin queue page at `/admin/sourcing-requests` with API-backed filter controls (`status`, `countryCode`, `userEmail`) and request detail navigation (`requestId`) wired to existing admin queue list/detail contracts. The page now renders deterministic queue cards, detail timeline/artifact context, and admin access-required fallback messaging for non-admin sessions.
+- backlog update: marked `AT-P1-04B` DONE with UI evidence pointers.
+- next: AT-P1-05 add admin action logging for review decisions and report uploads.
+
 ## 2026-03-06T09:21:30+0100
 
 - task: AT-P1-04A Add admin queue API list/detail contract with filter params
