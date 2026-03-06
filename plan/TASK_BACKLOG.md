@@ -84,10 +84,10 @@ Completion signal: CI blocks merges on lint/typecheck/test/build and migration/s
 - DoD: disclaimer appears on intake, request, and report-delivery surfaces.
 - Evidence: `src/legal/disclaimers.ts`, `app/page.tsx`, `app/api/v1/prescriptions/route.ts`, `app/api/v1/sourcing-requests/[requestId]/report/route.ts`, `tests/unit/legal-disclaimers.test.ts`
 
-8. [AT-P1-08] Implement GDPR export request flow.
+8. [AT-P1-08] Implement GDPR export request flow. ✅ DONE
 - Size: 2-3h
 - DoD: authenticated export request is queued and tracked.
-- Evidence: integration test and sample export contract.
+- Evidence: `app/api/v1/gdpr/export/route.ts`, `src/server/gdpr-export-requests.ts`, `tests/integration/gdpr-export-route.test.ts`, `docs/API_SPEC.md`.
 
 9. [AT-P1-09] Implement GDPR deletion flow (soft-delete then purge/anonymize workflow).
 - Size: 2-3h

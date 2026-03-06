@@ -136,7 +136,10 @@ All API surfaces must maintain these constraints:
 ### `POST /api/v1/gdpr/export`
 
 - Purpose: create personal-data export request.
-- Responses: `202`, `401`, `429`, `501`.
+- Auth note: requires authenticated session cookie (`401` when missing/invalid).
+- Contract: returns `{ request: { requestId, status: "QUEUED", requestedAt } }`.
+- Tracking note: request is persisted as immutable `GDPR_EXPORT_REQUESTED` audit evidence.
+- Responses: `202`, `401`, `500`.
 
 ### `POST /api/v1/gdpr/delete`
 

@@ -1,5 +1,13 @@
 # Progress Log
 
+## 2026-03-06T15:10:00+0100
+
+- task: AT-P1-08 Implement GDPR export request flow
+- result: added authenticated `POST /api/v1/gdpr/export` endpoint that queues personal-data export requests by persisting immutable `GDPR_EXPORT_REQUESTED` audit events with deterministic `QUEUED` status payload. Added integration coverage for `401` unauthenticated and `202` queued-request contracts.
+- backlog update: marked `AT-P1-08` DONE with route/service/test evidence and advanced next priority item to `AT-P1-09`.
+- quality gates: `npm run lint` ✅, `npm run typecheck` ✅, `npm run test` ✅, `npm run build` ✅.
+- next: AT-P1-09 implement GDPR deletion flow.
+
 ## 2026-03-06T13:35:00+0100
 
 - task: AT-P1-06 Add report delivery acknowledgment endpoint
