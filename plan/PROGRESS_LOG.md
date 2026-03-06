@@ -5,7 +5,7 @@
 - task: AT-P1-10 Add CI workflow for lint/typecheck/test/build
 - result: added GitHub Actions workflow at `.github/workflows/ci.yml` that provisions PostgreSQL, sets `DATABASE_URL`, runs `npm ci`, applies Prisma migration deploy, and enforces full quality gates (`npm run lint`, `npm run typecheck`, `npm run test`, `npm run build`) on `push`/`pull_request` to `main`.
 - backlog update: marked `AT-P1-10` DONE with CI evidence and advanced next priority item to `AT-P1-11`.
-- quality gates: local validation run in this automation pass pending (to execute now).
+- quality gates: `npm run lint` ✅, `npm run typecheck` ✅, `npm run test` ✅, `npm run build` ✅.
 - next: AT-P1-11 add schema drift and migration checks in CI.
 
 ## 2026-03-06T17:20:29+0100
