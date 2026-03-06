@@ -57,6 +57,7 @@ All API surfaces must maintain these constraints:
 
 - Purpose: retrieve submitted prescription metadata for owner/admin.
 - Auth note: session cookie required; non-owner `USER` sessions receive `403`.
+- UI note: `/timeline` can open a prescription detail panel via `?prescriptionId=<id>` and maps `401|403|404` outcomes to deterministic user-safe guidance.
 - Responses: `200`, `401`, `403`, `404`, `501`.
 
 ## Sourcing Requests

@@ -200,12 +200,12 @@ Completion signal: CI blocks merges on lint/typecheck/test/build and migration/s
   - DoD: signed-out states include authentication action links and integration tests cover CTA rendering.
   - Evidence target: `app/page.tsx`, `app/timeline/page.tsx`, `tests/integration/sourcing-request-timeline-page.test.ts`, `tests/integration/sourcing-timeline-route-page.test.ts`.
 
-- [AT-AUTO-UI-05] Add prescription detail UI panel with owner/admin auth-aware access messaging.
+- [AT-AUTO-UI-05] Add prescription detail UI panel with owner/admin auth-aware access messaging. ✅ DONE
   - Priority: P1
   - Acceptance: authenticated users can open a prescription detail panel and receive deterministic access guidance for missing/forbidden records.
   - Source signal: `AT-P1-02` now exposes secure prescription detail API, but no UI surface consumes or explains this payload yet.
   - DoD: at least one authenticated UI route renders normalized prescription details and handles `401|403|404` responses with user-safe messaging.
-  - Evidence target: `app/page.tsx` (or `/timeline`), related UI tests under `tests/integration/*`.
+  - Evidence: `app/timeline/page.tsx`, `src/server/page-auth.ts`, `tests/integration/sourcing-timeline-route-page.test.ts`.
 
 ## TECH_DEBT
 

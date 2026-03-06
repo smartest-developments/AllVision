@@ -1,12 +1,17 @@
 import React from "react";
 import Link from "next/link";
 import { getLegalCopy } from "@/legal/disclaimers";
-import { resolvePageSessionUserId } from "@/server/page-auth";
+import { resolvePageSessionIdentity } from "@/server/page-auth";
 import { listSourcingRequestStatusesForUser } from "@/server/sourcing-request-status";
+import {
+  getPrescriptionForViewer,
+  PrescriptionAccessError
+} from "@/server/prescriptions";
 
 type TimelinePageProps = {
   searchParams?: Promise<{
     requestId?: string | string[];
+    prescriptionId?: string | string[];
   }>;
 };
 
@@ -20,9 +25,13 @@ function formatTimestamp(value: Date | null): string {
 
 export default async function TimelinePage({ searchParams }: TimelinePageProps) {
   const resolvedSearchParams = searchParams ? await searchParams : undefined;
-  const userId = await resolvePageSessionUserId();
+  const sessionIdentity = await resolvePageSessionIdentity();
+  const userId = sessionIdentity?.userId ?? null;
   const rawRequestId = resolvedSearchParams?.requestId;
   const requestId = typeof rawRequestId === "string" ? rawRequestId.trim() : "";
+  const rawPrescriptionId = resolvedSearchParams?.prescriptionId;
+  const prescriptionId =
+    typeof rawPrescriptionId === "string" ? rawPrescriptionId.trim() : "";
   const legal = getLegalCopy("request");
   const requests = userId ? await listSourcingRequestStatusesForUser(userId) : [];
   const filteredRequests = requestId
@@ -31,8 +40,11 @@ export default async function TimelinePage({ searchParams }: TimelinePageProps) 
   const homeHref = "/";
   const timelineHref = "/timeline";
   const returnToTimelineHref =
-    requestId !== ""
-      ? `${timelineHref}?requestId=${encodeURIComponent(requestId)}`
+    requestId !== "" || prescriptionId !== ""
+      ? `${timelineHref}?${new URLSearchParams({
+          ...(requestId !== "" ? { requestId } : {}),
+          ...(prescriptionId !== "" ? { prescriptionId } : {}),
+        }).toString()}`
       : timelineHref;
   const signInHref = `/auth/login?next=${encodeURIComponent(returnToTimelineHref)}`;
   const registerHref = `/auth/register?next=${encodeURIComponent(
@@ -40,6 +52,76 @@ export default async function TimelinePage({ searchParams }: TimelinePageProps) 
   )}`;
   const hasInvalidRequestFocus =
     userId !== "" && requestId !== "" && filteredRequests.length === 0;
+  let prescriptionPanel:
+    | { state: "hidden" }
+    | { state: "auth_required" }
+    | { state: "forbidden" }
+    | { state: "not_found" }
+    | {
+        state: "loaded";
+        prescription: {
+          id: string;
+          countryCode: string;
+          consentVersion: string | null;
+          leftSphere: string;
+          rightSphere: string;
+          pupillaryDistance: string;
+          createdAt: string;
+          updatedAt: string;
+        };
+      } = { state: "hidden" };
+
+  if (prescriptionId !== "") {
+    if (!sessionIdentity) {
+      prescriptionPanel = { state: "auth_required" };
+    } else {
+      try {
+        const prescription = await getPrescriptionForViewer({
+          prescriptionId,
+          viewerUserId: sessionIdentity.userId,
+          viewerRole: sessionIdentity.role,
+        });
+        const payload =
+          typeof prescription.payload === "object" && prescription.payload !== null
+            ? (prescription.payload as Record<string, unknown>)
+            : {};
+        const leftEye =
+          typeof payload.leftEye === "object" && payload.leftEye !== null
+            ? (payload.leftEye as Record<string, unknown>)
+            : {};
+        const rightEye =
+          typeof payload.rightEye === "object" && payload.rightEye !== null
+            ? (payload.rightEye as Record<string, unknown>)
+            : {};
+
+        prescriptionPanel = {
+          state: "loaded",
+          prescription: {
+            id: prescription.id,
+            countryCode: prescription.countryCode,
+            consentVersion: prescription.consentVersion,
+            leftSphere:
+              typeof leftEye.sphere === "number" ? String(leftEye.sphere) : "N/A",
+            rightSphere:
+              typeof rightEye.sphere === "number" ? String(rightEye.sphere) : "N/A",
+            pupillaryDistance:
+              typeof payload.pupillaryDistance === "number"
+                ? String(payload.pupillaryDistance)
+                : "N/A",
+            createdAt: formatTimestamp(prescription.createdAt),
+            updatedAt: formatTimestamp(prescription.updatedAt),
+          },
+        };
+      } catch (error) {
+        if (error instanceof PrescriptionAccessError) {
+          prescriptionPanel =
+            error.status === 403 ? { state: "forbidden" } : { state: "not_found" };
+        } else {
+          prescriptionPanel = { state: "not_found" };
+        }
+      }
+    }
+  }
 
   return (
     <main className="mx-auto flex min-h-screen max-w-3xl flex-col gap-6 px-6 py-16">
@@ -85,6 +167,22 @@ export default async function TimelinePage({ searchParams }: TimelinePageProps) 
             className="rounded-md bg-neutral-900 px-3 py-2 text-sm text-white"
           >
             Load timeline
+          </button>
+        </form>
+        <form className="mt-3 flex gap-2" method="get">
+          <input type="hidden" name="requestId" value={requestId} />
+          <input
+            type="text"
+            name="prescriptionId"
+            defaultValue={prescriptionId}
+            placeholder="prescription-id (optional)"
+            className="min-w-0 flex-1 rounded-md border border-neutral-300 px-3 py-2 text-sm"
+          />
+          <button
+            type="submit"
+            className="rounded-md border border-neutral-300 px-3 py-2 text-sm text-neutral-900"
+          >
+            Open prescription panel
           </button>
         </form>
 
@@ -158,6 +256,51 @@ export default async function TimelinePage({ searchParams }: TimelinePageProps) 
               );
             })}
           </ul>
+        ) : null}
+
+        {prescriptionPanel.state === "auth_required" ? (
+          <p className="mt-4 text-sm text-neutral-700">
+            Prescription detail requires authentication (401).{" "}
+            <Link className="underline" href={signInHref}>
+              Sign in
+            </Link>{" "}
+            to continue.
+          </p>
+        ) : null}
+
+        {prescriptionPanel.state === "forbidden" ? (
+          <p className="mt-4 text-sm text-neutral-700">
+            Prescription detail unavailable: access denied for this account (403).
+          </p>
+        ) : null}
+
+        {prescriptionPanel.state === "not_found" ? (
+          <p className="mt-4 text-sm text-neutral-700">
+            Prescription detail unavailable: record not found (404).
+          </p>
+        ) : null}
+
+        {prescriptionPanel.state === "loaded" ? (
+          <section className="mt-4 rounded-md border border-neutral-200 p-3">
+            <h3 className="text-sm font-semibold">
+              Prescription detail {prescriptionPanel.prescription.id}
+            </h3>
+            <ul className="mt-2 list-disc pl-6 text-xs">
+              <li>Country: {prescriptionPanel.prescription.countryCode}</li>
+              <li>Left sphere: {prescriptionPanel.prescription.leftSphere}</li>
+              <li>Right sphere: {prescriptionPanel.prescription.rightSphere}</li>
+              <li>
+                Pupillary distance:{" "}
+                {prescriptionPanel.prescription.pupillaryDistance}
+              </li>
+              <li>
+                Consent version:{" "}
+                {prescriptionPanel.prescription.consentVersion ?? "N/A"}
+              </li>
+              <li>Created: {prescriptionPanel.prescription.createdAt}</li>
+              <li>Updated: {prescriptionPanel.prescription.updatedAt}</li>
+            </ul>
+          </section>
         ) : null}
       </section>
     </main>

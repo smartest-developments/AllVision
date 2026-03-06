@@ -2,19 +2,19 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { prisma } from "@/server/db";
-import { resolvePageSessionUserId } from "@/server/page-auth";
+import { resolvePageSessionIdentity } from "@/server/page-auth";
 import TimelinePage from "../../app/timeline/page";
 
 vi.mock("@/server/page-auth", () => ({
-  resolvePageSessionUserId: vi.fn(),
+  resolvePageSessionIdentity: vi.fn(),
 }));
 
-const mockedResolvePageSessionUserId = vi.mocked(resolvePageSessionUserId);
+const mockedResolvePageSessionIdentity = vi.mocked(resolvePageSessionIdentity);
 
 describe("Timeline page deep-linking", () => {
   beforeEach(async () => {
-    mockedResolvePageSessionUserId.mockReset();
-    mockedResolvePageSessionUserId.mockResolvedValue(null);
+    mockedResolvePageSessionIdentity.mockReset();
+    mockedResolvePageSessionIdentity.mockResolvedValue(null);
     await prisma.auditEvent.deleteMany();
     await prisma.reportArtifact.deleteMany();
     await prisma.sourcingStatusEvent.deleteMany();
@@ -66,7 +66,10 @@ describe("Timeline page deep-linking", () => {
       },
     });
 
-    mockedResolvePageSessionUserId.mockResolvedValue(owner.id);
+    mockedResolvePageSessionIdentity.mockResolvedValue({
+      userId: owner.id,
+      role: "USER",
+    });
 
     const markup = renderToStaticMarkup(
       await TimelinePage({
@@ -144,7 +147,10 @@ describe("Timeline page deep-linking", () => {
       },
     });
 
-    mockedResolvePageSessionUserId.mockResolvedValue(owner.id);
+    mockedResolvePageSessionIdentity.mockResolvedValue({
+      userId: owner.id,
+      role: "USER",
+    });
 
     const markup = renderToStaticMarkup(
       await TimelinePage({
@@ -177,6 +183,121 @@ describe("Timeline page deep-linking", () => {
     );
     expect(markup).toContain(
       "/auth/register?next=%2Ftimeline%3FrequestId%3Dreq_123",
+    );
+  });
+
+  it("renders prescription detail panel for owner-visible record", async () => {
+    const owner = await prisma.user.create({
+      data: {
+        email: "timeline-prescription-owner@example.com",
+        passwordHash: "hash",
+        role: "USER",
+      },
+    });
+
+    const prescription = await prisma.prescription.create({
+      data: {
+        userId: owner.id,
+        countryCode: "CH",
+        payload: {
+          countryCode: "CH",
+          leftEye: { sphere: -1.0 },
+          rightEye: { sphere: -0.75 },
+          pupillaryDistance: 61,
+        },
+      },
+    });
+
+    mockedResolvePageSessionIdentity.mockResolvedValue({
+      userId: owner.id,
+      role: "USER",
+    });
+
+    const markup = renderToStaticMarkup(
+      await TimelinePage({
+        searchParams: Promise.resolve({
+          prescriptionId: prescription.id,
+        }),
+      }),
+    );
+
+    expect(markup).toContain(`Prescription detail ${prescription.id}`);
+    expect(markup).toContain("Country: CH");
+    expect(markup).toContain("Left sphere: -1");
+    expect(markup).toContain("Right sphere: -0.75");
+    expect(markup).toContain("Pupillary distance: 61");
+  });
+
+  it("renders forbidden prescription message when record belongs to another user", async () => {
+    const owner = await prisma.user.create({
+      data: {
+        email: "timeline-prescription-actor@example.com",
+        passwordHash: "hash",
+        role: "USER",
+      },
+    });
+    const other = await prisma.user.create({
+      data: {
+        email: "timeline-prescription-other@example.com",
+        passwordHash: "hash",
+        role: "USER",
+      },
+    });
+    const prescription = await prisma.prescription.create({
+      data: {
+        userId: other.id,
+        countryCode: "DE",
+        payload: {
+          countryCode: "DE",
+          leftEye: { sphere: -2.0 },
+          rightEye: { sphere: -1.5 },
+          pupillaryDistance: 63,
+        },
+      },
+    });
+
+    mockedResolvePageSessionIdentity.mockResolvedValue({
+      userId: owner.id,
+      role: "USER",
+    });
+
+    const markup = renderToStaticMarkup(
+      await TimelinePage({
+        searchParams: Promise.resolve({
+          prescriptionId: prescription.id,
+        }),
+      }),
+    );
+
+    expect(markup).toContain(
+      "Prescription detail unavailable: access denied for this account (403).",
+    );
+  });
+
+  it("renders not-found prescription message for unknown record id", async () => {
+    const owner = await prisma.user.create({
+      data: {
+        email: "timeline-prescription-not-found@example.com",
+        passwordHash: "hash",
+        role: "USER",
+      },
+    });
+
+    mockedResolvePageSessionIdentity.mockResolvedValue({
+      userId: owner.id,
+      role: "USER",
+    });
+
+    const markup = renderToStaticMarkup(
+      await TimelinePage({
+        searchParams: Promise.resolve({
+          prescriptionId: "missing-prescription-id",
+        }),
+      }),
+    );
+
+    expect(markup).toContain(
+      "Prescription detail unavailable: record not found (404).",
     );
   });
 });

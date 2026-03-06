@@ -2,7 +2,7 @@ import { cookies } from "next/headers";
 import { SESSION_COOKIE_NAME } from "@/server/auth";
 import { resolveSessionIdentityFromToken } from "@/server/session-identity";
 
-export async function resolvePageSessionUserId(): Promise<string | null> {
+export async function resolvePageSessionIdentity() {
   let sessionToken: string | undefined;
 
   try {
@@ -12,6 +12,10 @@ export async function resolvePageSessionUserId(): Promise<string | null> {
     return null;
   }
 
-  const identity = await resolveSessionIdentityFromToken(sessionToken);
+  return resolveSessionIdentityFromToken(sessionToken);
+}
+
+export async function resolvePageSessionUserId(): Promise<string | null> {
+  const identity = await resolvePageSessionIdentity();
   return identity?.userId ?? null;
 }

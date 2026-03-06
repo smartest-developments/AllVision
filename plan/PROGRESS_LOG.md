@@ -1,5 +1,12 @@
 # Progress Log
 
+## 2026-03-06T12:20:00+0100
+
+- task: AT-AUTO-UI-05 Add prescription detail UI panel with owner/admin auth-aware access messaging
+- result: extended `/timeline` with an authenticated prescription detail panel driven by optional `prescriptionId` query input; page now resolves full session identity (user + role) server-side, renders normalized prescription fields for owner/admin-visible records, and returns deterministic user-safe UI messaging for `401` (auth required), `403` (forbidden), and `404` (not found) access outcomes.
+- backlog update: marked `AT-AUTO-UI-05` DONE with evidence links.
+- next: AT-P1-05B add immutable audit event on explicit admin review decision transitions.
+
 ## 2026-03-06T10:55:00+0100
 
 - task: AT-P1-02 Add sensitive-data access restrictions for prescription records
