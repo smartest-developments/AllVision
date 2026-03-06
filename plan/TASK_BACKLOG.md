@@ -109,10 +109,10 @@ Completion signal: CI blocks merges on lint/typecheck/test/build and migration/s
 - DoD: CI fails on drift or missing migration.
 - Evidence: `.github/workflows/ci.yml` (`prisma migrate status` + `prisma migrate diff --exit-code`).
 
-13. [AT-P1-12] Add dependency vulnerability scanning.
+13. [AT-P1-12] Add dependency vulnerability scanning. ✅ DONE
 - Size: 1-2h
 - DoD: high/critical findings fail CI unless waived.
-- Evidence: CI run artifact.
+- Evidence: `.github/workflows/ci.yml` (`npm audit --audit-level=high --omit=dev`).
 
 14. [AT-P1-13] Build authenticated sourcing-request timeline UI surface. ✅ DONE
 - Size: 2-3h

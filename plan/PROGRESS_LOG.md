@@ -1,5 +1,13 @@
 # Progress Log
 
+## 2026-03-06T23:49:45+0100
+
+- task: AT-P1-12 Add dependency vulnerability scanning.
+- result: extended `.github/workflows/ci.yml` with an explicit dependency audit gate (`npm audit --audit-level=high --omit=dev`) so CI fails on high/critical production dependency vulnerabilities unless waived.
+- backlog update: marked `AT-P1-12` DONE with CI evidence; highest remaining P1 item is `AT-P1-09B`.
+- quality gates: `npm run lint` ✅, `npm run typecheck` ✅, `npm run test` ✅, `npm run build` ✅.
+- next: AT-P1-09B implement admin-reviewed soft-delete execution workflow.
+
 ## 2026-03-06T23:10:05+0100
 
 - task: AT-AUTO-UI-07 Add report-delivery acknowledgment UI action on timeline surfaces.
