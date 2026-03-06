@@ -1,5 +1,12 @@
 # Progress Log
 
+## 2026-03-06T09:21:30+0100
+
+- task: AT-P1-04A Add admin queue API list/detail contract with filter params
+- result: added admin-only queue list (`GET /api/v1/admin/sourcing-requests`) and detail (`GET /api/v1/admin/sourcing-requests/:requestId`) routes with session-cookie `ADMIN` enforcement, validated query params (`status`, `countryCode`, `userEmail`), default pending-state queue behavior (`SUBMITTED|IN_REVIEW`), and deterministic list/detail payloads including timeline and artifact metadata. Added integration coverage for auth (`401/403`), default filtering, explicit filters, invalid query handling, detail success, and detail `404`.
+- backlog update: marked `AT-P1-04A` DONE with concrete evidence pointers.
+- next: AT-P1-04B add admin queue UI surface bound to API list/detail contract.
+
 ## 2026-03-06T08:19:57+0100
 
 - task: AT-AUTO-BE-02 Consolidate session identity resolution for API and server-rendered pages

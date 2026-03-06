@@ -10,3 +10,4 @@
 - Scope: prior plan-sync blocker for `AT-P1-01`.
 - Resolution: write access to `plan/` restored in this run; backlog/progress/docs synchronized.
 - Status: unblocked.
+- 2026-03-06T09:21:47+0100: automation sandbox cannot write in this repository (`Operation not permitted`), so backlog/code/doc updates were skipped this run.

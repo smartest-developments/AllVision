@@ -57,11 +57,11 @@ Completion signal: CI blocks merges on lint/typecheck/test/build and migration/s
 - DoD: admin-only list/detail retrieval with basic filters.
 - Evidence: integration tests for visibility and filters.
 
-4a. [AT-P1-04A] Add admin queue API list/detail contract with filter params.
+4a. [AT-P1-04A] Add admin queue API list/detail contract with filter params. ✅ DONE
 - Priority: P1
 - Size: 1-2h
 - DoD: admin-only queue endpoints return deterministic list/detail payloads with validated filter inputs.
-- Evidence: API integration tests for auth visibility + filter/query validation.
+- Evidence: `app/api/v1/admin/sourcing-requests/route.ts`, `app/api/v1/admin/sourcing-requests/[requestId]/route.ts`, `src/server/admin-sourcing-queue.ts`, `tests/integration/admin-sourcing-queue-route.test.ts`, `docs/API_SPEC.md`.
 
 4b. [AT-P1-04B] Add admin queue UI surface bound to API list/detail contract.
 - Priority: P1

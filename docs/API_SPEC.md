@@ -96,7 +96,19 @@ All API surfaces must maintain these constraints:
 ### `GET /api/v1/admin/sourcing-requests`
 
 - Purpose: list queued/in-review sourcing requests.
-- Responses: `200`, `401`, `403`, `501`.
+- Query params:
+  - `status` optional (`SUBMITTED|IN_REVIEW`)
+  - `countryCode` optional ISO alpha-2 filter
+  - `userEmail` optional owner email filter
+- Notes:
+  - without `status`, queue defaults to pending states (`SUBMITTED|IN_REVIEW`)
+  - payload shape: `{ requests: [...] }`
+- Responses: `200`, `400`, `401`, `403`.
+
+### `GET /api/v1/admin/sourcing-requests/:requestId`
+
+- Purpose: fetch admin queue request detail with timeline and report artifacts.
+- Responses: `200`, `401`, `403`, `404`.
 
 ### `PATCH /api/v1/admin/sourcing-requests/:requestId/status`
 
