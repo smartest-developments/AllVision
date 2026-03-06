@@ -1,5 +1,13 @@
 # Progress Log
 
+## 2026-03-06T23:10:05+0100
+
+- task: AT-AUTO-UI-07 Add report-delivery acknowledgment UI action on timeline surfaces.
+- result: wired owner-facing acknowledgment controls on both authenticated timeline surfaces (`/` and `/timeline`) so `REPORT_READY` request cards can submit `POST /api/v1/sourcing-requests/:requestId/report/ack` without manual API invocation; `DELIVERED` cards now show deterministic already-acknowledged guidance.
+- backlog update: added and marked `AT-AUTO-UI-07` DONE (P1 UI) and restored missing active backlog entry `AT-P1-09B` for GDPR admin-reviewed delete execution follow-up.
+- quality gates: `npm run lint` ✅, `npm run typecheck` ✅, `npm run test` ✅, `npm run build` ✅.
+- next: AT-P1-12 add dependency vulnerability scanning.
+
 ## 2026-03-06T21:51:26+0100
 
 - task: AT-P1-11 Add schema drift and migration checks in CI.

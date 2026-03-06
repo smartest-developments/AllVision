@@ -82,6 +82,48 @@ describe("Home page sourcing request timeline", () => {
     expect(markup).toContain('action="/api/v1/gdpr/delete"');
   });
 
+  it("renders report-delivery acknowledgment action when request is report-ready", async () => {
+    const owner = await prisma.user.create({
+      data: {
+        email: "timeline-owner-report-ready@example.com",
+        passwordHash: "hash",
+        role: "USER",
+      },
+    });
+
+    const prescription = await prisma.prescription.create({
+      data: {
+        userId: owner.id,
+        countryCode: "IT",
+        payload: {
+          countryCode: "IT",
+          leftEye: { sphere: -1.0 },
+          rightEye: { sphere: -1.25 },
+          pupillaryDistance: 61,
+        },
+      },
+    });
+
+    const request = await prisma.sourcingRequest.create({
+      data: {
+        userId: owner.id,
+        prescriptionId: prescription.id,
+        status: "REPORT_READY",
+        reportPaymentRequired: false,
+        currency: "EUR",
+      },
+    });
+
+    mockedResolvePageSessionUserId.mockResolvedValue(owner.id);
+
+    const markup = renderToStaticMarkup(await HomePage());
+
+    expect(markup).toContain("Acknowledge report delivery");
+    expect(markup).toContain(
+      `/api/v1/sourcing-requests/${request.id}/report/ack`,
+    );
+  });
+
   it("renders sign-in guidance when session identity is absent", async () => {
     const markup = renderToStaticMarkup(await HomePage());
 

@@ -34,7 +34,7 @@ Completion signal: CI blocks merges on lint/typecheck/test/build and migration/s
 
 ### P0 (0 tasks, MVP blockers)
 
-### P1 (13 tasks)
+### P1 (15 tasks)
 
 1. [AT-P1-01] Enforce RBAC middleware (`USER`, `ADMIN`). ✅ DONE
 - Size: 1-2h
@@ -94,25 +94,36 @@ Completion signal: CI blocks merges on lint/typecheck/test/build and migration/s
 - DoD: deletion lifecycle recorded with legal-hold checks.
 - Evidence: `app/api/v1/gdpr/delete/route.ts`, `src/server/gdpr-delete-requests.ts`, `tests/integration/gdpr-delete-route.test.ts`, `docs/API_SPEC.md`.
 
-10. [AT-P1-10] Add CI workflow for lint/typecheck/test/build. ✅ DONE
+10. [AT-P1-09B] Implement admin-reviewed soft-delete execution and purge/anonymize workflow.
+- Size: 2-3h
+- DoD: queued deletion requests can be executed with deterministic anonymization/purge steps and immutable audit trace.
+- Evidence target: server workflow module + integration tests + API/docs updates.
+
+11. [AT-P1-10] Add CI workflow for lint/typecheck/test/build. ✅ DONE
 - Size: 1-2h
 - DoD: PRs fail on red gate.
 - Evidence: `.github/workflows/ci.yml` (Node 22 + Postgres service + prisma migrate + lint/typecheck/test/build gate sequence).
 
-11. [AT-P1-11] Add schema drift and migration checks in CI. ✅ DONE
+12. [AT-P1-11] Add schema drift and migration checks in CI. ✅ DONE
 - Size: 1-2h
 - DoD: CI fails on drift or missing migration.
 - Evidence: `.github/workflows/ci.yml` (`prisma migrate status` + `prisma migrate diff --exit-code`).
 
-12. [AT-P1-12] Add dependency vulnerability scanning.
+13. [AT-P1-12] Add dependency vulnerability scanning.
 - Size: 1-2h
 - DoD: high/critical findings fail CI unless waived.
 - Evidence: CI run artifact.
 
-13. [AT-P1-13] Build authenticated sourcing-request timeline UI surface. ✅ DONE
+14. [AT-P1-13] Build authenticated sourcing-request timeline UI surface. ✅ DONE
 - Size: 2-3h
 - DoD: authenticated users can see request status history cards with timestamps and legal copy.
 - Evidence: UI component/page tests plus API consumption contract assertions.
+
+15. [AT-AUTO-UI-07] Add report-delivery acknowledgment UI action on timeline surfaces. ✅ DONE
+- Size: 1-2h
+- Acceptance: report-ready requests render a deterministic UI action that posts to owner-only delivery-ack endpoint.
+- DoD: home + `/timeline` surfaces expose report-ready acknowledgment control and integration coverage validates action wiring.
+- Evidence: `app/page.tsx`, `app/timeline/page.tsx`, `tests/integration/sourcing-request-timeline-page.test.ts`, `tests/integration/sourcing-timeline-route-page.test.ts`.
 
 ### P2 (3 tasks, execution-ready but non-urgent)
 
@@ -206,6 +217,12 @@ Completion signal: CI blocks merges on lint/typecheck/test/build and migration/s
   - Source signal: `AT-P1-02` now exposes secure prescription detail API, but no UI surface consumes or explains this payload yet.
   - DoD: at least one authenticated UI route renders normalized prescription details and handles `401|403|404` responses with user-safe messaging.
   - Evidence: `app/timeline/page.tsx`, `src/server/page-auth.ts`, `tests/integration/sourcing-timeline-route-page.test.ts`.
+- [AT-AUTO-UI-07] Add report-delivery acknowledgment UI action on home/timeline request cards. ✅ DONE
+  - Priority: P1
+  - Acceptance: when a request reaches `REPORT_READY`, authenticated owner can submit delivery acknowledgment without manual API invocation.
+  - Source signal: `AT-P1-06` shipped owner acknowledgment endpoint, but no UI control exposed the action path.
+  - DoD: both timeline surfaces render request-scoped `POST /api/v1/sourcing-requests/:requestId/report/ack` control for `REPORT_READY` items and tests lock action wiring.
+  - Evidence: `app/page.tsx`, `app/timeline/page.tsx`, `tests/integration/sourcing-request-timeline-page.test.ts`, `tests/integration/sourcing-timeline-route-page.test.ts`.
 
 ## TECH_DEBT
 

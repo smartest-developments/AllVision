@@ -241,6 +241,27 @@ export default async function TimelinePage({ searchParams }: TimelinePageProps) 
                     Updated: {formatTimestamp(request.updatedAt)} | Latest event:{" "}
                     {formatTimestamp(request.latestEventAt)}
                   </p>
+                  {request.status === "REPORT_READY" ? (
+                    <form
+                      className="mt-2"
+                      action={`/api/v1/sourcing-requests/${encodeURIComponent(
+                        request.requestId,
+                      )}/report/ack`}
+                      method="post"
+                    >
+                      <button
+                        type="submit"
+                        className="rounded-md border border-neutral-400 px-2 py-1 text-xs text-neutral-900"
+                      >
+                        Acknowledge report delivery
+                      </button>
+                    </form>
+                  ) : null}
+                  {request.status === "DELIVERED" ? (
+                    <p className="mt-2 text-xs text-neutral-700">
+                      Report delivery already acknowledged.
+                    </p>
+                  ) : null}
                   {request.timeline.length > 0 ? (
                     <ul className="mt-2 list-disc pl-6 text-xs">
                       {request.timeline.map((event) => (

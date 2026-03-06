@@ -300,4 +300,55 @@ describe("Timeline page deep-linking", () => {
       "Prescription detail unavailable: record not found (404).",
     );
   });
+
+  it("renders report-delivery acknowledgment action for focused report-ready request", async () => {
+    const owner = await prisma.user.create({
+      data: {
+        email: "timeline-report-ready-owner@example.com",
+        passwordHash: "hash",
+        role: "USER",
+      },
+    });
+
+    const prescription = await prisma.prescription.create({
+      data: {
+        userId: owner.id,
+        countryCode: "CH",
+        payload: {
+          countryCode: "CH",
+          leftEye: { sphere: -1.0 },
+          rightEye: { sphere: -0.75 },
+          pupillaryDistance: 61,
+        },
+      },
+    });
+
+    const reportReadyRequest = await prisma.sourcingRequest.create({
+      data: {
+        userId: owner.id,
+        prescriptionId: prescription.id,
+        status: "REPORT_READY",
+        reportPaymentRequired: false,
+        currency: "EUR",
+      },
+    });
+
+    mockedResolvePageSessionIdentity.mockResolvedValue({
+      userId: owner.id,
+      role: "USER",
+    });
+
+    const markup = renderToStaticMarkup(
+      await TimelinePage({
+        searchParams: Promise.resolve({
+          requestId: reportReadyRequest.id,
+        }),
+      }),
+    );
+
+    expect(markup).toContain("Acknowledge report delivery");
+    expect(markup).toContain(
+      `/api/v1/sourcing-requests/${reportReadyRequest.id}/report/ack`,
+    );
+  });
 });
