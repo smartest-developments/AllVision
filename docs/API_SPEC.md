@@ -160,3 +160,12 @@ All API surfaces must maintain these constraints:
   - `toStatus`
   - `note`
   - `statusEventId`
+
+## 2026-03-06 GDPR Deletion Request Contract Increment
+- `POST /api/v1/gdpr/delete` is now implemented with authenticated deletion-request queueing.
+- Success (`202`) payload:
+  - `{ request: { requestId, status: "QUEUED", requestedAt } }`
+- Error contracts:
+  - `401 UNAUTHORIZED` when session cookie is missing/invalid.
+  - `409 LEGAL_HOLD_ACTIVE` when user has sourcing requests in retained states (`IN_REVIEW|REPORT_READY`).
+- Tracking note: successful requests persist immutable `GDPR_DELETION_REQUESTED` audit evidence including legal-hold metadata context.

@@ -194,3 +194,17 @@
 - backlog update: added and marked `AT-AUTO-BE-03` DONE with explicit race/idempotency acceptance and evidence.
 - quality gates: `npm run lint` ✅, `npm run typecheck` ✅, `npm run test` ✅, `npm run build` ✅.
 - next: AT-P1-08 implement GDPR export request flow.
+
+## 2026-03-06T16:23:58+0100
+
+- task: AT-P1-09A GDPR deletion request endpoint with legal-hold gate
+- result: implemented `POST /api/v1/gdpr/delete` with session auth, legal-hold check on in-flight sourcing states (`IN_REVIEW|REPORT_READY`), immutable `GDPR_DELETION_REQUESTED` audit persistence, and deterministic `202|401|409` contracts; added integration coverage in `tests/integration/gdpr-delete-route.test.ts`.
+- backlog update: split `AT-P1-09` into `AT-P1-09A` (DONE) and `AT-P1-09B` (TODO), and added UI follow-up `AT-AUTO-UI-06` for self-service GDPR status/actions.
+- next: AT-P1-09B admin-reviewed soft-delete execution + purge/anonymize workflow.
+
+## 2026-03-06T16:27:30+0100
+
+- task: AT-AUTO-UI-06A GDPR self-service action panel on home UI
+- result: added authenticated GDPR self-service panel on home (`app/page.tsx`) with direct export/deletion request controls (`POST /api/v1/gdpr/export`, `POST /api/v1/gdpr/delete`) plus signed-out guidance copy; expanded integration coverage in `tests/integration/sourcing-request-timeline-page.test.ts` to assert panel visibility and action contract wiring.
+- backlog update: split `AT-AUTO-UI-06` into `06A` (DONE) and `06B` (TODO dedicated `/gdpr` status page).
+- next: AT-AUTO-UI-06B dedicated GDPR status/history page.

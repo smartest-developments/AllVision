@@ -245,3 +245,29 @@ Mitigation refs: [AT-P0-05], [AT-P0-06], [AT-P0-07], [AT-P1-06].
   - Source signal: delivery acknowledgment transition previously updated status/events without a conditional state transition guard.
   - DoD: delivery acknowledgment transition uses conditional `REPORT_READY -> DELIVERED` update semantics and integration tests assert idempotent repeated-ack behavior.
   - Evidence: `src/server/report-retrieval.ts`, `tests/integration/report-ack-route.test.ts`.
+
+## RUN_UPDATE_2026-03-06T16:23:58+0100
+- [AT-P1-09] Implement GDPR deletion flow (soft-delete then purge/anonymize workflow). (split into `AT-P1-09A` + `AT-P1-09B`)
+- [AT-P1-09A] Add authenticated GDPR deletion-request endpoint with legal-hold gate + immutable audit evidence. ✅ DONE
+  - Priority: P1
+  - DoD: `POST /api/v1/gdpr/delete` returns `202` for queued requests, `401` for unauthenticated calls, and `409 LEGAL_HOLD_ACTIVE` when in-flight sourcing states require retention.
+  - Evidence: `app/api/v1/gdpr/delete/route.ts`, `src/server/gdpr-delete-requests.ts`, `tests/integration/gdpr-delete-route.test.ts`, `docs/API_SPEC.md`.
+- [AT-P1-09B] Implement admin-reviewed soft-delete execution and purge/anonymize workflow.
+  - Priority: P1
+  - DoD: queued deletion requests can be executed with deterministic anonymization/purge steps and immutable audit trace.
+  - Evidence target: server workflow module + integration tests + API/docs updates.
+- [AT-AUTO-UI-06] Add authenticated GDPR self-service page for export/deletion request status and legal-hold messaging.
+  - Priority: P1
+  - DoD: authenticated user can submit GDPR export/deletion requests and see deterministic status/error messaging without manual API invocation.
+  - Evidence target: `app/gdpr/page.tsx`, integration page tests, API contract references.
+
+## RUN_UPDATE_2026-03-06T16:27:30+0100_UI
+- [AT-AUTO-UI-06] Add authenticated GDPR self-service page for export/deletion request status and legal-hold messaging. (split into `AT-AUTO-UI-06A` + `AT-AUTO-UI-06B`)
+- [AT-AUTO-UI-06A] Add authenticated GDPR action panel on home timeline surface with export/deletion submit controls. ✅ DONE
+  - Priority: P1
+  - DoD: authenticated home UI renders deterministic GDPR action controls targeting export/deletion request APIs; signed-out state shows explicit auth CTA copy.
+  - Evidence: `app/page.tsx`, `tests/integration/sourcing-request-timeline-page.test.ts`.
+- [AT-AUTO-UI-06B] Add dedicated `/gdpr` status page with request history + legal-hold guidance copy.
+  - Priority: P1
+  - DoD: authenticated users can view last GDPR request states and legal-hold guidance without leaving timeline context.
+  - Evidence target: `app/gdpr/page.tsx` + integration tests.

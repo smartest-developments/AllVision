@@ -121,6 +121,39 @@ export default async function HomePage() {
           </ul>
         ) : null}
       </section>
+
+      <section className="rounded-md border border-neutral-300 p-4">
+        <h2 className="text-2xl font-semibold">GDPR self-service actions</h2>
+        <p className="mt-2 text-sm text-neutral-700">
+          Use these controls to create export/deletion requests from the authenticated UI.
+        </p>
+
+        {!userId ? (
+          <p className="mt-4 text-sm text-neutral-700">
+            Sign in to submit GDPR requests. <Link className="underline" href={signInHref}>Sign in</Link>
+            .
+          </p>
+        ) : (
+          <div className="mt-4 flex flex-wrap gap-3">
+            <form action="/api/v1/gdpr/export" method="post">
+              <button
+                type="submit"
+                className="rounded-md bg-neutral-900 px-3 py-2 text-sm text-white"
+              >
+                Request data export
+              </button>
+            </form>
+            <form action="/api/v1/gdpr/delete" method="post">
+              <button
+                type="submit"
+                className="rounded-md border border-neutral-400 px-3 py-2 text-sm text-neutral-900"
+              >
+                Request account deletion
+              </button>
+            </form>
+          </div>
+        )}
+      </section>
     </main>
   );
 }
