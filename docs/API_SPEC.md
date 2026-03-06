@@ -91,7 +91,11 @@ All API surfaces must maintain these constraints:
 ### `POST /api/v1/sourcing-requests/:requestId/report/ack`
 
 - Purpose: acknowledge report delivery/receipt event.
-- Responses: `200`, `401`, `403`, `404`, `501`.
+- Notes:
+  - owner-only endpoint.
+  - when current state is `REPORT_READY`, persists `REPORT_DELIVERY_ACKNOWLEDGED` audit marker and status event, then transitions request to `DELIVERED`.
+  - idempotent when request is already `DELIVERED`.
+- Responses: `200`, `401`, `403`, `404`, `409`.
 
 ## Admin Review and Report Upload
 

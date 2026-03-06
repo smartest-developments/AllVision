@@ -74,10 +74,10 @@ Completion signal: CI blocks merges on lint/typecheck/test/build and migration/s
 - DoD: admin review/upload actions emit immutable audit events.
 - Evidence: `src/server/report-artifacts.ts`, `src/server/admin-review-decisions.ts`, `app/api/v1/admin/sourcing-requests/[requestId]/route.ts`, `tests/integration/admin-report-artifact.test.ts`, `tests/integration/admin-sourcing-queue-route.test.ts`.
 
-6. [AT-P1-06] Add report delivery acknowledgment endpoint.
+6. [AT-P1-06] Add report delivery acknowledgment endpoint. ✅ DONE
 - Size: 1-2h
 - DoD: retrieval acknowledgment writes delivery audit evidence.
-- Evidence: integration tests for ack behavior.
+- Evidence: `src/server/report-retrieval.ts`, `app/api/v1/sourcing-requests/[requestId]/report/ack/route.ts`, `tests/integration/report-ack-route.test.ts`, `docs/API_SPEC.md`.
 
 7. [AT-P1-07] Centralize legal disclaimer and informational-only copy blocks. ✅ DONE
 - Size: 1-2h
@@ -238,3 +238,10 @@ Mitigation refs: [AT-P0-05], [AT-P0-06], [AT-P0-07], [AT-P1-06].
 - [AT-P1-05B] Add immutable audit event on explicit admin review decision transitions. ✅ DONE
   - DoD: admin review decision route writes deterministic audit event payload per transition.
   - Evidence: `src/server/admin-review-decisions.ts`, `app/api/v1/admin/sourcing-requests/[requestId]/route.ts`, `tests/integration/admin-sourcing-queue-route.test.ts`.
+
+- [AT-AUTO-BE-03] Harden report-ack delivery transition for concurrent idempotency. ✅ DONE
+  - Priority: P1
+  - Acceptance: repeated/concurrent `POST /api/v1/sourcing-requests/:requestId/report/ack` calls never create duplicate `DELIVERED` status events or duplicate `REPORT_DELIVERY_ACKNOWLEDGED` audit markers.
+  - Source signal: delivery acknowledgment transition previously updated status/events without a conditional state transition guard.
+  - DoD: delivery acknowledgment transition uses conditional `REPORT_READY -> DELIVERED` update semantics and integration tests assert idempotent repeated-ack behavior.
+  - Evidence: `src/server/report-retrieval.ts`, `tests/integration/report-ack-route.test.ts`.

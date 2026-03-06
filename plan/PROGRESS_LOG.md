@@ -1,5 +1,13 @@
 # Progress Log
 
+## 2026-03-06T13:35:00+0100
+
+- task: AT-P1-06 Add report delivery acknowledgment endpoint
+- result: implemented owner-only `POST /api/v1/sourcing-requests/:requestId/report/ack` contract that marks `REPORT_READY -> DELIVERED`, writes `SourcingStatusEvent`, and persists immutable `REPORT_DELIVERY_ACKNOWLEDGED` audit evidence with deterministic transition metadata.
+- backlog update: marked `AT-P1-06` DONE with API/server/test evidence.
+- quality gates: `npm run lint` ✅, `npm run typecheck` ✅, `npm run build` ✅, `npm run test` ⚠️ blocked (sandbox cannot reach DB at `localhost:5433`; Docker socket access denied).
+- next: AT-P1-08 implement GDPR export request flow.
+
 ## 2026-03-06T13:25:00+0100
 
 - task: AT-P1-05B Add immutable audit event on explicit admin review decision transitions
@@ -162,3 +170,11 @@
 - result: `createReportArtifactAndMarkReady` now writes dedicated `REPORT_ARTIFACT_UPLOADED` audit evidence before email enqueue marker, including artifact key, delivery channel, and status transition context (`IN_REVIEW -> REPORT_READY`). Expanded integration assertions in `admin-report-artifact.test.ts` to enforce actor/entity/context payload.
 - backlog update: split `AT-P1-05` into `AT-P1-05A` (DONE) and `AT-P1-05B` (TODO) because explicit review-decision mutation route is not yet present.
 - next: AT-P1-05B add review-decision mutation endpoint with immutable audit logging.
+
+## 2026-03-06T14:22:00+0100
+
+- task: AT-AUTO-BE-03 Harden report-ack transition idempotency under repeated/concurrent delivery acknowledgment calls
+- result: upgraded `acknowledgeReportDeliveryForOwner` to use conditional `updateMany` state transition guard (`REPORT_READY -> DELIVERED`) inside transaction so duplicate acknowledgments cannot emit duplicate status/audit rows; added integration coverage that calls ack twice and asserts exactly one `DELIVERED` status event + one `REPORT_DELIVERY_ACKNOWLEDGED` audit marker.
+- backlog update: added and marked `AT-AUTO-BE-03` DONE with explicit race/idempotency acceptance and evidence.
+- quality gates: `npm run lint` ✅, `npm run typecheck` ✅, `npm run test` ✅, `npm run build` ✅.
+- next: AT-P1-08 implement GDPR export request flow.
