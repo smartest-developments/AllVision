@@ -36,10 +36,11 @@ Completion signal: CI blocks merges on lint/typecheck/test/build and migration/s
 
 ### P1 (13 tasks)
 
-1. [AT-P1-01] Enforce RBAC middleware (`USER`, `ADMIN`).
+1. [AT-P1-01] Enforce RBAC middleware (`USER`, `ADMIN`). ✅ DONE
 - Size: 1-2h
+- Acceptance: admin endpoints deterministically return `401` for missing identity and `403` for non-admin role headers.
 - DoD: admin routes blocked server-side for non-admin users.
-- Evidence: integration tests for allow/deny matrix.
+- Evidence: `src/server/request-auth.ts`, `app/api/v1/admin/sourcing-requests/[requestId]/report-artifacts/route.ts`, `tests/integration/admin-report-artifact-route-auth.test.ts`.
 
 2. [AT-P1-02] Add sensitive-data access restrictions for prescription records.
 - Size: 1-2h
@@ -136,6 +137,8 @@ Completion signal: CI blocks merges on lint/typecheck/test/build and migration/s
   - Evidence: integration test asserts status-event persistence and `REPORT_READY_EMAIL_ENQUEUED` audit marker.
 - [AT-P1-07] Centralize legal disclaimer and informational-only copy blocks.
   - Evidence: shared legal copy module + request/intake/report-delivery wiring with unit coverage.
+- [AT-P1-01] Enforce RBAC middleware (`USER`, `ADMIN`).
+  - Evidence: `src/server/request-auth.ts`, `app/api/v1/admin/sourcing-requests/[requestId]/report-artifacts/route.ts`, `tests/integration/admin-report-artifact-route-auth.test.ts`.
 - [AT-P1-03] Expose user-facing sourcing request status endpoint.
   - Evidence: owner-only route/service wired with integration coverage for unauthorized and cross-user access.
 - [AT-P1-13] Build authenticated sourcing-request timeline UI surface.
@@ -152,11 +155,13 @@ Completion signal: CI blocks merges on lint/typecheck/test/build and migration/s
   - Evidence target: `app/timeline/page.tsx`, `app/page.tsx`, `tests/integration/sourcing-timeline-route-page.test.ts`.
 - [AT-AUTO-BE-01] Replace `x-user-id` header auth shim with session-derived identity for sourcing status APIs.
   - Priority: P1
+  - Acceptance: timeline and status APIs ignore caller-supplied identity headers and resolve user from session cookie only.
   - Source signal: current UI/API integration depends on manual user-id input and header-based identity.
   - DoD: sourcing-request APIs resolve authenticated user from session cookie and reject identity spoofing.
   - Evidence target: integration tests for session-authenticated allow/deny matrix.
 - [AT-AUTO-UI-02] Add authenticated navigation entry and empty-state UX polish for timeline deep-linking.
   - Priority: P1
+  - Acceptance: authenticated users can always reach timeline from shell navigation and recover from invalid `requestId` focus with one click.
   - Source signal: `/timeline` now exists but remains disconnected from authenticated shell and lacks error recovery affordances.
   - DoD: authenticated surfaces link to `/timeline`, request-focus miss state includes reset CTA, and component tests cover navigation + reset behavior.
   - Evidence target: app-shell/nav tests plus timeline page interaction coverage.

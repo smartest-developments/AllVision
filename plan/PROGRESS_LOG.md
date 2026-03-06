@@ -1,5 +1,11 @@
 # Progress Log
 
+## 2026-03-06T02:10:00+0100
+
+- task: AT-P1-01 Enforce RBAC middleware (`USER`, `ADMIN`)
+- result: Added shared request-auth helper enforcing `x-user-id` + `x-user-role`, wired admin report-artifact route to require explicit `ADMIN` role, and added integration allow/deny matrix coverage (`401` missing identity, `403` non-admin, `200` admin).
+- next: AT-AUTO-UI-02 Add authenticated navigation entry and empty-state UX polish for timeline deep-linking
+
 ## 2026-03-06T00:51:26+0100
 
 - task: AT-AUTO-UI-01 Add dedicated authenticated timeline route with request detail deep-linking

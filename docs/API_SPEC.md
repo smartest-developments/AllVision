@@ -105,6 +105,7 @@ All API surfaces must maintain these constraints:
 ### `POST /api/v1/admin/sourcing-requests/:requestId/report-artifacts`
 
 - Purpose: attach report artifact metadata and mark request as report-ready/delivered.
+- Auth headers required: `x-user-id` and `x-user-role=ADMIN` (missing identity -> `401`, non-admin role -> `403`).
 - Responses: `200`, `400`, `401`, `403`, `404`, `501`.
 
 ## Compliance/GDPR

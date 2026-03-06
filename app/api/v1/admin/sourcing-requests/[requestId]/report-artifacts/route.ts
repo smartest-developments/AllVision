@@ -4,6 +4,7 @@ import {
   reportArtifactInputSchema,
   ReportArtifactError
 } from "@/server/report-artifacts";
+import { RequestAuthError, requireRequestRole } from "@/server/request-auth";
 import { SourcingRequestTransitionError } from "@/server/sourcing-requests";
 
 export async function POST(
@@ -11,19 +12,21 @@ export async function POST(
   { params }: { params: Promise<{ requestId: string }> }
 ) {
   const { requestId } = await params;
-  const userId = request.headers.get("x-user-id");
-  if (!userId) {
-    return NextResponse.json(
-      { error: { code: "UNAUTHORIZED", message: "Authentication required." } },
-      { status: 401 }
-    );
-  }
 
-  const userRole = request.headers.get("x-user-role");
-  if (userRole !== "ADMIN") {
+  let userId: string;
+  try {
+    userId = requireRequestRole(request, "ADMIN");
+  } catch (error) {
+    if (error instanceof RequestAuthError) {
+      return NextResponse.json(
+        { error: { code: error.code, message: error.message } },
+        { status: error.status }
+      );
+    }
+
     return NextResponse.json(
-      { error: { code: "FORBIDDEN", message: "Admin access required." } },
-      { status: 403 }
+      { error: { code: "INTERNAL_ERROR", message: "Unexpected error." } },
+      { status: 500 }
     );
   }
 
