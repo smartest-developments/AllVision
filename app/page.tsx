@@ -23,9 +23,23 @@ export default async function HomePage({ searchParams }: HomePageProps) {
   const userId = typeof rawUserId === "string" ? rawUserId.trim() : "";
   const legal = getLegalCopy("request");
   const requests = userId ? await listSourcingRequestStatusesForUser(userId) : [];
+  const timelineHref = userId
+    ? `/timeline?userId=${encodeURIComponent(userId)}`
+    : "/timeline";
 
   return (
     <main className="mx-auto flex min-h-screen max-w-3xl flex-col gap-6 px-6 py-16">
+      <nav
+        aria-label="Authenticated navigation"
+        className="flex flex-wrap items-center gap-4 text-sm text-neutral-700"
+      >
+        <Link className="underline" href="/">
+          Home
+        </Link>
+        <Link className="underline" href={timelineHref}>
+          Timeline
+        </Link>
+      </nav>
       <h1 className="text-4xl font-semibold">AllVision</h1>
       <p className="text-lg">
         Documentation-first bootstrap. This service provides informational
@@ -34,7 +48,7 @@ export default async function HomePage({ searchParams }: HomePageProps) {
       </p>
       <p className="text-sm text-neutral-700">
         View the dedicated timeline page at{" "}
-        <Link className="underline" href="/timeline">
+        <Link className="underline" href={timelineHref}>
           /timeline
         </Link>{" "}
         for deep-link request focus.

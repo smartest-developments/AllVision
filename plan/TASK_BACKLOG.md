@@ -145,6 +145,8 @@ Completion signal: CI blocks merges on lint/typecheck/test/build and migration/s
   - Evidence: `app/page.tsx`, `tests/integration/sourcing-request-timeline-page.test.ts`.
 - [AT-AUTO-UI-01] Add dedicated authenticated timeline route with request detail deep-linking.
   - Evidence: `app/timeline/page.tsx`, `app/page.tsx`, `tests/integration/sourcing-timeline-route-page.test.ts`.
+- [AT-AUTO-UI-02] Add authenticated navigation entry and empty-state UX polish for timeline deep-linking.
+  - Evidence: `app/page.tsx`, `app/timeline/page.tsx`, `tests/integration/sourcing-request-timeline-page.test.ts`, `tests/integration/sourcing-timeline-route-page.test.ts`.
 
 ## AUTO_DISCOVERED
 
@@ -159,7 +161,7 @@ Completion signal: CI blocks merges on lint/typecheck/test/build and migration/s
   - Source signal: current UI/API integration depends on manual user-id input and header-based identity.
   - DoD: sourcing-request APIs resolve authenticated user from session cookie and reject identity spoofing.
   - Evidence target: integration tests for session-authenticated allow/deny matrix.
-- [AT-AUTO-UI-02] Add authenticated navigation entry and empty-state UX polish for timeline deep-linking.
+- [AT-AUTO-UI-02] Add authenticated navigation entry and empty-state UX polish for timeline deep-linking. ✅ DONE
   - Priority: P1
   - Acceptance: authenticated users can always reach timeline from shell navigation and recover from invalid `requestId` focus with one click.
   - Source signal: `/timeline` now exists but remains disconnected from authenticated shell and lacks error recovery affordances.

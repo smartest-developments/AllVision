@@ -64,6 +64,8 @@ describe("Home page sourcing request timeline", () => {
     expect(markup).toContain(`Request ${request.id}`);
     expect(markup).toContain("Current status: IN_REVIEW");
     expect(markup).toContain("SUBMITTED -&gt; IN_REVIEW");
+    expect(markup).toContain('aria-label="Authenticated navigation"');
+    expect(markup).toContain(`/timeline?userId=${owner.id}`);
   });
 
   it("renders guidance message when userId is absent", async () => {

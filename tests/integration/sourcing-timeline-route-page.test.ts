@@ -144,6 +144,8 @@ describe("Timeline page deep-linking", () => {
     );
 
     expect(markup).toContain("No request matching this request ID was found for this account.");
+    expect(markup).toContain("Clear request focus");
+    expect(markup).toContain(`/timeline?userId=${owner.id}`);
     expect(markup).not.toContain(`Request ${otherRequest.id}`);
   });
 });

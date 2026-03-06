@@ -29,15 +29,32 @@ export default async function TimelinePage({ searchParams }: TimelinePageProps) 
   const filteredRequests = requestId
     ? requests.filter((request) => request.requestId === requestId)
     : requests;
+  const homeHref = userId ? `/?userId=${encodeURIComponent(userId)}` : "/";
+  const timelineHref = userId
+    ? `/timeline?userId=${encodeURIComponent(userId)}`
+    : "/timeline";
+  const hasInvalidRequestFocus =
+    userId !== "" && requestId !== "" && filteredRequests.length === 0;
 
   return (
     <main className="mx-auto flex min-h-screen max-w-3xl flex-col gap-6 px-6 py-16">
+      <nav
+        aria-label="Authenticated navigation"
+        className="flex flex-wrap items-center gap-4 text-sm text-neutral-700"
+      >
+        <Link className="underline" href={homeHref}>
+          Home
+        </Link>
+        <Link className="underline" href={timelineHref}>
+          Timeline
+        </Link>
+      </nav>
       <h1 className="text-4xl font-semibold">Sourcing timeline</h1>
       <p className="text-sm text-neutral-700">
         Owner-scoped request timeline with optional request deep-linking.
       </p>
       <p className="text-sm text-neutral-700">
-        <Link className="underline" href="/">
+        <Link className="underline" href={homeHref}>
           Return to home
         </Link>
       </p>
@@ -85,9 +102,13 @@ export default async function TimelinePage({ searchParams }: TimelinePageProps) 
           </p>
         ) : null}
 
-        {userId && requestId && filteredRequests.length === 0 ? (
+        {hasInvalidRequestFocus ? (
           <p className="mt-4 text-sm text-neutral-700">
-            No request matching this request ID was found for this account.
+            No request matching this request ID was found for this account.{" "}
+            <Link className="underline" href={timelineHref}>
+              Clear request focus
+            </Link>
+            .
           </p>
         ) : null}
 

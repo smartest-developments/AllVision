@@ -1,5 +1,11 @@
 # Progress Log
 
+## 2026-03-06T02:51:22+0100
+
+- task: AT-AUTO-UI-02 Add authenticated navigation entry and empty-state UX polish for timeline deep-linking
+- result: Added authenticated navigation links on home and timeline surfaces with user-aware deep links, plus a timeline reset CTA (`Clear request focus`) when `requestId` does not match the current owner-scoped result set; expanded integration tests to assert nav wiring and focus reset behavior.
+- next: AT-AUTO-BE-01 Replace `x-user-id` header auth shim with session-derived identity for sourcing status APIs
+
 ## 2026-03-06T02:10:00+0100
 
 - task: AT-P1-01 Enforce RBAC middleware (`USER`, `ADMIN`)
