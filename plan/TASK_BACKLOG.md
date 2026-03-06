@@ -52,10 +52,22 @@ Completion signal: CI blocks merges on lint/typecheck/test/build and migration/s
 - DoD: users view only own request timeline and current state.
 - Evidence: `app/api/v1/sourcing-requests/route.ts`, `src/server/sourcing-request-status.ts`, `tests/integration/sourcing-request-status.test.ts`, `tests/integration/sourcing-request-status-route.test.ts`.
 
-4. [AT-P1-04] Build admin queue for pending and in-review sourcing requests.
+4. [AT-P1-04] Build admin queue for pending and in-review sourcing requests. (split into `AT-P1-04A` + `AT-P1-04B`)
 - Size: 2-3h
 - DoD: admin-only list/detail retrieval with basic filters.
 - Evidence: integration tests for visibility and filters.
+
+4a. [AT-P1-04A] Add admin queue API list/detail contract with filter params.
+- Priority: P1
+- Size: 1-2h
+- DoD: admin-only queue endpoints return deterministic list/detail payloads with validated filter inputs.
+- Evidence: API integration tests for auth visibility + filter/query validation.
+
+4b. [AT-P1-04B] Add admin queue UI surface bound to API list/detail contract.
+- Priority: P1
+- Size: 1-2h
+- DoD: admin-only queue page renders pending/in-review requests with filter controls backed by API responses.
+- Evidence: integration tests for queue rendering, filter interactions, and detail navigation.
 
 5. [AT-P1-05] Add admin action logging for review decisions and report uploads.
 - Size: 1-2h
@@ -179,12 +191,12 @@ Completion signal: CI blocks merges on lint/typecheck/test/build and migration/s
   - Source signal: session lookup logic is currently duplicated between request middleware and page SSR helper.
   - DoD: one shared resolver enforces expiry/revocation semantics across API routes and server-rendered UI.
   - Evidence target: `src/server/request-auth.ts`, `src/server/page-auth.ts`, auth/session tests.
-- [AT-AUTO-UI-04] Add signed-out recovery CTA on home/timeline timeline surfaces.
+- [AT-AUTO-UI-04] Add signed-out recovery CTA on home/timeline timeline surfaces. ✅ DONE
   - Priority: P1
   - Acceptance: signed-out guidance includes a clear path to authenticate and return to timeline context.
   - Source signal: session-aware timeline views now hide data when signed out but provide no direct auth CTA.
   - DoD: signed-out states include authentication action links and integration tests cover CTA rendering.
-  - Evidence target: `app/page.tsx`, `app/timeline/page.tsx`, integration timeline page tests.
+  - Evidence target: `app/page.tsx`, `app/timeline/page.tsx`, `tests/integration/sourcing-request-timeline-page.test.ts`, `tests/integration/sourcing-timeline-route-page.test.ts`.
 
 ## TECH_DEBT
 

@@ -84,5 +84,7 @@ describe("Home page sourcing request timeline", () => {
     expect(markup).toContain(
       "Sign in to load your owner-only sourcing request statuses.",
     );
+    expect(markup).toContain("/auth/login?next=%2Ftimeline");
+    expect(markup).toContain("/auth/register?next=%2Ftimeline");
   });
 });

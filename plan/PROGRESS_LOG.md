@@ -1,5 +1,12 @@
 # Progress Log
 
+## 2026-03-06T07:17:44+0100
+
+- task: AT-AUTO-UI-04 Add signed-out recovery CTA on home/timeline timeline surfaces
+- result: added explicit signed-out auth CTA links (`/auth/login` + `/auth/register`) on home and timeline pages with `next` return-path preservation (including deep-linked `requestId` timeline context), and expanded integration tests to assert CTA rendering + encoded return URLs.
+- backlog update: marked `AT-AUTO-UI-04` DONE and split oversized mixed-surface queue item `AT-P1-04` into `AT-P1-04A` (backend contract) and `AT-P1-04B` (UI surface) to keep backend/UI execution balanced.
+- next: AT-AUTO-BE-02 Consolidate session identity resolution for API and server-rendered pages.
+
 ## 2026-03-06T06:39:52+0100
 
 - task: AT-AUTO-UI-03 Replace manual `userId` query input with session-aware timeline loading UX

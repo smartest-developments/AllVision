@@ -30,6 +30,14 @@ export default async function TimelinePage({ searchParams }: TimelinePageProps) 
     : requests;
   const homeHref = "/";
   const timelineHref = "/timeline";
+  const returnToTimelineHref =
+    requestId !== ""
+      ? `${timelineHref}?requestId=${encodeURIComponent(requestId)}`
+      : timelineHref;
+  const signInHref = `/auth/login?next=${encodeURIComponent(returnToTimelineHref)}`;
+  const registerHref = `/auth/register?next=${encodeURIComponent(
+    returnToTimelineHref,
+  )}`;
   const hasInvalidRequestFocus =
     userId !== "" && requestId !== "" && filteredRequests.length === 0;
 
@@ -82,7 +90,15 @@ export default async function TimelinePage({ searchParams }: TimelinePageProps) 
 
         {!userId ? (
           <p className="mt-4 text-sm text-neutral-700">
-            Sign in to load your owner-only sourcing request statuses.
+            Sign in to load your owner-only sourcing request statuses.{" "}
+            <Link className="underline" href={signInHref}>
+              Sign in
+            </Link>{" "}
+            or{" "}
+            <Link className="underline" href={registerHref}>
+              create an account
+            </Link>
+            .
           </p>
         ) : null}
 

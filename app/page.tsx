@@ -17,6 +17,8 @@ export default async function HomePage() {
   const legal = getLegalCopy("request");
   const requests = userId ? await listSourcingRequestStatusesForUser(userId) : [];
   const timelineHref = "/timeline";
+  const signInHref = `/auth/login?next=${encodeURIComponent(timelineHref)}`;
+  const registerHref = `/auth/register?next=${encodeURIComponent(timelineHref)}`;
 
   return (
     <main className="mx-auto flex min-h-screen max-w-3xl flex-col gap-6 px-6 py-16">
@@ -59,7 +61,15 @@ export default async function HomePage() {
 
         {!userId ? (
           <p className="mt-4 text-sm text-neutral-700">
-            Sign in to load your owner-only sourcing request statuses.
+            Sign in to load your owner-only sourcing request statuses.{" "}
+            <Link className="underline" href={signInHref}>
+              Sign in
+            </Link>{" "}
+            or{" "}
+            <Link className="underline" href={registerHref}>
+              create an account
+            </Link>
+            .
           </p>
         ) : null}
 

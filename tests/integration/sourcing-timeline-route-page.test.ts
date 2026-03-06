@@ -159,4 +159,24 @@ describe("Timeline page deep-linking", () => {
     expect(markup).toContain("/timeline");
     expect(markup).not.toContain(`Request ${otherRequest.id}`);
   });
+
+  it("renders sign-in CTA links with return path when session identity is absent", async () => {
+    const markup = renderToStaticMarkup(
+      await TimelinePage({
+        searchParams: Promise.resolve({
+          requestId: "req_123",
+        }),
+      }),
+    );
+
+    expect(markup).toContain(
+      "Sign in to load your owner-only sourcing request statuses.",
+    );
+    expect(markup).toContain(
+      "/auth/login?next=%2Ftimeline%3FrequestId%3Dreq_123",
+    );
+    expect(markup).toContain(
+      "/auth/register?next=%2Ftimeline%3FrequestId%3Dreq_123",
+    );
+  });
 });
