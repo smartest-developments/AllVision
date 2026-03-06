@@ -94,10 +94,10 @@ Completion signal: CI blocks merges on lint/typecheck/test/build and migration/s
 - DoD: deletion lifecycle recorded with legal-hold checks.
 - Evidence: `app/api/v1/gdpr/delete/route.ts`, `src/server/gdpr-delete-requests.ts`, `tests/integration/gdpr-delete-route.test.ts`, `docs/API_SPEC.md`.
 
-10. [AT-P1-10] Add CI workflow for lint/typecheck/test/build.
+10. [AT-P1-10] Add CI workflow for lint/typecheck/test/build. ✅ DONE
 - Size: 1-2h
 - DoD: PRs fail on red gate.
-- Evidence: CI config + passing run artifact.
+- Evidence: `.github/workflows/ci.yml` (Node 22 + Postgres service + prisma migrate + lint/typecheck/test/build gate sequence).
 
 11. [AT-P1-11] Add schema drift and migration checks in CI.
 - Size: 1-2h
