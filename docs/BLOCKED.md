@@ -20,3 +20,6 @@
 
 ## 2026-03-06T13:22:42+0100 - Automation blocked
 - This run could not safely commit: planning/docs files are read-only and concurrent in-repo edits changed tracked files during execution.
+
+## 2026-03-06T20:31:36+0100
+- Automation blocker: repository is read-only in this environment (`Operation not permitted` on file writes), so AT-P1-10 CI workflow and backlog/progress updates could not be applied.
