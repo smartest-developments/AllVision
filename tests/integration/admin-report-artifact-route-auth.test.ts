@@ -1,6 +1,8 @@
+import { randomUUID } from "node:crypto";
 import { NextRequest } from "next/server";
 import { beforeEach, describe, expect, it } from "vitest";
 
+import { hashToken, SESSION_COOKIE_NAME } from "@/server/auth";
 import { POST } from "../../app/api/v1/admin/sourcing-requests/[requestId]/report-artifacts/route";
 import { prisma } from "@/server/db";
 
@@ -60,7 +62,22 @@ describe("POST /api/v1/admin/sourcing-requests/:requestId/report-artifacts auth"
     return { admin, owner, request };
   }
 
-  it("returns 401 when user header is missing", async () => {
+  async function issueSessionCookie(userId: string): Promise<string> {
+    const token = `session-${randomUUID()}`;
+    await prisma.session.create({
+      data: {
+        userId,
+        tokenHash: hashToken(token),
+        expiresAt: new Date(Date.now() + 60 * 60 * 1000),
+        ipHash: null,
+        userAgentHash: null
+      }
+    });
+
+    return `${SESSION_COOKIE_NAME}=${token}`;
+  }
+
+  it("returns 401 when session cookie is missing", async () => {
     const { request } = await seedReviewRequest();
 
     const response = await POST(
@@ -83,14 +100,15 @@ describe("POST /api/v1/admin/sourcing-requests/:requestId/report-artifacts auth"
 
   it("returns 403 for non-admin role", async () => {
     const { owner, request } = await seedReviewRequest();
+    const ownerCookie = await issueSessionCookie(owner.id);
 
     const response = await POST(
       new NextRequest(`http://localhost/api/v1/admin/sourcing-requests/${request.id}/report-artifacts`, {
         method: "POST",
         headers: {
           "content-type": "application/json",
-          "x-user-id": owner.id,
-          "x-user-role": "USER"
+          cookie: ownerCookie,
+          "x-user-role": "ADMIN"
         },
         body: JSON.stringify({
           storageKey: "reports/request-auth.pdf",
@@ -108,14 +126,15 @@ describe("POST /api/v1/admin/sourcing-requests/:requestId/report-artifacts auth"
 
   it("allows admin role and writes report artifact", async () => {
     const { admin, request } = await seedReviewRequest();
+    const adminCookie = await issueSessionCookie(admin.id);
 
     const response = await POST(
       new NextRequest(`http://localhost/api/v1/admin/sourcing-requests/${request.id}/report-artifacts`, {
         method: "POST",
         headers: {
           "content-type": "application/json",
-          "x-user-id": admin.id,
-          "x-user-role": "ADMIN"
+          cookie: adminCookie,
+          "x-user-role": "USER"
         },
         body: JSON.stringify({
           storageKey: "reports/request-auth.pdf",

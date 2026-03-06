@@ -155,18 +155,24 @@ Completion signal: CI blocks merges on lint/typecheck/test/build and migration/s
   - Source signal: timeline UI now lives on root page and needs dedicated navigation/URL semantics as auth surfaces expand.
   - DoD: `/timeline` route lists owner requests and supports `requestId` focus state without exposing other users' data.
   - Evidence target: `app/timeline/page.tsx`, `app/page.tsx`, `tests/integration/sourcing-timeline-route-page.test.ts`.
-- [AT-AUTO-BE-01] Replace `x-user-id` header auth shim with session-derived identity for sourcing status APIs.
+- [AT-AUTO-BE-01] Replace `x-user-id` header auth shim with session-derived identity for sourcing status APIs. ✅ DONE
   - Priority: P1
   - Acceptance: timeline and status APIs ignore caller-supplied identity headers and resolve user from session cookie only.
   - Source signal: current UI/API integration depends on manual user-id input and header-based identity.
   - DoD: sourcing-request APIs resolve authenticated user from session cookie and reject identity spoofing.
-  - Evidence target: integration tests for session-authenticated allow/deny matrix.
+  - Evidence target: `src/server/request-auth.ts`, `app/api/v1/sourcing-requests/route.ts`, `app/api/v1/sourcing-requests/[requestId]/report/route.ts`, `app/api/v1/prescriptions/route.ts`, `tests/integration/sourcing-request-status-route.test.ts`, `tests/integration/admin-report-artifact-route-auth.test.ts`.
 - [AT-AUTO-UI-02] Add authenticated navigation entry and empty-state UX polish for timeline deep-linking. ✅ DONE
   - Priority: P1
   - Acceptance: authenticated users can always reach timeline from shell navigation and recover from invalid `requestId` focus with one click.
   - Source signal: `/timeline` now exists but remains disconnected from authenticated shell and lacks error recovery affordances.
   - DoD: authenticated surfaces link to `/timeline`, request-focus miss state includes reset CTA, and component tests cover navigation + reset behavior.
   - Evidence target: app-shell/nav tests plus timeline page interaction coverage.
+- [AT-AUTO-UI-03] Replace manual `userId` query input with session-aware timeline loading UX.
+  - Priority: P1
+  - Acceptance: home/timeline pages load owner-scoped data from authenticated session without requiring `?userId=` query entry.
+  - Source signal: UI still requires manual user-id entry despite backend now resolving identity from session cookie.
+  - DoD: timeline pages remove manual user-id form dependency and keep request deep-link/focus behavior.
+  - Evidence target: `app/page.tsx`, `app/timeline/page.tsx`, integration tests for session-driven timeline rendering.
 
 ## TECH_DEBT
 

@@ -1,4 +1,6 @@
 import type { NextRequest } from "next/server";
+import { hashToken, SESSION_COOKIE_NAME, type UserRole } from "@/server/auth";
+import { prisma } from "@/server/db";
 
 export type RequestUserRole = "USER" | "ADMIN";
 
@@ -13,21 +15,45 @@ export class RequestAuthError extends Error {
   }
 }
 
-export function requireRequestUserId(request: NextRequest): string {
-  const userId = request.headers.get("x-user-id")?.trim();
-  if (!userId) {
+type RequestIdentity = {
+  userId: string;
+  role: UserRole;
+};
+
+async function resolveRequestIdentity(request: NextRequest): Promise<RequestIdentity> {
+  const sessionToken = request.cookies.get(SESSION_COOKIE_NAME)?.value?.trim();
+  if (!sessionToken) {
     throw new RequestAuthError(401, "UNAUTHORIZED", "Authentication required.");
   }
 
-  return userId;
+  const session = await prisma.session.findUnique({
+    where: { tokenHash: hashToken(sessionToken) },
+    include: { user: true }
+  });
+
+  if (!session || session.revokedAt || session.expiresAt <= new Date()) {
+    throw new RequestAuthError(401, "UNAUTHORIZED", "Authentication required.");
+  }
+
+  return {
+    userId: session.userId,
+    role: session.user.role
+  };
 }
 
-export function requireRequestRole(request: NextRequest, requiredRole: RequestUserRole): string {
-  const userId = requireRequestUserId(request);
-  const userRole = request.headers.get("x-user-role");
-  if (userRole !== requiredRole) {
+export async function requireRequestUserId(request: NextRequest): Promise<string> {
+  const identity = await resolveRequestIdentity(request);
+  return identity.userId;
+}
+
+export async function requireRequestRole(
+  request: NextRequest,
+  requiredRole: RequestUserRole
+): Promise<string> {
+  const identity = await resolveRequestIdentity(request);
+  if (identity.role !== requiredRole) {
     throw new RequestAuthError(403, "FORBIDDEN", "Admin access required.");
   }
 
-  return userId;
+  return identity.userId;
 }

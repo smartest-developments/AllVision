@@ -3,6 +3,7 @@ import bcrypt from "bcryptjs";
 
 const SESSION_TTL_DAYS = 7;
 const MIN_PASSWORD_LENGTH = 8;
+export const SESSION_COOKIE_NAME = "allvision_session";
 
 export type UserRole = "USER" | "ADMIN";
 

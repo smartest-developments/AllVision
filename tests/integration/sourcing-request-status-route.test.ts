@@ -1,6 +1,8 @@
+import { randomUUID } from "node:crypto";
 import { NextRequest } from "next/server";
 import { beforeEach, describe, expect, it } from "vitest";
 
+import { hashToken, SESSION_COOKIE_NAME } from "@/server/auth";
 import { prisma } from "@/server/db";
 import { GET } from "../../app/api/v1/sourcing-requests/route";
 
@@ -15,7 +17,22 @@ describe("GET /api/v1/sourcing-requests", () => {
     await prisma.user.deleteMany();
   });
 
-  it("returns 401 when authentication header is missing", async () => {
+  async function issueSessionCookie(userId: string): Promise<string> {
+    const token = `session-${randomUUID()}`;
+    await prisma.session.create({
+      data: {
+        userId,
+        tokenHash: hashToken(token),
+        expiresAt: new Date(Date.now() + 60 * 60 * 1000),
+        ipHash: null,
+        userAgentHash: null
+      }
+    });
+
+    return `${SESSION_COOKIE_NAME}=${token}`;
+  }
+
+  it("returns 401 when session cookie is missing", async () => {
     const request = new NextRequest("http://localhost/api/v1/sourcing-requests");
 
     const response = await GET(request);
@@ -101,9 +118,11 @@ describe("GET /api/v1/sourcing-requests", () => {
       }
     });
 
+    const ownerCookie = await issueSessionCookie(owner.id);
     const request = new NextRequest("http://localhost/api/v1/sourcing-requests", {
       headers: {
-        "x-user-id": owner.id
+        cookie: ownerCookie,
+        "x-user-id": otherUser.id
       }
     });
 
@@ -132,6 +151,7 @@ describe("GET /api/v1/sourcing-requests", () => {
       status: "IN_REVIEW",
       timeline: [{ fromStatus: "SUBMITTED", toStatus: "IN_REVIEW", note: "Admin started review" }]
     });
+    expect(payload.requests[0]?.requestId).not.toBe(otherUser.id);
     expect(payload.legal.title).toBe("Legal Notice");
   });
 });

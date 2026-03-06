@@ -69,6 +69,7 @@ All API surfaces must maintain these constraints:
 
 - Purpose: list authenticated user sourcing requests.
 - Notes: returns owner-only request timeline entries (`requestId`, `status`, `createdAt`, `updatedAt`, `latestEventAt`, `timeline[]`) and includes `legal` copy for request-surface consistency.
+- Auth note: caller identity is resolved from session cookie only; `x-user-id` headers are ignored.
 - UI consumption note: `/timeline` supports optional client-side `requestId` focus against this owner-scoped payload.
 - Responses: `200`, `401`.
 
@@ -105,7 +106,7 @@ All API surfaces must maintain these constraints:
 ### `POST /api/v1/admin/sourcing-requests/:requestId/report-artifacts`
 
 - Purpose: attach report artifact metadata and mark request as report-ready/delivered.
-- Auth headers required: `x-user-id` and `x-user-role=ADMIN` (missing identity -> `401`, non-admin role -> `403`).
+- Auth note: requires authenticated session cookie with persisted user role `ADMIN` (missing/invalid session -> `401`, non-admin role -> `403`).
 - Responses: `200`, `400`, `401`, `403`, `404`, `501`.
 
 ## Compliance/GDPR

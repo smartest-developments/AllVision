@@ -15,7 +15,7 @@ export async function POST(
 
   let userId: string;
   try {
-    userId = requireRequestRole(request, "ADMIN");
+    userId = await requireRequestRole(request, "ADMIN");
   } catch (error) {
     if (error instanceof RequestAuthError) {
       return NextResponse.json(

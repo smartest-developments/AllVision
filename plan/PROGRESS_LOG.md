@@ -1,5 +1,11 @@
 # Progress Log
 
+## 2026-03-06T04:25:00+0100
+
+- task: AT-AUTO-BE-01 Replace `x-user-id` header auth shim with session-derived identity for sourcing status APIs
+- result: Added session-cookie identity resolution in `src/server/request-auth.ts` and migrated prescription/sourcing/report/admin API routes to authenticate via signed session token lookup (ignoring caller-supplied identity headers). Expanded integration coverage to assert cookie-authenticated allow/deny behavior and role enforcement from persisted user role.
+- next: AT-AUTO-UI-03 Replace manual `userId` query input with session-aware timeline loading UX
+
 ## 2026-03-06T02:51:22+0100
 
 - task: AT-AUTO-UI-02 Add authenticated navigation entry and empty-state UX polish for timeline deep-linking
