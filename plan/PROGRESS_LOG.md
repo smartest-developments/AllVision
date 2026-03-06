@@ -1,5 +1,12 @@
 # Progress Log
 
+## 2026-03-06T08:19:57+0100
+
+- task: AT-AUTO-BE-02 Consolidate session identity resolution for API and server-rendered pages
+- result: extracted shared active-session identity resolver into `src/server/session-identity.ts` and rewired both API request auth (`src/server/request-auth.ts`) and page session auth (`src/server/page-auth.ts`) to use the same expiry/revocation-aware lookup path. Added integration coverage for active, expired, revoked, and unknown token paths in `tests/integration/session-identity-resolver.test.ts`.
+- backlog update: marked `AT-AUTO-BE-02` DONE with concrete evidence pointers.
+- next: AT-P1-04A add admin queue API list/detail contract with filter params.
+
 ## 2026-03-06T07:17:44+0100
 
 - task: AT-AUTO-UI-04 Add signed-out recovery CTA on home/timeline timeline surfaces

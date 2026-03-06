@@ -1,6 +1,6 @@
 import { cookies } from "next/headers";
 import { SESSION_COOKIE_NAME } from "@/server/auth";
-import { resolveIdentityFromSessionToken } from "@/server/request-auth";
+import { resolveSessionIdentityFromToken } from "@/server/session-identity";
 
 export async function resolvePageSessionUserId(): Promise<string | null> {
   let sessionToken: string | undefined;
@@ -12,6 +12,6 @@ export async function resolvePageSessionUserId(): Promise<string | null> {
     return null;
   }
 
-  const identity = await resolveIdentityFromSessionToken(sessionToken);
+  const identity = await resolveSessionIdentityFromToken(sessionToken);
   return identity?.userId ?? null;
 }

@@ -185,12 +185,12 @@ Completion signal: CI blocks merges on lint/typecheck/test/build and migration/s
   - Source signal: UI still requires manual user-id entry despite backend now resolving identity from session cookie.
   - DoD: timeline pages remove manual user-id form dependency and keep request deep-link/focus behavior.
   - Evidence target: `app/page.tsx`, `app/timeline/page.tsx`, `src/server/page-auth.ts`, integration tests for session-driven timeline rendering.
-- [AT-AUTO-BE-02] Consolidate session identity resolution for API and server-rendered pages.
+- [AT-AUTO-BE-02] Consolidate session identity resolution for API and server-rendered pages. ✅ DONE
   - Priority: P1
   - Acceptance: API middleware and page/session resolver share one canonical active-session lookup helper.
   - Source signal: session lookup logic is currently duplicated between request middleware and page SSR helper.
   - DoD: one shared resolver enforces expiry/revocation semantics across API routes and server-rendered UI.
-  - Evidence target: `src/server/request-auth.ts`, `src/server/page-auth.ts`, auth/session tests.
+  - Evidence target: `src/server/session-identity.ts`, `src/server/request-auth.ts`, `src/server/page-auth.ts`, `tests/integration/session-identity-resolver.test.ts`.
 - [AT-AUTO-UI-04] Add signed-out recovery CTA on home/timeline timeline surfaces. ✅ DONE
   - Priority: P1
   - Acceptance: signed-out guidance includes a clear path to authenticate and return to timeline context.

@@ -1,6 +1,6 @@
 import type { NextRequest } from "next/server";
-import { hashToken, SESSION_COOKIE_NAME, type UserRole } from "@/server/auth";
-import { prisma } from "@/server/db";
+import { SESSION_COOKIE_NAME, type UserRole } from "@/server/auth";
+import { resolveSessionIdentityFromToken } from "@/server/session-identity";
 
 export type RequestUserRole = "USER" | "ADMIN";
 
@@ -21,25 +21,9 @@ type RequestIdentity = {
 };
 
 export async function resolveIdentityFromSessionToken(
-  sessionToken: string | null | undefined
+  sessionToken: string | null | undefined,
 ): Promise<RequestIdentity | null> {
-  if (!sessionToken) {
-    return null;
-  }
-
-  const session = await prisma.session.findUnique({
-    where: { tokenHash: hashToken(sessionToken) },
-    include: { user: true }
-  });
-
-  if (!session || session.revokedAt || session.expiresAt <= new Date()) {
-    return null;
-  }
-
-  return {
-    userId: session.userId,
-    role: session.user.role
-  };
+  return resolveSessionIdentityFromToken(sessionToken);
 }
 
 async function resolveRequestIdentity(request: NextRequest): Promise<RequestIdentity> {
@@ -59,7 +43,7 @@ export async function requireRequestUserId(request: NextRequest): Promise<string
 
 export async function requireRequestRole(
   request: NextRequest,
-  requiredRole: RequestUserRole
+  requiredRole: RequestUserRole,
 ): Promise<string> {
   const identity = await resolveRequestIdentity(request);
   if (identity.role !== requiredRole) {
