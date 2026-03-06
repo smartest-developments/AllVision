@@ -150,6 +150,7 @@ All API surfaces must maintain these constraints:
 - Tracking note: lifecycle is persisted as immutable audit evidence (`GDPR_DELETE_REQUESTED` then `GDPR_DELETE_COMPLETED`) with anonymization metadata.
 - Responses: `202`, `401`, `409`, `500`.
 
+- UI note: authenticated users can review GDPR request history on /gdpr, including legal-hold guidance and latest request states derived from audit events.
 ## 2026-03-06 Admin Audit Increment
 - Admin report-artifact upload flow now emits two audit markers:
   - `REPORT_ARTIFACT_UPLOADED` (`entityType=ReportArtifact`) with upload + transition context.

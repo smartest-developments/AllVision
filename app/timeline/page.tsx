@@ -135,6 +135,9 @@ export default async function TimelinePage({ searchParams }: TimelinePageProps) 
         <Link className="underline" href={timelineHref}>
           Timeline
         </Link>
+        <Link className="underline" href="/gdpr">
+          GDPR
+        </Link>
       </nav>
       <h1 className="text-4xl font-semibold">Sourcing timeline</h1>
       <p className="text-sm text-neutral-700">

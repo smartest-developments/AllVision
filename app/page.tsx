@@ -32,6 +32,9 @@ export default async function HomePage() {
         <Link className="underline" href={timelineHref}>
           Timeline
         </Link>
+        <Link className="underline" href="/gdpr">
+          GDPR
+        </Link>
       </nav>
       <h1 className="text-4xl font-semibold">AllVision</h1>
       <p className="text-lg">
@@ -126,6 +129,13 @@ export default async function HomePage() {
         <h2 className="text-2xl font-semibold">GDPR self-service actions</h2>
         <p className="mt-2 text-sm text-neutral-700">
           Use these controls to create export/deletion requests from the authenticated UI.
+        </p>
+        <p className="mt-2 text-sm text-neutral-700">
+          For request history and legal-hold guidance, open{" "}
+          <Link className="underline" href="/gdpr">
+            /gdpr
+          </Link>
+          .
         </p>
 
         {!userId ? (

@@ -1,5 +1,13 @@
 # Progress Log
 
+## 2026-03-06T17:20:29+0100
+
+- task: AT-AUTO-UI-06B Add dedicated GDPR status/history page
+- result: added authenticated /gdpr page with request-history rendering and legal-hold guidance, wired home/timeline navigation link to /gdpr, and introduced server helper to resolve GDPR audit history from immutable audit events.
+- backlog update: marked AT-AUTO-UI-06B DONE with evidence and advanced next priority item to AT-P1-10.
+- quality gates: npm run lint ✅, npm run typecheck ✅, npm run test ✅, npm run build ✅.
+- next: AT-P1-10 add CI workflow for lint/typecheck/test/build.
+
 ## 2026-03-06T16:05:00+0100
 
 - task: AT-P1-09 Implement GDPR deletion flow

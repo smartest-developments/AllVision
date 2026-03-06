@@ -75,6 +75,7 @@ describe("Home page sourcing request timeline", () => {
     expect(markup).toContain("SUBMITTED -&gt; IN_REVIEW");
     expect(markup).toContain('aria-label="Authenticated navigation"');
     expect(markup).toContain("/timeline");
+    expect(markup).toContain("/gdpr");
     expect(markup).toContain("Open focused timeline view");
     expect(markup).toContain("GDPR self-service actions");
     expect(markup).toContain('action="/api/v1/gdpr/export"');
@@ -91,5 +92,6 @@ describe("Home page sourcing request timeline", () => {
     expect(markup).toContain("/auth/register?next=%2Ftimeline");
     expect(markup).toContain("GDPR self-service actions");
     expect(markup).toContain("Sign in to submit GDPR requests.");
+    expect(markup).toContain("For request history and legal-hold guidance");
   });
 });

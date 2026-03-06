@@ -267,7 +267,7 @@ Mitigation refs: [AT-P0-05], [AT-P0-06], [AT-P0-07], [AT-P1-06].
   - Priority: P1
   - DoD: authenticated home UI renders deterministic GDPR action controls targeting export/deletion request APIs; signed-out state shows explicit auth CTA copy.
   - Evidence: `app/page.tsx`, `tests/integration/sourcing-request-timeline-page.test.ts`.
-- [AT-AUTO-UI-06B] Add dedicated `/gdpr` status page with request history + legal-hold guidance copy.
+- [AT-AUTO-UI-06B] Add dedicated /gdpr status page with request history + legal-hold guidance copy. ✅ DONE
   - Priority: P1
-  - DoD: authenticated users can view last GDPR request states and legal-hold guidance without leaving timeline context.
-  - Evidence target: `app/gdpr/page.tsx` + integration tests.
+  - DoD: authenticated users can view GDPR request history and legal-hold guidance without leaving timeline context.
+  - Evidence: app/gdpr/page.tsx, src/server/gdpr-request-history.ts, tests/integration/gdpr-page.test.ts, tests/integration/sourcing-request-timeline-page.test.ts.
