@@ -229,3 +229,12 @@ Mitigation refs: [AT-P0-05], [AT-P0-06], [AT-P0-07], [AT-P1-06].
 - PK-01: Add social login option with secure account linking (from prior P2).
 - PK-02: Add scoped localization for legal disclaimers by country/language (from prior P2).
 - PK-03: Add E2E smoke suite after core lifecycle stabilizes (from prior P2, intentionally deferred until core flow is stable).
+
+## AUTO_SPLIT_2026-03-06_AT-P1-05
+- [AT-P1-05] Add admin action logging for review decisions and report uploads. (split into `AT-P1-05A` + `AT-P1-05B`)
+- [AT-P1-05A] Persist immutable `REPORT_ARTIFACT_UPLOADED` audit event on admin report upload/status move. ✅ DONE
+  - DoD: report-artifact upload writes dedicated audit row with actor/request/artifact context and transition metadata.
+  - Evidence: `src/server/report-artifacts.ts`, `tests/integration/admin-report-artifact.test.ts`.
+- [AT-P1-05B] Add immutable audit event on explicit admin review decision transitions. TODO
+  - DoD: admin review decision route writes deterministic audit event payload per transition.
+  - Evidence target: admin decision mutation route + integration tests.

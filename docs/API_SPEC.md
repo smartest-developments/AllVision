@@ -134,3 +134,9 @@ All API surfaces must maintain these constraints:
 
 - Purpose: create account deletion request.
 - Responses: `202`, `401`, `429`, `501`.
+
+## 2026-03-06 Admin Audit Increment
+- Admin report-artifact upload flow now emits two audit markers:
+  - `REPORT_ARTIFACT_UPLOADED` (`entityType=ReportArtifact`) with upload + transition context.
+  - `REPORT_READY_EMAIL_ENQUEUED` (`entityType=SourcingRequest`) for delivery notification pipeline marker.
+- Follow-up (`AT-P1-05B`): add equivalent immutable audit event for explicit admin review decision transitions.

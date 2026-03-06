@@ -93,6 +93,22 @@ describe("admin report artifact upload", () => {
       actorUserId: admin.id
     });
 
+    const uploadAudit = await prisma.auditEvent.findFirst({
+      where: {
+        sourcingRequestId: request.id,
+        action: "REPORT_ARTIFACT_UPLOADED"
+      }
+    });
+    expect(uploadAudit).not.toBeNull();
+    expect(uploadAudit?.actorUserId).toBe(admin.id);
+    expect(uploadAudit?.entityType).toBe("ReportArtifact");
+    expect(uploadAudit?.context).toMatchObject({
+      storageKey: "reports/request-1.pdf",
+      deliveryChannel: "email",
+      fromStatus: "IN_REVIEW",
+      toStatus: "REPORT_READY"
+    });
+
     const emailAudit = await prisma.auditEvent.findFirst({
       where: {
         sourcingRequestId: request.id,

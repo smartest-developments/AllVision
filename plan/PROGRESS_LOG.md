@@ -140,3 +140,10 @@
 - task: AT-P0-07 Persist status-change audit trail and report-ready email notification stub
 - result: Report-ready transition now writes `SourcingStatusEvent` and creates `REPORT_READY_EMAIL_ENQUEUED` audit marker; integration coverage added.
 - next: AT-P1-01 Enforce RBAC middleware (`USER`, `ADMIN`)
+
+## 2026-03-06T11:38:00+0100
+
+- task: AT-P1-05A Persist immutable report-upload audit event
+- result: `createReportArtifactAndMarkReady` now writes dedicated `REPORT_ARTIFACT_UPLOADED` audit evidence before email enqueue marker, including artifact key, delivery channel, and status transition context (`IN_REVIEW -> REPORT_READY`). Expanded integration assertions in `admin-report-artifact.test.ts` to enforce actor/entity/context payload.
+- backlog update: split `AT-P1-05` into `AT-P1-05A` (DONE) and `AT-P1-05B` (TODO) because explicit review-decision mutation route is not yet present.
+- next: AT-P1-05B add review-decision mutation endpoint with immutable audit logging.

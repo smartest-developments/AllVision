@@ -77,6 +77,22 @@ export async function createReportArtifactAndMarkReady(input: {
       data: {
         actorUserId: admin.id,
         sourcingRequestId: request.id,
+        entityType: "ReportArtifact",
+        entityId: artifact.id,
+        action: "REPORT_ARTIFACT_UPLOADED",
+        context: {
+          storageKey: artifact.storageKey,
+          deliveryChannel: artifact.deliveryChannel ?? "email",
+          fromStatus: request.status,
+          toStatus: SourcingRequestStatus.REPORT_READY
+        }
+      }
+    });
+
+    await tx.auditEvent.create({
+      data: {
+        actorUserId: admin.id,
+        sourcingRequestId: request.id,
         entityType: "SourcingRequest",
         entityId: request.id,
         action: "REPORT_READY_EMAIL_ENQUEUED",
