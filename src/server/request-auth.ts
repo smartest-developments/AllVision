@@ -20,10 +20,11 @@ type RequestIdentity = {
   role: UserRole;
 };
 
-async function resolveRequestIdentity(request: NextRequest): Promise<RequestIdentity> {
-  const sessionToken = request.cookies.get(SESSION_COOKIE_NAME)?.value?.trim();
+export async function resolveIdentityFromSessionToken(
+  sessionToken: string | null | undefined
+): Promise<RequestIdentity | null> {
   if (!sessionToken) {
-    throw new RequestAuthError(401, "UNAUTHORIZED", "Authentication required.");
+    return null;
   }
 
   const session = await prisma.session.findUnique({
@@ -32,13 +33,23 @@ async function resolveRequestIdentity(request: NextRequest): Promise<RequestIden
   });
 
   if (!session || session.revokedAt || session.expiresAt <= new Date()) {
-    throw new RequestAuthError(401, "UNAUTHORIZED", "Authentication required.");
+    return null;
   }
 
   return {
     userId: session.userId,
     role: session.user.role
   };
+}
+
+async function resolveRequestIdentity(request: NextRequest): Promise<RequestIdentity> {
+  const sessionToken = request.cookies.get(SESSION_COOKIE_NAME)?.value?.trim();
+  const identity = await resolveIdentityFromSessionToken(sessionToken);
+  if (!identity) {
+    throw new RequestAuthError(401, "UNAUTHORIZED", "Authentication required.");
+  }
+
+  return identity;
 }
 
 export async function requireRequestUserId(request: NextRequest): Promise<string> {

@@ -1,11 +1,20 @@
 import { renderToStaticMarkup } from "react-dom/server";
-import { beforeEach, describe, expect, it } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { prisma } from "@/server/db";
+import { resolvePageSessionUserId } from "@/server/page-auth";
 import TimelinePage from "../../app/timeline/page";
+
+vi.mock("@/server/page-auth", () => ({
+  resolvePageSessionUserId: vi.fn(),
+}));
+
+const mockedResolvePageSessionUserId = vi.mocked(resolvePageSessionUserId);
 
 describe("Timeline page deep-linking", () => {
   beforeEach(async () => {
+    mockedResolvePageSessionUserId.mockReset();
+    mockedResolvePageSessionUserId.mockResolvedValue(null);
     await prisma.auditEvent.deleteMany();
     await prisma.reportArtifact.deleteMany();
     await prisma.sourcingStatusEvent.deleteMany();
@@ -15,7 +24,7 @@ describe("Timeline page deep-linking", () => {
     await prisma.user.deleteMany();
   });
 
-  it("renders focused request card when requestId belongs to user", async () => {
+  it("renders focused request card when requestId belongs to session user", async () => {
     const owner = await prisma.user.create({
       data: {
         email: "timeline-focus-owner@example.com",
@@ -57,10 +66,11 @@ describe("Timeline page deep-linking", () => {
       },
     });
 
+    mockedResolvePageSessionUserId.mockResolvedValue(owner.id);
+
     const markup = renderToStaticMarkup(
       await TimelinePage({
         searchParams: Promise.resolve({
-          userId: owner.id,
           requestId: focusedRequest.id,
         }),
       }),
@@ -71,7 +81,7 @@ describe("Timeline page deep-linking", () => {
     expect(markup).not.toContain("No request matching this request ID");
   });
 
-  it("does not reveal another user's request when requestId does not belong to user", async () => {
+  it("does not reveal another user's request when requestId does not belong to session user", async () => {
     const owner = await prisma.user.create({
       data: {
         email: "timeline-owner@example.com",
@@ -134,10 +144,11 @@ describe("Timeline page deep-linking", () => {
       },
     });
 
+    mockedResolvePageSessionUserId.mockResolvedValue(owner.id);
+
     const markup = renderToStaticMarkup(
       await TimelinePage({
         searchParams: Promise.resolve({
-          userId: owner.id,
           requestId: otherRequest.id,
         }),
       }),
@@ -145,7 +156,7 @@ describe("Timeline page deep-linking", () => {
 
     expect(markup).toContain("No request matching this request ID was found for this account.");
     expect(markup).toContain("Clear request focus");
-    expect(markup).toContain(`/timeline?userId=${owner.id}`);
+    expect(markup).toContain("/timeline");
     expect(markup).not.toContain(`Request ${otherRequest.id}`);
   });
 });

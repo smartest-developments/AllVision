@@ -1,5 +1,11 @@
 # Progress Log
 
+## 2026-03-06T06:39:52+0100
+
+- task: AT-AUTO-UI-03 Replace manual `userId` query input with session-aware timeline loading UX
+- result: removed manual `userId` dependency from home and `/timeline` timeline surfaces; both pages now resolve owner identity from active session cookie via shared `resolvePageSessionUserId` helper and keep request deep-link focus via `requestId` only. Added/updated integration tests to assert session-driven timeline rendering and focused request isolation.
+- next: AT-AUTO-BE-02 Consolidate session identity resolution for API and server-rendered pages.
+
 ## 2026-03-06T04:25:00+0100
 
 - task: AT-AUTO-BE-01 Replace `x-user-id` header auth shim with session-derived identity for sourcing status APIs

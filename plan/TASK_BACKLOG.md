@@ -167,12 +167,24 @@ Completion signal: CI blocks merges on lint/typecheck/test/build and migration/s
   - Source signal: `/timeline` now exists but remains disconnected from authenticated shell and lacks error recovery affordances.
   - DoD: authenticated surfaces link to `/timeline`, request-focus miss state includes reset CTA, and component tests cover navigation + reset behavior.
   - Evidence target: app-shell/nav tests plus timeline page interaction coverage.
-- [AT-AUTO-UI-03] Replace manual `userId` query input with session-aware timeline loading UX.
+- [AT-AUTO-UI-03] Replace manual `userId` query input with session-aware timeline loading UX. ✅ DONE
   - Priority: P1
   - Acceptance: home/timeline pages load owner-scoped data from authenticated session without requiring `?userId=` query entry.
   - Source signal: UI still requires manual user-id entry despite backend now resolving identity from session cookie.
   - DoD: timeline pages remove manual user-id form dependency and keep request deep-link/focus behavior.
-  - Evidence target: `app/page.tsx`, `app/timeline/page.tsx`, integration tests for session-driven timeline rendering.
+  - Evidence target: `app/page.tsx`, `app/timeline/page.tsx`, `src/server/page-auth.ts`, integration tests for session-driven timeline rendering.
+- [AT-AUTO-BE-02] Consolidate session identity resolution for API and server-rendered pages.
+  - Priority: P1
+  - Acceptance: API middleware and page/session resolver share one canonical active-session lookup helper.
+  - Source signal: session lookup logic is currently duplicated between request middleware and page SSR helper.
+  - DoD: one shared resolver enforces expiry/revocation semantics across API routes and server-rendered UI.
+  - Evidence target: `src/server/request-auth.ts`, `src/server/page-auth.ts`, auth/session tests.
+- [AT-AUTO-UI-04] Add signed-out recovery CTA on home/timeline timeline surfaces.
+  - Priority: P1
+  - Acceptance: signed-out guidance includes a clear path to authenticate and return to timeline context.
+  - Source signal: session-aware timeline views now hide data when signed out but provide no direct auth CTA.
+  - DoD: signed-out states include authentication action links and integration tests cover CTA rendering.
+  - Evidence target: `app/page.tsx`, `app/timeline/page.tsx`, integration timeline page tests.
 
 ## TECH_DEBT
 

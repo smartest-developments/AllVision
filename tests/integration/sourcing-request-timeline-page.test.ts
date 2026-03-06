@@ -1,11 +1,20 @@
 import { renderToStaticMarkup } from "react-dom/server";
-import { beforeEach, describe, expect, it } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { prisma } from "@/server/db";
+import { resolvePageSessionUserId } from "@/server/page-auth";
 import HomePage from "../../app/page";
+
+vi.mock("@/server/page-auth", () => ({
+  resolvePageSessionUserId: vi.fn(),
+}));
+
+const mockedResolvePageSessionUserId = vi.mocked(resolvePageSessionUserId);
 
 describe("Home page sourcing request timeline", () => {
   beforeEach(async () => {
+    mockedResolvePageSessionUserId.mockReset();
+    mockedResolvePageSessionUserId.mockResolvedValue(null);
     await prisma.auditEvent.deleteMany();
     await prisma.reportArtifact.deleteMany();
     await prisma.sourcingStatusEvent.deleteMany();
@@ -15,7 +24,7 @@ describe("Home page sourcing request timeline", () => {
     await prisma.user.deleteMany();
   });
 
-  it("renders an authenticated timeline card when userId is provided", async () => {
+  it("renders an authenticated timeline card from session identity", async () => {
     const owner = await prisma.user.create({
       data: {
         email: "timeline-owner@example.com",
@@ -56,23 +65,24 @@ describe("Home page sourcing request timeline", () => {
       },
     });
 
-    const markup = renderToStaticMarkup(
-      await HomePage({ searchParams: Promise.resolve({ userId: owner.id }) }),
-    );
+    mockedResolvePageSessionUserId.mockResolvedValue(owner.id);
+
+    const markup = renderToStaticMarkup(await HomePage());
 
     expect(markup).toContain("Sourcing request timeline");
     expect(markup).toContain(`Request ${request.id}`);
     expect(markup).toContain("Current status: IN_REVIEW");
     expect(markup).toContain("SUBMITTED -&gt; IN_REVIEW");
     expect(markup).toContain('aria-label="Authenticated navigation"');
-    expect(markup).toContain(`/timeline?userId=${owner.id}`);
+    expect(markup).toContain("/timeline");
+    expect(markup).toContain("Open focused timeline view");
   });
 
-  it("renders guidance message when userId is absent", async () => {
-    const markup = renderToStaticMarkup(await HomePage({}));
+  it("renders sign-in guidance when session identity is absent", async () => {
+    const markup = renderToStaticMarkup(await HomePage());
 
     expect(markup).toContain(
-      "Enter a user ID to load owner-only sourcing request statuses.",
+      "Sign in to load your owner-only sourcing request statuses.",
     );
   });
 });
