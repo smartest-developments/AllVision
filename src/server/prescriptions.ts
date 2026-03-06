@@ -1,5 +1,6 @@
 import { prescriptionSchema } from "@/types/prescription";
 import { prisma } from "@/server/db";
+import type { UserRole } from "@/server/auth";
 
 export class PrescriptionIntakeError extends Error {
   code: string;
@@ -9,6 +10,17 @@ export class PrescriptionIntakeError extends Error {
     super(message);
     this.code = "INVALID_PRESCRIPTION";
     this.issues = issues;
+  }
+}
+
+export class PrescriptionAccessError extends Error {
+  code: string;
+  status: number;
+
+  constructor(code: string, message: string, status: number) {
+    super(message);
+    this.code = code;
+    this.status = status;
   }
 }
 
@@ -42,4 +54,26 @@ export async function createPrescription(input: { userId: string; payload: unkno
       consentVersion: consentVersion ?? null
     }
   });
+}
+
+export async function getPrescriptionForViewer(input: {
+  prescriptionId: string;
+  viewerUserId: string;
+  viewerRole: UserRole;
+}) {
+  const prescription = await prisma.prescription.findUnique({
+    where: { id: input.prescriptionId }
+  });
+
+  if (!prescription) {
+    throw new PrescriptionAccessError("NOT_FOUND", "Prescription not found.", 404);
+  }
+
+  const isOwner = prescription.userId === input.viewerUserId;
+  const isAdmin = input.viewerRole === "ADMIN";
+  if (!isOwner && !isAdmin) {
+    throw new PrescriptionAccessError("FORBIDDEN", "Access denied.", 403);
+  }
+
+  return prescription;
 }

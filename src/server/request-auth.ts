@@ -36,6 +36,12 @@ async function resolveRequestIdentity(request: NextRequest): Promise<RequestIden
   return identity;
 }
 
+export async function requireRequestIdentity(
+  request: NextRequest
+): Promise<RequestIdentity> {
+  return resolveRequestIdentity(request);
+}
+
 export async function requireRequestUserId(request: NextRequest): Promise<string> {
   const identity = await resolveRequestIdentity(request);
   return identity.userId;

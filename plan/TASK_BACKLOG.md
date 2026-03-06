@@ -42,10 +42,10 @@ Completion signal: CI blocks merges on lint/typecheck/test/build and migration/s
 - DoD: admin routes blocked server-side for non-admin users.
 - Evidence: `src/server/request-auth.ts`, `app/api/v1/admin/sourcing-requests/[requestId]/report-artifacts/route.ts`, `tests/integration/admin-report-artifact-route-auth.test.ts`.
 
-2. [AT-P1-02] Add sensitive-data access restrictions for prescription records.
+2. [AT-P1-02] Add sensitive-data access restrictions for prescription records. ✅ DONE
 - Size: 1-2h
 - DoD: only owner/admin can read prescription payload.
-- Evidence: authorization integration tests and audit assertions.
+- Evidence: `app/api/v1/prescriptions/[prescriptionId]/route.ts`, `src/server/prescriptions.ts`, `src/server/request-auth.ts`, `tests/integration/prescription-detail-route.test.ts`.
 
 3. [AT-P1-03] Expose user-facing sourcing request status endpoint. ✅ DONE
 - Size: 1-2h
@@ -199,6 +199,13 @@ Completion signal: CI blocks merges on lint/typecheck/test/build and migration/s
   - Source signal: session-aware timeline views now hide data when signed out but provide no direct auth CTA.
   - DoD: signed-out states include authentication action links and integration tests cover CTA rendering.
   - Evidence target: `app/page.tsx`, `app/timeline/page.tsx`, `tests/integration/sourcing-request-timeline-page.test.ts`, `tests/integration/sourcing-timeline-route-page.test.ts`.
+
+- [AT-AUTO-UI-05] Add prescription detail UI panel with owner/admin auth-aware access messaging.
+  - Priority: P1
+  - Acceptance: authenticated users can open a prescription detail panel and receive deterministic access guidance for missing/forbidden records.
+  - Source signal: `AT-P1-02` now exposes secure prescription detail API, but no UI surface consumes or explains this payload yet.
+  - DoD: at least one authenticated UI route renders normalized prescription details and handles `401|403|404` responses with user-safe messaging.
+  - Evidence target: `app/page.tsx` (or `/timeline`), related UI tests under `tests/integration/*`.
 
 ## TECH_DEBT
 

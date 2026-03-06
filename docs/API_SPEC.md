@@ -55,7 +55,8 @@ All API surfaces must maintain these constraints:
 
 ### `GET /api/v1/prescriptions/:prescriptionId`
 
-- Purpose: retrieve submitted prescription metadata for owner.
+- Purpose: retrieve submitted prescription metadata for owner/admin.
+- Auth note: session cookie required; non-owner `USER` sessions receive `403`.
 - Responses: `200`, `401`, `403`, `404`, `501`.
 
 ## Sourcing Requests

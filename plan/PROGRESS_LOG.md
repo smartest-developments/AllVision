@@ -1,5 +1,12 @@
 # Progress Log
 
+## 2026-03-06T10:55:00+0100
+
+- task: AT-P1-02 Add sensitive-data access restrictions for prescription records
+- result: added `GET /api/v1/prescriptions/:prescriptionId` route with session-cookie identity enforcement and owner/admin-only access semantics. Introduced shared request identity helper (`requireRequestIdentity`) and server-side authorization guard (`getPrescriptionForViewer`) returning deterministic `401|403|404` contracts. Added integration coverage for missing auth, owner success, admin success, forbidden non-owner, and missing-record cases.
+- backlog update: marked `AT-P1-02` DONE with concrete evidence links and added UI follow-up `AT-AUTO-UI-05` for auth-aware prescription-detail rendering.
+- next: AT-P1-05 add admin action logging for review decisions and report uploads.
+
 ## 2026-03-06T10:21:05+0100
 
 - task: AT-P1-04B Add admin queue UI surface bound to API list/detail contract
