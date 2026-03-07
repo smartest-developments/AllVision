@@ -23,3 +23,9 @@
 
 ## 2026-03-06T20:31:36+0100
 - Automation blocker: repository is read-only in this environment (`Operation not permitted` on file writes), so AT-P1-10 CI workflow and backlog/progress updates could not be applied.
+
+## 2026-03-07T01:40:00+0100
+- Scope: commit/push for `AT-AUTO-UI-08` admin queue review-action form increment.
+- Blocker: repository contains concurrent pre-existing in-flight changes outside this increment (`app/gdpr/page.tsx`, `src/server/gdpr-delete-requests.ts`, admin GDPR route/page files, and related tests), and full gates are red in current tree (`npm run typecheck` fails in `src/server/gdpr-delete-requests.ts`; `npm run test` fails in `tests/integration/report-ack-route.test.ts` and `tests/integration/prescription-detail-route.test.ts`).
+- Impact: new admin review-action UI/route/docs/backlog changes are implemented locally but not safe to commit alongside unrelated drift.
+- Next step: stabilize or isolate the unrelated GDPR/report-ack changes, rerun all gates, then commit this increment.

@@ -125,6 +125,15 @@ All API surfaces must maintain these constraints:
   - writes immutable `ADMIN_REVIEW_DECISION_RECORDED` audit marker with transition context and status-event id.
 - Responses: `200`, `400`, `401`, `403`, `404`, `409`.
 
+### `POST /api/v1/admin/sourcing-requests/:requestId/status`
+
+- Purpose: form-submit variant of admin review decision mutation for server-rendered admin queue UI.
+- Notes:
+  - accepts `application/x-www-form-urlencoded` or `multipart/form-data` (`toStatus`, optional `note`, optional `redirectTo`).
+  - uses the same transition and audit contract as `PATCH`.
+  - when `redirectTo` is a safe admin queue path, returns `303` redirect back to the queue detail context.
+- Responses: `303`, `400`, `401`, `403`, `404`, `409`.
+
 ### `POST /api/v1/admin/sourcing-requests/:requestId/report-artifacts`
 
 - Purpose: attach report artifact metadata and mark request as report-ready/delivered.
@@ -146,11 +155,30 @@ All API surfaces must maintain these constraints:
 - Purpose: create account deletion request.
 - Auth note: requires authenticated session cookie (`401` when missing/invalid).
 - Legal hold note: requests are rejected with `409 GDPR_DELETE_LEGAL_HOLD` while active sourcing work is still in progress (`SUBMITTED|IN_REVIEW`).
-- Contract: returns `{ request: { requestId, status: "ANONYMIZED", requestedAt, completedAt } }`.
-- Tracking note: lifecycle is persisted as immutable audit evidence (`GDPR_DELETE_REQUESTED` then `GDPR_DELETE_COMPLETED`) with anonymization metadata.
+- Contract: returns `{ request: { requestId, status: "PENDING_REVIEW", requestedAt } }`.
+- Tracking note: request is persisted as immutable `GDPR_DELETE_REQUESTED` audit evidence and must be executed by an admin review flow.
 - Responses: `202`, `401`, `409`, `500`.
 
 - UI note: authenticated users can review GDPR request history on /gdpr, including legal-hold guidance and latest request states derived from audit events.
+
+### `GET /api/v1/admin/gdpr/delete-requests`
+
+- Purpose: list pending GDPR account deletion requests for admin review.
+- Auth note: requires admin session cookie (`401` missing/invalid, `403` non-admin).
+- Contract: returns `{ requests: [{ requestId, userId, userEmail, requestedAt, status: "PENDING_REVIEW" }] }`.
+- Responses: `200`, `401`, `403`, `500`.
+
+### `POST /api/v1/admin/gdpr/delete-requests/:requestId/execute`
+
+- Purpose: execute irreversible anonymization for a pending GDPR delete request after admin review.
+- Auth note: requires admin session cookie (`401` missing/invalid, `403` non-admin).
+- Contract: returns `{ request: { requestId, userId, status: "ANONYMIZED", requestedAt, completedAt, reviewedByAdminUserId } }`.
+- Error note:
+  - `404 GDPR_DELETE_REQUEST_NOT_FOUND` when request id does not match a queued request.
+  - `409 GDPR_DELETE_REQUEST_NOT_PENDING` when request was already reviewed/executed.
+  - `409 GDPR_DELETE_ALREADY_EXECUTED` on duplicate execute attempts.
+  - `409 GDPR_DELETE_LEGAL_HOLD` if legal-hold constraints reappear before execution.
+- Responses: `200`, `401`, `403`, `404`, `409`, `500`.
 ## 2026-03-06 Admin Audit Increment
 - Admin report-artifact upload flow now emits two audit markers:
   - `REPORT_ARTIFACT_UPLOADED` (`entityType=ReportArtifact`) with upload + transition context.
@@ -161,12 +189,3 @@ All API surfaces must maintain these constraints:
   - `toStatus`
   - `note`
   - `statusEventId`
-
-## 2026-03-06 GDPR Deletion Request Contract Increment
-- `POST /api/v1/gdpr/delete` is now implemented with authenticated deletion-request queueing.
-- Success (`202`) payload:
-  - `{ request: { requestId, status: "QUEUED", requestedAt } }`
-- Error contracts:
-  - `401 UNAUTHORIZED` when session cookie is missing/invalid.
-  - `409 LEGAL_HOLD_ACTIVE` when user has sourcing requests in retained states (`IN_REVIEW|REPORT_READY`).
-- Tracking note: successful requests persist immutable `GDPR_DELETION_REQUESTED` audit evidence including legal-hold metadata context.

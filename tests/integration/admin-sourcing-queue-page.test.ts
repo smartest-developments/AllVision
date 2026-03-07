@@ -61,7 +61,7 @@ describe("Admin sourcing queue page", () => {
     );
   }
 
-  async function seedAdminQueue() {
+  async function seedAdminQueue(status: "SUBMITTED" | "IN_REVIEW" = "IN_REVIEW") {
     const admin = await prisma.user.create({
       data: {
         email: "admin-queue-page@example.com",
@@ -95,21 +95,23 @@ describe("Admin sourcing queue page", () => {
       data: {
         userId: owner.id,
         prescriptionId: prescription.id,
-        status: "IN_REVIEW",
+        status,
         reportPaymentRequired: false,
         currency: "EUR",
       },
     });
 
-    await prisma.sourcingStatusEvent.create({
-      data: {
-        sourcingRequestId: request.id,
-        fromStatus: "SUBMITTED",
-        toStatus: "IN_REVIEW",
-        note: "Admin triage",
-        actorUserId: admin.id,
-      },
-    });
+    if (status === "IN_REVIEW") {
+      await prisma.sourcingStatusEvent.create({
+        data: {
+          sourcingRequestId: request.id,
+          fromStatus: "SUBMITTED",
+          toStatus: "IN_REVIEW",
+          note: "Admin triage",
+          actorUserId: admin.id,
+        },
+      });
+    }
 
     return { admin, owner, request };
   }
@@ -153,6 +155,27 @@ describe("Admin sourcing queue page", () => {
     expect(markup).toContain(`Request ${request.id} (IN_REVIEW)`);
     expect(markup).toContain("SUBMITTED -&gt; IN_REVIEW");
     expect(markup).toContain("No report artifacts attached.");
+  });
+
+  it("renders review action form for submitted detail requests", async () => {
+    const { admin, request } = await seedAdminQueue("SUBMITTED");
+    const adminCookie = await issueSessionCookie(admin.id);
+    mockCookieHeader(adminCookie);
+
+    const markup = renderToStaticMarkup(
+      await AdminSourcingQueuePage({
+        searchParams: Promise.resolve({
+          requestId: request.id,
+          status: "SUBMITTED",
+        }),
+      }),
+    );
+
+    expect(markup).toContain("Review action");
+    expect(markup).toContain(`action=\"/api/v1/admin/sourcing-requests/${request.id}/status\"`);
+    expect(markup).toContain("name=\"toStatus\"");
+    expect(markup).toContain("value=\"IN_REVIEW\"");
+    expect(markup).toContain("Mark in review");
   });
 
   it("shows admin access required message for non-admin session", async () => {

@@ -41,7 +41,7 @@ describe("POST /api/v1/gdpr/delete", () => {
     expect(payload.error.code).toBe("UNAUTHORIZED");
   });
 
-  it("records soft-delete and anonymization lifecycle when legal hold checks pass", async () => {
+  it("queues deletion request for admin review when legal hold checks pass", async () => {
     const user = await prisma.user.create({
       data: {
         email: "gdpr-delete-owner@example.com",
@@ -87,35 +87,17 @@ describe("POST /api/v1/gdpr/delete", () => {
         requestId: string;
         status: string;
         requestedAt: string;
-        completedAt: string;
       };
     };
 
     expect(response.status).toBe(202);
-    expect(payload.request.status).toBe("ANONYMIZED");
+    expect(payload.request.status).toBe("PENDING_REVIEW");
     expect(new Date(payload.request.requestedAt).toString()).not.toBe("Invalid Date");
-    expect(new Date(payload.request.completedAt).toString()).not.toBe("Invalid Date");
 
     const refreshedUser = await prisma.user.findUniqueOrThrow({
       where: { id: user.id },
     });
-    expect(refreshedUser.email.startsWith(`deleted-${user.id}-`)).toBe(true);
-    expect(refreshedUser.email.endsWith("@allvision.invalid")).toBe(true);
-    expect(refreshedUser.passwordHash.startsWith("deleted:")).toBe(true);
-
-    const refreshedPrescription = await prisma.prescription.findUniqueOrThrow({
-      where: { id: prescription.id },
-    });
-    expect(refreshedPrescription.countryCode).toBe("XX");
-    expect(refreshedPrescription.payload).toMatchObject({
-      redacted: true,
-      reason: "GDPR_DELETE_REQUESTED",
-    });
-
-    const liveSessions = await prisma.session.count({
-      where: { userId: user.id, revokedAt: null },
-    });
-    expect(liveSessions).toBe(0);
+    expect(refreshedUser.email).toBe("gdpr-delete-owner@example.com");
 
     const events = await prisma.auditEvent.findMany({
       where: {
@@ -127,11 +109,11 @@ describe("POST /api/v1/gdpr/delete", () => {
       },
       orderBy: { createdAt: "asc" },
     });
-    expect(events).toHaveLength(2);
+
+    expect(events).toHaveLength(1);
+    expect(events[0]?.id).toBe(payload.request.requestId);
     expect(events[0]?.action).toBe("GDPR_DELETE_REQUESTED");
-    expect(events[0]?.context).toMatchObject({ status: "SOFT_DELETED", legalHoldChecked: true });
-    expect(events[1]?.action).toBe("GDPR_DELETE_COMPLETED");
-    expect(events[1]?.context).toMatchObject({ status: "ANONYMIZED" });
+    expect(events[0]?.context).toMatchObject({ status: "PENDING_REVIEW", legalHoldChecked: true });
   });
 
   it("returns 409 when legal hold is active", async () => {

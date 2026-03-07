@@ -34,7 +34,7 @@ Completion signal: CI blocks merges on lint/typecheck/test/build and migration/s
 
 ### P0 (0 tasks, MVP blockers)
 
-### P1 (15 tasks)
+### P1 (17 tasks)
 
 1. [AT-P1-01] Enforce RBAC middleware (`USER`, `ADMIN`). ✅ DONE
 - Size: 1-2h
@@ -94,10 +94,10 @@ Completion signal: CI blocks merges on lint/typecheck/test/build and migration/s
 - DoD: deletion lifecycle recorded with legal-hold checks.
 - Evidence: `app/api/v1/gdpr/delete/route.ts`, `src/server/gdpr-delete-requests.ts`, `tests/integration/gdpr-delete-route.test.ts`, `docs/API_SPEC.md`.
 
-10. [AT-P1-09B] Implement admin-reviewed soft-delete execution and purge/anonymize workflow.
+10. [AT-P1-09B] Implement admin-reviewed soft-delete execution and purge/anonymize workflow. ✅ DONE
 - Size: 2-3h
 - DoD: queued deletion requests can be executed with deterministic anonymization/purge steps and immutable audit trace.
-- Evidence target: server workflow module + integration tests + API/docs updates.
+- Evidence: `src/server/gdpr-delete-requests.ts`, `app/api/v1/admin/gdpr/delete-requests/route.ts`, `app/api/v1/admin/gdpr/delete-requests/[requestId]/execute/route.ts`, `tests/integration/admin-gdpr-delete-routes.test.ts`, `docs/API_SPEC.md`, `docs/GDPR.md`.
 
 11. [AT-P1-10] Add CI workflow for lint/typecheck/test/build. ✅ DONE
 - Size: 1-2h
@@ -124,6 +124,18 @@ Completion signal: CI blocks merges on lint/typecheck/test/build and migration/s
 - Acceptance: report-ready requests render a deterministic UI action that posts to owner-only delivery-ack endpoint.
 - DoD: home + `/timeline` surfaces expose report-ready acknowledgment control and integration coverage validates action wiring.
 - Evidence: `app/page.tsx`, `app/timeline/page.tsx`, `tests/integration/sourcing-request-timeline-page.test.ts`, `tests/integration/sourcing-timeline-route-page.test.ts`.
+
+16. [AT-AUTO-UI-08] Add admin queue review-action form for `SUBMITTED -> IN_REVIEW`. ✅ DONE
+- Size: 1-2h
+- Acceptance: admin queue detail shows a deterministic review-action form for submitted requests and posts to existing status decision route.
+- DoD: admins can trigger `IN_REVIEW` transition from request detail without manual API clients; form path preserves current queue filters on return.
+- Evidence: `app/admin/sourcing-requests/page.tsx`, `app/api/v1/admin/sourcing-requests/[requestId]/status/route.ts`, `tests/integration/admin-sourcing-queue-page.test.ts`, `tests/integration/admin-review-decision-route.test.ts`.
+
+17. [AT-AUTO-UI-09] Add admin GDPR delete-review queue page and execute action. ✅ DONE
+- Size: 1-2h
+- Acceptance: admin can view pending `PENDING_REVIEW` delete requests and trigger deterministic execute action from UI.
+- DoD: `/admin/gdpr-delete-requests` renders API-backed queue cards, exposes execute forms, and shows clear non-admin access message.
+- Evidence: `app/admin/gdpr-delete-requests/page.tsx`, `app/admin/sourcing-requests/page.tsx`, `tests/integration/admin-gdpr-delete-page.test.ts`.
 
 ### P2 (3 tasks, execution-ready but non-urgent)
 
@@ -223,6 +235,18 @@ Completion signal: CI blocks merges on lint/typecheck/test/build and migration/s
   - Source signal: `AT-P1-06` shipped owner acknowledgment endpoint, but no UI control exposed the action path.
   - DoD: both timeline surfaces render request-scoped `POST /api/v1/sourcing-requests/:requestId/report/ack` control for `REPORT_READY` items and tests lock action wiring.
   - Evidence: `app/page.tsx`, `app/timeline/page.tsx`, `tests/integration/sourcing-request-timeline-page.test.ts`, `tests/integration/sourcing-timeline-route-page.test.ts`.
+- [AT-AUTO-UI-08] Add admin queue review-action form for `SUBMITTED -> IN_REVIEW`. ✅ DONE
+  - Priority: P1
+  - Acceptance: admin detail surface can trigger the existing review-decision transition route using a deterministic form action.
+  - Source signal: admin queue already exposes detail context and status decision API, but no built-in UI action existed to execute review decisions in-place.
+  - DoD: submitted requests render a review form posting to admin status route, preserving queue-detail return context and covered by UI + route integration tests.
+  - Evidence: `app/admin/sourcing-requests/page.tsx`, `app/api/v1/admin/sourcing-requests/[requestId]/status/route.ts`, `tests/integration/admin-sourcing-queue-page.test.ts`, `tests/integration/admin-review-decision-route.test.ts`.
+- [AT-AUTO-UI-09] Add admin GDPR delete-review queue page and execute action. ✅ DONE
+  - Priority: P1
+  - Acceptance: admin can process queued GDPR deletion requests from in-app UI without manual API clients.
+  - Source signal: GDPR deletion moved to queued admin-review contract and needed an operator-facing execution surface.
+  - DoD: dedicated admin page lists pending delete requests, includes execute forms, and is covered by integration page tests plus admin API route tests.
+  - Evidence: `app/admin/gdpr-delete-requests/page.tsx`, `app/api/v1/admin/gdpr/delete-requests/route.ts`, `app/api/v1/admin/gdpr/delete-requests/[requestId]/execute/route.ts`, `tests/integration/admin-gdpr-delete-page.test.ts`, `tests/integration/admin-gdpr-delete-routes.test.ts`.
 
 ## TECH_DEBT
 
@@ -270,9 +294,10 @@ Mitigation refs: [AT-P0-05], [AT-P0-06], [AT-P0-07], [AT-P1-06].
   - DoD: `POST /api/v1/gdpr/delete` returns `202` for queued requests, `401` for unauthenticated calls, and `409 LEGAL_HOLD_ACTIVE` when in-flight sourcing states require retention.
   - Evidence: `app/api/v1/gdpr/delete/route.ts`, `src/server/gdpr-delete-requests.ts`, `tests/integration/gdpr-delete-route.test.ts`, `docs/API_SPEC.md`.
 - [AT-P1-09B] Implement admin-reviewed soft-delete execution and purge/anonymize workflow.
+- [AT-P1-09B] Implement admin-reviewed soft-delete execution and purge/anonymize workflow. ✅ DONE
   - Priority: P1
   - DoD: queued deletion requests can be executed with deterministic anonymization/purge steps and immutable audit trace.
-  - Evidence target: server workflow module + integration tests + API/docs updates.
+  - Evidence: `src/server/gdpr-delete-requests.ts`, `app/api/v1/gdpr/delete/route.ts`, `app/api/v1/admin/gdpr/delete-requests/route.ts`, `app/api/v1/admin/gdpr/delete-requests/[requestId]/execute/route.ts`, `tests/integration/gdpr-delete-route.test.ts`, `tests/integration/admin-gdpr-delete-routes.test.ts`, `docs/API_SPEC.md`, `docs/GDPR.md`.
 - [AT-AUTO-UI-06] Add authenticated GDPR self-service page for export/deletion request status and legal-hold messaging.
   - Priority: P1
   - DoD: authenticated user can submit GDPR export/deletion requests and see deterministic status/error messaging without manual API invocation.

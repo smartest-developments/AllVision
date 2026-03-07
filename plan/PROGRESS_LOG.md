@@ -1,5 +1,21 @@
 # Progress Log
 
+## 2026-03-07T02:05:00+0100
+
+- task: AT-P1-09B Implement admin-reviewed soft-delete execution and purge/anonymize workflow.
+- result: switched `POST /api/v1/gdpr/delete` to queue requests as `PENDING_REVIEW`, added admin GDPR delete queue/execute APIs, and shipped `/admin/gdpr-delete-requests` UI with execute actions. Execution now performs legal-hold recheck, session revocation, account/prescription anonymization, and immutable `GDPR_DELETE_COMPLETED` reviewer attribution.
+- backlog update: marked `AT-P1-09B` DONE and added/completed UI companion task `AT-AUTO-UI-09` for admin delete queue execution.
+- quality gates: `npm run lint` ✅, `npm run typecheck` ✅, `npm run test` ✅, `npm run build` ✅.
+- next: AT-P2-01 add optional report-fee collection for informational service.
+
+## 2026-03-07T01:25:00+0100
+
+- task: AT-AUTO-UI-08 Add admin queue review-action form for submitted requests.
+- result: added in-place admin review action controls on `/admin/sourcing-requests` detail view for `SUBMITTED` requests (optional note + deterministic submit button), and extended the admin status route with a form-submit `POST` variant that reuses existing transition/audit logic and supports safe `redirectTo` return flow.
+- backlog update: added and marked `AT-AUTO-UI-08` DONE (P1 UI) and kept `AT-P1-09B` as highest remaining open P1 item.
+- quality gates: `npm run lint` ✅, `npm run typecheck` ❌ (existing unrelated failures in `src/server/gdpr-delete-requests.ts`), `npm run test` ❌ (existing unrelated failures in `tests/integration/report-ack-route.test.ts` and `tests/integration/prescription-detail-route.test.ts`), `npm run build` ✅.
+- next: AT-P1-09B implement admin-reviewed soft-delete execution workflow.
+
 ## 2026-03-06T23:49:45+0100
 
 - task: AT-P1-12 Add dependency vulnerability scanning.

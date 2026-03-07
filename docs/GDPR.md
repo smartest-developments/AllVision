@@ -60,7 +60,8 @@ Track request timestamps, status, and completion evidence.
 - Preserve minimal audit evidence for compliance proof.
 - Current API baseline:
   - `POST /api/v1/gdpr/export` persists `GDPR_EXPORT_REQUESTED` with queued status context.
-  - `POST /api/v1/gdpr/delete` enforces legal-hold guard (`SUBMITTED|IN_REVIEW` block), records `GDPR_DELETE_REQUESTED` + `GDPR_DELETE_COMPLETED`, revokes sessions, and anonymizes account/prescription fields.
+  - `POST /api/v1/gdpr/delete` enforces legal-hold guard (`SUBMITTED|IN_REVIEW` block) and records `GDPR_DELETE_REQUESTED` with `PENDING_REVIEW` status.
+  - `POST /api/v1/admin/gdpr/delete-requests/:requestId/execute` executes anonymization (`GDPR_DELETE_COMPLETED`) after admin review, revokes sessions, and redacts account/prescription fields.
 
 ## Processor and Transfer Controls
 
@@ -78,3 +79,4 @@ Track request timestamps, status, and completion evidence.
 - The page lists recent `GDPR_EXPORT_REQUESTED`, `GDPR_DELETE_REQUESTED`, and `GDPR_DELETE_COMPLETED` audit events for the signed-in user.
 - Signed-out users receive deterministic auth CTAs with `next=/gdpr` preservation.
 - Legal-hold guidance is surfaced inline: deletion may return `409 GDPR_DELETE_LEGAL_HOLD` while requests are in `SUBMITTED` or `IN_REVIEW`.
+- Admin operators can review pending delete requests on `/admin/gdpr-delete-requests` and execute anonymization with immutable reviewer attribution.

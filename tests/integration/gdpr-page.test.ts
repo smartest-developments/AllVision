@@ -59,7 +59,7 @@ describe("GDPR status page", () => {
         entityType: "User",
         entityId: owner.id,
         action: "GDPR_DELETE_REQUESTED",
-        context: { status: "SOFT_DELETED" },
+        context: { status: "PENDING_REVIEW" },
       },
     });
 
@@ -69,7 +69,7 @@ describe("GDPR status page", () => {
 
     expect(markup).toContain("Recent requests");
     expect(markup).toContain("GDPR_DELETE_REQUESTED");
-    expect(markup).toContain("SOFT_DELETED");
+    expect(markup).toContain("PENDING_REVIEW");
     expect(markup).toContain("GDPR_EXPORT_REQUESTED");
     expect(markup).toContain("QUEUED");
     expect(markup).toContain('action="/api/v1/gdpr/export"');

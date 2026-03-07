@@ -251,6 +251,7 @@ export default async function AdminSourcingQueuePage({
     userEmail: filters.userEmail,
     requestId: "",
   };
+  const detailViewHref = `/admin/sourcing-requests${buildQueryString(filters)}`;
 
   const clearFiltersHref = "/admin/sourcing-requests";
 
@@ -268,6 +269,9 @@ export default async function AdminSourcingQueuePage({
         </Link>
         <Link className="underline" href="/admin/sourcing-requests">
           Admin queue
+        </Link>
+        <Link className="underline" href="/admin/gdpr-delete-requests">
+          GDPR deletes
         </Link>
       </nav>
 
@@ -397,6 +401,37 @@ export default async function AdminSourcingQueuePage({
               <p className="text-xs text-neutral-600">
                 Prescription created: {formatTimestamp(queueState.detailPayload.request.prescriptionCreatedAt)}
               </p>
+
+              {queueState.detailPayload.request.status === "SUBMITTED" ? (
+                <form
+                  action={`/api/v1/admin/sourcing-requests/${queueState.detailPayload.request.requestId}/status`}
+                  className="mt-4 rounded-md border border-neutral-200 bg-neutral-50 p-3"
+                  method="post"
+                >
+                  <h3 className="text-sm font-semibold">Review action</h3>
+                  <p className="mt-1 text-xs text-neutral-600">
+                    Move this request into active admin review.
+                  </p>
+                  <input name="toStatus" type="hidden" value="IN_REVIEW" />
+                  <input name="redirectTo" type="hidden" value={detailViewHref} />
+                  <label className="mt-2 block text-xs text-neutral-700">
+                    Optional note
+                    <textarea
+                      className="mt-1 w-full rounded-md border border-neutral-300 px-2 py-1 text-xs"
+                      maxLength={500}
+                      name="note"
+                      placeholder="Review started; awaiting report artifacts."
+                      rows={3}
+                    />
+                  </label>
+                  <button
+                    className="mt-3 rounded-md bg-neutral-900 px-3 py-2 text-xs text-white"
+                    type="submit"
+                  >
+                    Mark in review
+                  </button>
+                </form>
+              ) : null}
 
               <h3 className="mt-4 text-sm font-semibold">Timeline</h3>
               {queueState.detailPayload.timeline.length === 0 ? (

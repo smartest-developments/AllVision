@@ -4,7 +4,10 @@ import { beforeEach, describe, expect, it } from "vitest";
 
 import { hashToken, SESSION_COOKIE_NAME } from "@/server/auth";
 import { prisma } from "@/server/db";
-import { PATCH as patchAdminRequestStatus } from "../../app/api/v1/admin/sourcing-requests/[requestId]/status/route";
+import {
+  PATCH as patchAdminRequestStatus,
+  POST as postAdminRequestStatus,
+} from "../../app/api/v1/admin/sourcing-requests/[requestId]/status/route";
 
 describe("PATCH /api/v1/admin/sourcing-requests/:requestId/status", () => {
   beforeEach(async () => {
@@ -197,5 +200,34 @@ describe("PATCH /api/v1/admin/sourcing-requests/:requestId/status", () => {
     const payload = (await response.json()) as { error: { code: string } };
     expect(response.status).toBe(409);
     expect(payload.error.code).toBe("INVALID_STATUS_TRANSITION");
+  });
+
+  it("accepts form-post decision payload and redirects back to admin queue detail", async () => {
+    const { admin, request } = await seedReviewRequest();
+    const adminCookie = await issueSessionCookie(admin.id);
+
+    const formData = new FormData();
+    formData.set("toStatus", "IN_REVIEW");
+    formData.set("note", "Queued for admin review.");
+    formData.set("redirectTo", `/admin/sourcing-requests?requestId=${request.id}`);
+
+    const response = await postAdminRequestStatus(
+      new NextRequest(`http://localhost/api/v1/admin/sourcing-requests/${request.id}/status`, {
+        method: "POST",
+        headers: { cookie: adminCookie },
+        body: formData,
+      }),
+      { params: Promise.resolve({ requestId: request.id }) },
+    );
+
+    expect(response.status).toBe(303);
+    expect(response.headers.get("location")).toBe(
+      `http://localhost/admin/sourcing-requests?requestId=${request.id}`,
+    );
+
+    const updatedRequest = await prisma.sourcingRequest.findUnique({
+      where: { id: request.id },
+    });
+    expect(updatedRequest?.status).toBe("IN_REVIEW");
   });
 });

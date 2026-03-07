@@ -45,6 +45,7 @@ export default async function GdprPage() {
             <h2 className="text-2xl font-semibold">Request actions</h2>
             <p className="mt-2 text-sm text-neutral-700">
               Submit GDPR export/deletion requests directly from this status view.
+              Deletion requests are queued for admin review before anonymization runs.
             </p>
             <div className="mt-4 flex flex-wrap gap-3">
               <form action="/api/v1/gdpr/export" method="post">
@@ -60,7 +61,7 @@ export default async function GdprPage() {
                   type="submit"
                   className="rounded-md border border-neutral-400 px-3 py-2 text-sm text-neutral-900"
                 >
-                  Request account deletion
+                  Request account deletion review
                 </button>
               </form>
             </div>
@@ -91,6 +92,9 @@ export default async function GdprPage() {
         <p className="mt-2">
           Deletion requests can return <code>409 GDPR_DELETE_LEGAL_HOLD</code> while sourcing requests remain active
           in <code>SUBMITTED</code> or <code>IN_REVIEW</code> states.
+        </p>
+        <p className="mt-2">
+          Successful deletion requests move to <code>PENDING_REVIEW</code> until an admin executes anonymization.
         </p>
         <p className="mt-2">
           You can still submit export requests while legal hold is active.
