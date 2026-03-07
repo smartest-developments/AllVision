@@ -195,4 +195,87 @@ describe("Admin sourcing queue page", () => {
     expect(markup).toContain("Admin access required");
     expect(markup).toContain("Admin access required.");
   });
+
+  it("renders SLA snapshot metrics for current queue scope", async () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date("2026-03-07T12:00:00.000Z"));
+    try {
+      const admin = await prisma.user.create({
+        data: {
+          email: "admin-sla-page@example.com",
+          passwordHash: "hash",
+          role: "ADMIN",
+        },
+      });
+
+      const owner = await prisma.user.create({
+        data: {
+          email: "owner-sla-page@example.com",
+          passwordHash: "hash",
+          role: "USER",
+        },
+      });
+
+      const prescription = await prisma.prescription.create({
+        data: {
+          userId: owner.id,
+          countryCode: "DE",
+          payload: {
+            countryCode: "DE",
+            leftEye: { sphere: -1.5 },
+            rightEye: { sphere: -1.25 },
+            pupillaryDistance: 62,
+          },
+        },
+      });
+
+      await prisma.sourcingRequest.create({
+        data: {
+          userId: owner.id,
+          prescriptionId: prescription.id,
+          status: "SUBMITTED",
+          reportPaymentRequired: false,
+          currency: "EUR",
+          createdAt: new Date("2026-03-07T10:00:00.000Z"),
+        },
+      });
+
+      const inReviewRequest = await prisma.sourcingRequest.create({
+        data: {
+          userId: owner.id,
+          prescriptionId: prescription.id,
+          status: "IN_REVIEW",
+          reportPaymentRequired: false,
+          currency: "EUR",
+          createdAt: new Date("2026-03-07T08:00:00.000Z"),
+        },
+      });
+
+      await prisma.sourcingStatusEvent.create({
+        data: {
+          sourcingRequestId: inReviewRequest.id,
+          fromStatus: "SUBMITTED",
+          toStatus: "IN_REVIEW",
+          note: "Triage started",
+          actorUserId: admin.id,
+          createdAt: new Date("2026-03-07T10:30:00.000Z"),
+        },
+      });
+
+      const adminCookie = await issueSessionCookie(admin.id);
+      mockCookieHeader(adminCookie);
+
+      const markup = renderToStaticMarkup(await AdminSourcingQueuePage({}));
+
+      expect(markup).toContain("SLA snapshot");
+      expect(markup).toContain("Total queue items: 2");
+      expect(markup).toContain("Submitted: 1");
+      expect(markup).toContain("In review: 1");
+      expect(markup).toContain("Average queue age: 3.0h");
+      expect(markup).toContain("Oldest queue age: 4.0h");
+      expect(markup).toContain("Average first-review latency: 2.5h");
+    } finally {
+      vi.useRealTimers();
+    }
+  });
 });

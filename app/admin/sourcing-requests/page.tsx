@@ -78,6 +78,15 @@ type QueueFilters = {
   requestId: string;
 };
 
+type QueueSlaSnapshot = {
+  total: number;
+  submitted: number;
+  inReview: number;
+  averageQueueAgeHours: number;
+  oldestQueueAgeHours: number;
+  averageFirstReviewLatencyHours: number | null;
+};
+
 function firstParam(value: string | string[] | undefined): string {
   if (typeof value === "string") {
     return value.trim();
@@ -127,6 +136,68 @@ function formatTimestamp(value: string | null): string {
   }
 
   return value;
+}
+
+function parseIsoTimestamp(value: string | null): number | null {
+  if (!value) {
+    return null;
+  }
+
+  const parsed = Date.parse(value);
+  return Number.isFinite(parsed) ? parsed : null;
+}
+
+function formatHours(value: number | null): string {
+  if (value === null || Number.isNaN(value)) {
+    return "N/A";
+  }
+
+  return `${value.toFixed(1)}h`;
+}
+
+function buildQueueSlaSnapshot(
+  items: AdminQueueListItem[],
+  nowMs = Date.now(),
+): QueueSlaSnapshot {
+  const total = items.length;
+  const submitted = items.filter((item) => item.status === "SUBMITTED").length;
+  const inReview = items.filter((item) => item.status === "IN_REVIEW").length;
+
+  const queueAgeHours = items
+    .map((item) => parseIsoTimestamp(item.createdAt))
+    .filter((value): value is number => value !== null)
+    .map((createdAtMs) => Math.max(0, (nowMs - createdAtMs) / (1000 * 60 * 60)));
+
+  const reviewLatencyHours = items
+    .map((item) => {
+      const createdAtMs = parseIsoTimestamp(item.createdAt);
+      const latestEventMs = parseIsoTimestamp(item.latestEventAt);
+      if (createdAtMs === null || latestEventMs === null) {
+        return null;
+      }
+      return Math.max(0, (latestEventMs - createdAtMs) / (1000 * 60 * 60));
+    })
+    .filter((value): value is number => value !== null);
+
+  const averageQueueAgeHours =
+    queueAgeHours.length > 0
+      ? queueAgeHours.reduce((sum, value) => sum + value, 0) / queueAgeHours.length
+      : 0;
+  const oldestQueueAgeHours =
+    queueAgeHours.length > 0 ? Math.max(...queueAgeHours) : 0;
+  const averageFirstReviewLatencyHours =
+    reviewLatencyHours.length > 0
+      ? reviewLatencyHours.reduce((sum, value) => sum + value, 0) / reviewLatencyHours.length
+      : null;
+
+  return {
+    total,
+    submitted,
+    inReview,
+    averageQueueAgeHours,
+    oldestQueueAgeHours,
+    averageFirstReviewLatencyHours,
+  };
 }
 
 async function buildCookieHeader(): Promise<string> {
@@ -251,6 +322,10 @@ export default async function AdminSourcingQueuePage({
     userEmail: filters.userEmail,
     requestId: "",
   };
+  const queueSlaSnapshot =
+    queueState.listStatus === 200
+      ? buildQueueSlaSnapshot(queueState.listItems)
+      : null;
   const detailViewHref = `/admin/sourcing-requests${buildQueryString(filters)}`;
 
   const clearFiltersHref = "/admin/sourcing-requests";
@@ -332,6 +407,26 @@ export default async function AdminSourcingQueuePage({
           </div>
         </form>
       </section>
+
+      {queueSlaSnapshot ? (
+        <section className="rounded-md border border-neutral-300 p-4">
+          <h2 className="text-2xl font-semibold">SLA snapshot</h2>
+          <p className="mt-1 text-sm text-neutral-700">
+            Queue-age and first-review latency indicators for the current filter scope.
+          </p>
+          <ul className="mt-3 space-y-1 text-sm">
+            <li>Total queue items: {queueSlaSnapshot.total}</li>
+            <li>Submitted: {queueSlaSnapshot.submitted}</li>
+            <li>In review: {queueSlaSnapshot.inReview}</li>
+            <li>Average queue age: {formatHours(queueSlaSnapshot.averageQueueAgeHours)}</li>
+            <li>Oldest queue age: {formatHours(queueSlaSnapshot.oldestQueueAgeHours)}</li>
+            <li>
+              Average first-review latency:{" "}
+              {formatHours(queueSlaSnapshot.averageFirstReviewLatencyHours)}
+            </li>
+          </ul>
+        </section>
+      ) : null}
 
       {queueState.listStatus !== 200 ? (
         <section className="rounded-md border border-red-300 bg-red-50 p-4 text-sm text-red-800">

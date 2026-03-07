@@ -144,10 +144,20 @@ Completion signal: CI blocks merges on lint/typecheck/test/build and migration/s
 - DoD: payment state links to report service product only.
 - Evidence: integration tests for payment-required toggle.
 
-2. [AT-P2-02] Build admin SLA dashboard for sourcing request throughput.
+2. [AT-P2-02] Build admin SLA dashboard for sourcing request throughput. (split into `AT-P2-02A` + `AT-P2-02B`)
 - Size: 2-3h
 - DoD: queue age and delivery-time metrics visible to admin.
 - Evidence: dashboard screenshot + metric tests.
+
+2a. [AT-P2-02A] Add SLA snapshot metrics on admin queue page. ✅ DONE
+- Size: 1-2h
+- DoD: admin queue page shows queue age and first-review latency metrics scoped to active filters.
+- Evidence: `app/admin/sourcing-requests/page.tsx`, `tests/integration/admin-sourcing-queue-page.test.ts`.
+
+2b. [AT-P2-02B] Extend SLA dashboard with delivered-time throughput trend.
+- Size: 1-2h
+- DoD: admin SLA view includes median time from submit to report-ready/delivered buckets.
+- Evidence: `app/admin/sourcing-requests/page.tsx`, `src/server/admin-sourcing-queue.ts`, `tests/integration/admin-sourcing-queue-page.test.ts`.
 
 3. [AT-P2-03] Add template library for report-generation consistency.
 - Size: 2-3h
@@ -319,3 +329,13 @@ Mitigation refs: [AT-P0-05], [AT-P0-06], [AT-P0-07], [AT-P1-06].
   - Priority: P1
   - DoD: authenticated UI route renders GDPR export/deletion request history with signed-out fallback guidance and explicit legal-hold contract note (`409 GDPR_DELETE_LEGAL_HOLD`).
   - Evidence: `app/gdpr/page.tsx`, `src/server/gdpr-request-history.ts`, `tests/integration/gdpr-page.test.ts`, `tests/integration/sourcing-request-timeline-page.test.ts`, `plan/PROGRESS_LOG.md`, `docs/GDPR.md`.
+
+## RUN_UPDATE_2026-03-07T03:30:00+0100
+- [AT-P2-02A] Add SLA snapshot metrics on admin queue page. ✅ DONE
+  - Priority: P2
+  - DoD: admin queue page shows queue-age and first-review latency metrics scoped to active filters.
+  - Evidence: `app/admin/sourcing-requests/page.tsx`, `tests/integration/admin-sourcing-queue-page.test.ts`.
+- [AT-P2-02B] Extend SLA dashboard with delivered-time throughput trend.
+  - Priority: P2
+  - DoD: admin SLA view includes median time from submit to report-ready/delivered buckets.
+  - Evidence target: `app/admin/sourcing-requests/page.tsx`, `src/server/admin-sourcing-queue.ts`, `tests/integration/admin-sourcing-queue-page.test.ts`.

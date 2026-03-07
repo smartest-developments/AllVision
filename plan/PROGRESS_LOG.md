@@ -1,5 +1,13 @@
 # Progress Log
 
+## 2026-03-07T03:30:00+0100
+
+- task: AT-P2-02A Add SLA snapshot metrics on admin queue page.
+- result: added an admin-facing SLA snapshot section on `/admin/sourcing-requests` that computes queue throughput indicators from API-backed queue data (`total`, `submitted`, `in review`, average/oldest queue age, and average first-review latency). Metrics are filter-scoped and render only for successful admin queue loads.
+- backlog update: split `AT-P2-02` into `AT-P2-02A` (DONE) and `AT-P2-02B` (TODO); next priority remains `AT-P2-01` for optional report-fee collection.
+- quality gates: `npm run lint` ✅, `npm run typecheck` ✅, `npm run test` ✅, `npm run build` ✅.
+- next: AT-P2-01 add optional report-fee collection for informational service.
+
 ## 2026-03-07T02:05:00+0100
 
 - task: AT-P1-09B Implement admin-reviewed soft-delete execution and purge/anonymize workflow.
