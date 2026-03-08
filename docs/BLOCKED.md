@@ -59,3 +59,5 @@
 - scope: `AT-AUTO-UI-15` changes committed locally as `1543a0c`.
 - blocker: `git push` failed (`ssh: Could not resolve hostname ssh.github.com`).
 - next: retry push when outbound DNS/network is available.
+- 2026-03-09T00:41:20+0100 - Automation blocked: sandbox denied write access in this run context (`operation not permitted`), so backlog/code/docs updates could not be applied.
+- 2026-03-09T00:41:20+0100 - Partial blocker: tracked planning files (including `plan/TASK_BACKLOG.md`) are write-restricted in this run context; unable to mark completed tasks in backlog despite code parity.

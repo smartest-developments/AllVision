@@ -452,3 +452,4 @@
 - quality gates:
   - pending run (`npm run lint`, `npm run typecheck`, `npm run test`, `npm run build`).
 - next: `AT-AUTO-BE-09`.
+- 2026-03-09T00:41:20+0100 - Blocked planning reconcile run: route/page code already satisfies `AT-AUTO-BE-08` + `AT-AUTO-UI-17`, but backlog/progress canonicalization and any code/docs updates were blocked by write restrictions on tracked planning files in this run context. Quality gates remained green (`lint`, `typecheck`, `test`, `build`).
