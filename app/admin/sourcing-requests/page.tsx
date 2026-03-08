@@ -5,6 +5,7 @@ import { NextRequest } from "next/server";
 
 import { GET as getAdminQueue } from "../../api/v1/admin/sourcing-requests/route";
 import { GET as getAdminQueueDetail } from "../../api/v1/admin/sourcing-requests/[requestId]/route";
+import { listAdminThroughputRequests } from "@/server/admin-sourcing-queue";
 
 type QueueStatus = "SUBMITTED" | "IN_REVIEW";
 
@@ -87,6 +88,28 @@ type QueueSlaSnapshot = {
   averageFirstReviewLatencyHours: number | null;
 };
 
+type ThroughputSnapshot = {
+  reportReadyMedianHours: number | null;
+  deliveredMedianHours: number | null;
+  reportReadyBucketUnder24h: number;
+  reportReadyBucket24To72h: number;
+  reportReadyBucketOver72h: number;
+  deliveredBucketUnder24h: number;
+  deliveredBucket24To72h: number;
+  deliveredBucketOver72h: number;
+};
+
+type ThroughputRequest = {
+  createdAt: Date;
+  statusEvents: Array<{
+    toStatus: string;
+    createdAt: Date;
+  }>;
+  reportArtifacts: Array<{
+    deliveredAt: Date | null;
+  }>;
+};
+
 function firstParam(value: string | string[] | undefined): string {
   if (typeof value === "string") {
     return value.trim();
@@ -153,6 +176,87 @@ function formatHours(value: number | null): string {
   }
 
   return `${value.toFixed(1)}h`;
+}
+
+function computeMedian(values: number[]): number | null {
+  if (values.length === 0) {
+    return null;
+  }
+
+  const sorted = [...values].sort((a, b) => a - b);
+  const middle = Math.floor(sorted.length / 2);
+  if (sorted.length % 2 === 0) {
+    return (sorted[middle - 1] + sorted[middle]) / 2;
+  }
+
+  return sorted[middle];
+}
+
+function classifyDurationHours(value: number) {
+  if (value < 24) {
+    return "under24h";
+  }
+  if (value <= 72) {
+    return "from24To72h";
+  }
+  return "over72h";
+}
+
+function buildThroughputSnapshot(items: ThroughputRequest[]): ThroughputSnapshot {
+  const reportReadyDurations: number[] = [];
+  const deliveredDurations: number[] = [];
+
+  for (const item of items) {
+    const submittedAtMs = item.createdAt.getTime();
+    const reportReadyEvent = item.statusEvents.find(
+      (event) => event.toStatus === "REPORT_READY",
+    );
+
+    if (reportReadyEvent) {
+      reportReadyDurations.push(
+        Math.max(0, (reportReadyEvent.createdAt.getTime() - submittedAtMs) / (1000 * 60 * 60)),
+      );
+    }
+
+    const deliveredAt = item.reportArtifacts.find((artifact) => artifact.deliveredAt !== null)
+      ?.deliveredAt;
+    if (deliveredAt) {
+      deliveredDurations.push(
+        Math.max(0, (deliveredAt.getTime() - submittedAtMs) / (1000 * 60 * 60)),
+      );
+    }
+  }
+
+  const reportReadyBucketUnder24h = reportReadyDurations.filter(
+    (value) => classifyDurationHours(value) === "under24h",
+  ).length;
+  const reportReadyBucket24To72h = reportReadyDurations.filter(
+    (value) => classifyDurationHours(value) === "from24To72h",
+  ).length;
+  const reportReadyBucketOver72h = reportReadyDurations.filter(
+    (value) => classifyDurationHours(value) === "over72h",
+  ).length;
+
+  const deliveredBucketUnder24h = deliveredDurations.filter(
+    (value) => classifyDurationHours(value) === "under24h",
+  ).length;
+  const deliveredBucket24To72h = deliveredDurations.filter(
+    (value) => classifyDurationHours(value) === "from24To72h",
+  ).length;
+  const deliveredBucketOver72h = deliveredDurations.filter(
+    (value) => classifyDurationHours(value) === "over72h",
+  ).length;
+
+  return {
+    reportReadyMedianHours: computeMedian(reportReadyDurations),
+    deliveredMedianHours: computeMedian(deliveredDurations),
+    reportReadyBucketUnder24h,
+    reportReadyBucket24To72h,
+    reportReadyBucketOver72h,
+    deliveredBucketUnder24h,
+    deliveredBucket24To72h,
+    deliveredBucketOver72h,
+  };
 }
 
 function buildQueueSlaSnapshot(
@@ -326,6 +430,14 @@ export default async function AdminSourcingQueuePage({
     queueState.listStatus === 200
       ? buildQueueSlaSnapshot(queueState.listItems)
       : null;
+  const throughputRequests =
+    queueState.listStatus === 200
+      ? await listAdminThroughputRequests({
+          countryCode: filters.countryCode || undefined,
+          userEmail: filters.userEmail || undefined,
+        })
+      : [];
+  const throughputSnapshot = buildThroughputSnapshot(throughputRequests);
   const detailViewHref = `/admin/sourcing-requests${buildQueryString(filters)}`;
 
   const clearFiltersHref = "/admin/sourcing-requests";
@@ -423,6 +535,20 @@ export default async function AdminSourcingQueuePage({
             <li>
               Average first-review latency:{" "}
               {formatHours(queueSlaSnapshot.averageFirstReviewLatencyHours)}
+            </li>
+            <li>
+              Median submit -&gt; report ready: {formatHours(throughputSnapshot.reportReadyMedianHours)}
+            </li>
+            <li>
+              Median submit -&gt; delivered: {formatHours(throughputSnapshot.deliveredMedianHours)}
+            </li>
+            <li>
+              Report-ready throughput buckets: &lt;24h {throughputSnapshot.reportReadyBucketUnder24h} |
+              24-72h {throughputSnapshot.reportReadyBucket24To72h} | &gt;72h {throughputSnapshot.reportReadyBucketOver72h}
+            </li>
+            <li>
+              Delivered throughput buckets: &lt;24h {throughputSnapshot.deliveredBucketUnder24h} |
+              24-72h {throughputSnapshot.deliveredBucket24To72h} | &gt;72h {throughputSnapshot.deliveredBucketOver72h}
             </li>
           </ul>
         </section>

@@ -154,7 +154,7 @@ Completion signal: CI blocks merges on lint/typecheck/test/build and migration/s
 - DoD: admin queue page shows queue age and first-review latency metrics scoped to active filters.
 - Evidence: `app/admin/sourcing-requests/page.tsx`, `tests/integration/admin-sourcing-queue-page.test.ts`.
 
-2b. [AT-P2-02B] Extend SLA dashboard with delivered-time throughput trend.
+2b. [AT-P2-02B] Extend SLA dashboard with delivered-time throughput trend. ✅ DONE
 - Size: 1-2h
 - DoD: admin SLA view includes median time from submit to report-ready/delivered buckets.
 - Evidence: `app/admin/sourcing-requests/page.tsx`, `src/server/admin-sourcing-queue.ts`, `tests/integration/admin-sourcing-queue-page.test.ts`.
@@ -335,7 +335,7 @@ Mitigation refs: [AT-P0-05], [AT-P0-06], [AT-P0-07], [AT-P1-06].
   - Priority: P2
   - DoD: admin queue page shows queue-age and first-review latency metrics scoped to active filters.
   - Evidence: `app/admin/sourcing-requests/page.tsx`, `tests/integration/admin-sourcing-queue-page.test.ts`.
-- [AT-P2-02B] Extend SLA dashboard with delivered-time throughput trend.
+- [AT-P2-02B] Extend SLA dashboard with delivered-time throughput trend. ✅ DONE
   - Priority: P2
   - DoD: admin SLA view includes median time from submit to report-ready/delivered buckets.
   - Evidence target: `app/admin/sourcing-requests/page.tsx`, `src/server/admin-sourcing-queue.ts`, `tests/integration/admin-sourcing-queue-page.test.ts`.

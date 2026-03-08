@@ -110,6 +110,7 @@ All API surfaces must maintain these constraints:
   - without `status`, queue defaults to pending states (`SUBMITTED|IN_REVIEW`)
   - payload shape: `{ requests: [...] }`
   - UI binding: `/admin/sourcing-requests` consumes this contract with filter controls (`status`, `countryCode`, `userEmail`) and list-to-detail navigation.
+  - SLA view note: admin queue page also computes throughput trend metrics from closed requests (`REPORT_READY|DELIVERED`) in the same filter scope, surfacing medians (`submit -> report-ready`, `submit -> delivered`) and `<24h|24-72h|>72h` buckets.
 - Responses: `200`, `400`, `401`, `403`.
 
 ### `GET /api/v1/admin/sourcing-requests/:requestId`

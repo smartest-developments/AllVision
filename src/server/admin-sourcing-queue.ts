@@ -73,3 +73,27 @@ export async function getAdminSourcingRequestDetail(requestId: string) {
     }
   });
 }
+
+export async function listAdminThroughputRequests(filters: {
+  countryCode?: string;
+  userEmail?: string;
+}) {
+  return prisma.sourcingRequest.findMany({
+    where: {
+      status: { in: [SourcingRequestStatus.REPORT_READY, SourcingRequestStatus.DELIVERED] },
+      ...(filters.countryCode
+        ? { prescription: { countryCode: filters.countryCode.toUpperCase() } }
+        : {}),
+      ...(filters.userEmail ? { user: { email: filters.userEmail } } : {}),
+    },
+    orderBy: [{ createdAt: "desc" }],
+    include: {
+      statusEvents: {
+        orderBy: { createdAt: "asc" },
+      },
+      reportArtifacts: {
+        orderBy: { createdAt: "asc" },
+      },
+    },
+  });
+}

@@ -262,6 +262,61 @@ describe("Admin sourcing queue page", () => {
         },
       });
 
+      const reportReadyRequest = await prisma.sourcingRequest.create({
+        data: {
+          userId: owner.id,
+          prescriptionId: prescription.id,
+          status: "REPORT_READY",
+          reportPaymentRequired: false,
+          currency: "EUR",
+          createdAt: new Date("2026-03-06T10:00:00.000Z"),
+        },
+      });
+
+      await prisma.sourcingStatusEvent.create({
+        data: {
+          sourcingRequestId: reportReadyRequest.id,
+          fromStatus: "IN_REVIEW",
+          toStatus: "REPORT_READY",
+          note: "Report ready",
+          actorUserId: admin.id,
+          createdAt: new Date("2026-03-06T20:00:00.000Z"),
+        },
+      });
+
+      const deliveredRequest = await prisma.sourcingRequest.create({
+        data: {
+          userId: owner.id,
+          prescriptionId: prescription.id,
+          status: "DELIVERED",
+          reportPaymentRequired: false,
+          currency: "EUR",
+          createdAt: new Date("2026-03-05T12:00:00.000Z"),
+        },
+      });
+
+      await prisma.sourcingStatusEvent.create({
+        data: {
+          sourcingRequestId: deliveredRequest.id,
+          fromStatus: "IN_REVIEW",
+          toStatus: "REPORT_READY",
+          note: "Report ready",
+          actorUserId: admin.id,
+          createdAt: new Date("2026-03-06T00:00:00.000Z"),
+        },
+      });
+
+      await prisma.reportArtifact.create({
+        data: {
+          sourcingRequestId: deliveredRequest.id,
+          createdByAdminId: admin.id,
+          storageKey: "reports/delivered.pdf",
+          checksumSha256: "abc123",
+          deliveryChannel: "EMAIL_LINK",
+          deliveredAt: new Date("2026-03-06T12:00:00.000Z"),
+        },
+      });
+
       const adminCookie = await issueSessionCookie(admin.id);
       mockCookieHeader(adminCookie);
 
@@ -274,6 +329,14 @@ describe("Admin sourcing queue page", () => {
       expect(markup).toContain("Average queue age: 3.0h");
       expect(markup).toContain("Oldest queue age: 4.0h");
       expect(markup).toContain("Average first-review latency: 2.5h");
+      expect(markup).toContain("Median submit -&gt; report ready: 11.0h");
+      expect(markup).toContain("Median submit -&gt; delivered: 24.0h");
+      expect(markup).toContain(
+        "Report-ready throughput buckets: &lt;24h 2 | 24-72h 0 | &gt;72h 0",
+      );
+      expect(markup).toContain(
+        "Delivered throughput buckets: &lt;24h 0 | 24-72h 1 | &gt;72h 0",
+      );
     } finally {
       vi.useRealTimers();
     }

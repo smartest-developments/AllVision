@@ -1,5 +1,13 @@
 # Progress Log
 
+## 2026-03-08T08:12:11+0100
+
+- task: AT-P2-02B Extend SLA dashboard with delivered-time throughput trend.
+- result: extended admin queue SLA panel with closed-request throughput metrics by adding median submit-to-report-ready and submit-to-delivered durations plus deterministic throughput buckets (`<24h`, `24-72h`, `>72h`) scoped to active country/email filters.
+- backlog update: marked `AT-P2-02B` DONE; next priority remains `AT-P2-01` for optional report-fee collection.
+- quality gates: `npm run lint` ✅, `npm run typecheck` ✅, `npm run test` ✅, `npm run build` ✅.
+- next: AT-P2-01 add optional report-fee collection for informational service.
+
 ## 2026-03-07T03:30:00+0100
 
 - task: AT-P2-02A Add SLA snapshot metrics on admin queue page.
