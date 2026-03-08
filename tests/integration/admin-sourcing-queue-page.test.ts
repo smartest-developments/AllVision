@@ -62,7 +62,7 @@ describe("Admin sourcing queue page", () => {
   }
 
   async function seedAdminQueue(
-    status: "SUBMITTED" | "IN_REVIEW" | "PAYMENT_PENDING" = "IN_REVIEW",
+    status: "SUBMITTED" | "IN_REVIEW" | "PAYMENT_PENDING" | "PAYMENT_SETTLED" = "IN_REVIEW",
   ) {
     const admin = await prisma.user.create({
       data: {
@@ -110,6 +110,18 @@ describe("Admin sourcing queue page", () => {
           fromStatus: "SUBMITTED",
           toStatus: "IN_REVIEW",
           note: "Admin triage",
+          actorUserId: admin.id,
+        },
+      });
+    }
+
+    if (status === "PAYMENT_SETTLED") {
+      await prisma.sourcingStatusEvent.create({
+        data: {
+          sourcingRequestId: request.id,
+          fromStatus: "PAYMENT_PENDING",
+          toStatus: "PAYMENT_SETTLED",
+          note: "Payment settled",
           actorUserId: admin.id,
         },
       });
@@ -327,8 +339,8 @@ describe("Admin sourcing queue page", () => {
     expect(markup).toContain("Settled at: 2026-03-08T16:41:22.000Z");
   });
 
-  it("renders settlement success fallback metadata when redirect omits actor/timestamp", async () => {
-    const { admin, request } = await seedAdminQueue("PAYMENT_PENDING");
+  it("renders settlement success fallback metadata from detail payload when redirect omits actor/timestamp", async () => {
+    const { admin, request } = await seedAdminQueue("PAYMENT_SETTLED");
     const adminCookie = await issueSessionCookie(admin.id);
     mockCookieHeader(adminCookie);
 
@@ -342,8 +354,9 @@ describe("Admin sourcing queue page", () => {
     );
 
     expect(markup).toContain("Report-fee settlement recorded successfully.");
-    expect(markup).toContain("Settled by: N/A");
-    expect(markup).toContain("Settled at: N/A");
+    expect(markup).toContain(`Settled by: ${admin.id}`);
+    expect(markup).toContain("Settled at: ");
+    expect(markup).not.toContain("Settled at: N/A");
   });
 
   it("shows admin access required message for non-admin session", async () => {

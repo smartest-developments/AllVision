@@ -145,6 +145,7 @@ All API surfaces must maintain these constraints:
 - Notes:
   - response includes deterministic `request.settlement` metadata for non-redirect detail loads: `{ settledByUserId: string | null, settledAt: string | null }`.
   - settlement metadata is populated from immutable `PAYMENT_SETTLED` status events and remains `null` when settlement has not occurred.
+  - admin queue UI settlement confirmation reads `request.settlement` first and uses settlement redirect query markers only as immediate post-submit fallback.
 - Responses: `200`, `401`, `403`, `404`.
 
 ### `PATCH /api/v1/admin/sourcing-requests/:requestId/status`

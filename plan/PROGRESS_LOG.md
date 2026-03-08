@@ -1,4 +1,12 @@
 # Progress Log
+## 2026-03-08T21:36:37+0100
+
+- task: AT-AUTO-UI-13 settlement banner metadata precedence on admin queue detail.
+- result: updated `/admin/sourcing-requests` settlement success rendering to prefer `request.settlement` metadata from admin detail payload and use `settledBy/settledAt` query params only as immediate post-redirect fallback. Extended integration coverage for fallback branch by seeding `PAYMENT_SETTLED` status evidence and asserting non-`N/A` settlement metadata when redirect query markers are omitted.
+- backlog update: confirmed `AT-AUTO-UI-13` DONE and added next balanced follow-ups `AT-AUTO-BE-06` (list payload settlement metadata) and `AT-AUTO-UI-14` (queue-card settlement evidence rendering).
+- quality gates: `npm run lint` ✅, `npm run typecheck` ✅, `npm run test` ✅ (113), `npm run build` ✅.
+- next: AT-AUTO-BE-06 expose settled metadata on admin queue list payload for queue-level observability.
+
 ## 2026-03-08T19:37:16+0100
 
 - task: AT-AUTO-BE-05 settlement metadata parity on admin queue detail payload.
@@ -383,3 +391,16 @@
   - marked `AT-AUTO-BE-05` DONE and added follow-up `AT-AUTO-UI-13` for direct-load settlement banner fallback.
 - quality gates:
   - pending repo gate run (`lint`, `typecheck`, `test`, `build`).
+
+## 2026-03-08T21:36:23+0100 - AT-AUTO-UI-13 detail-first settlement banner metadata
+- task: complete `AT-AUTO-UI-13` by preferring admin detail payload settlement metadata in the post-settlement success banner.
+- result:
+  - updated `app/admin/sourcing-requests/page.tsx` so success-banner `Settled by/at` values resolve from detail API `request.settlement` first and only fall back to redirect query values when present;
+  - added integration coverage in `tests/integration/admin-sourcing-queue-page.test.ts` for redirect-marker flow with missing query metadata and settled detail payload fallback.
+- backlog update:
+  - marked `AT-AUTO-UI-13` DONE and added backend follow-up `AT-AUTO-BE-06` (`GET /api/v1/admin/sourcing-requests` settlement metadata parity).
+- quality gates:
+  - `npm run lint` ✅
+  - `npm run typecheck` ✅
+  - `npm run test` ✅ (113/113)
+  - `npm run build` ✅
