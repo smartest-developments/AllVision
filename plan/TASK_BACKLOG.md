@@ -388,7 +388,15 @@ Mitigation refs: [AT-P0-05], [AT-P0-06], [AT-P0-07], [AT-P1-06].
   - Priority: P1
   - DoD: settlement form-submit redirects append deterministic `settled=1` marker and admin queue detail renders explicit success banner when marker is present.
   - Evidence: `app/api/v1/admin/sourcing-requests/[requestId]/report-fee/settle/route.ts`, `app/admin/sourcing-requests/page.tsx`, `tests/integration/report-fee-settle-route.test.ts`, `tests/integration/admin-sourcing-queue-page.test.ts`, `docs/API_SPEC.md`.
-- [AT-AUTO-BE-04] Add settlement response metadata envelope for admin UI observability.
+- [AT-AUTO-BE-04] Add settlement response metadata envelope for admin UI observability. ✅ DONE
   - Priority: P1
   - DoD: settlement JSON response includes deterministic settlement actor and settled-at timestamp fields for admin UI/telemetry correlation.
-  - Evidence target: `app/api/v1/admin/sourcing-requests/[requestId]/report-fee/settle/route.ts`, `src/server/report-retrieval.ts`, `tests/integration/report-fee-settle-route.test.ts`, `docs/API_SPEC.md`.
+  - Evidence: `app/api/v1/admin/sourcing-requests/[requestId]/report-fee/settle/route.ts`, `src/server/report-retrieval.ts`, `tests/integration/report-fee-settle-route.test.ts`, `docs/API_SPEC.md`.
+- [AT-AUTO-UI-12] Show settlement metadata on admin queue detail success state. ✅ DONE
+  - Priority: P1
+  - DoD: admin queue detail confirmation state renders `settledAt` and actor metadata from settlement API response with deterministic fallback copy when metadata is unavailable.
+  - Evidence: `app/admin/sourcing-requests/page.tsx`, `app/api/v1/admin/sourcing-requests/[requestId]/report-fee/settle/route.ts`, `tests/integration/admin-sourcing-queue-page.test.ts`, `tests/integration/report-fee-settle-route.test.ts`, `docs/API_SPEC.md`.
+- [AT-AUTO-BE-05] Include settlement metadata on admin queue detail API payload.
+  - Priority: P1
+  - DoD: `GET /api/v1/admin/sourcing-requests/:requestId` includes immutable settlement actor/timestamp fields when request is `PAYMENT_SETTLED|DELIVERED` so admin UI can render settlement evidence without redirect query dependence.
+  - Evidence target: `app/api/v1/admin/sourcing-requests/[requestId]/route.ts`, `src/server/admin-sourcing-queue.ts`, `tests/integration/admin-sourcing-queue-route.test.ts`, `docs/API_SPEC.md`.

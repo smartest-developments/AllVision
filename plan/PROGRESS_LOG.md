@@ -1,4 +1,20 @@
 # Progress Log
+## 2026-03-08T18:38:00+0100
+
+- task: AT-AUTO-UI-12 settlement metadata success state on admin queue detail.
+- result: extended settlement form-submit redirect contract so `POST /api/v1/admin/sourcing-requests/:requestId/report-fee/settle` now appends `settledBy` and `settledAt` query metadata alongside `settled=1`, and updated `/admin/sourcing-requests` to render actor/timestamp evidence with deterministic `N/A` fallback copy when metadata is missing/invalid.
+- backlog update: marked `AT-AUTO-UI-12` DONE and added `AT-AUTO-BE-05` TODO to expose settlement metadata in admin queue detail API payloads.
+- quality gates: `npm run lint` ✅, `npm run typecheck` ✅, `npm run test` ✅, `npm run build` ✅.
+- next: AT-AUTO-BE-05 include settlement metadata on `GET /api/v1/admin/sourcing-requests/:requestId` for non-redirect detail loads.
+
+## 2026-03-08T17:05:00+0100
+
+- task: AT-AUTO-BE-04 settlement response metadata envelope for admin observability.
+- result: extended settlement backend/route contract so `POST /api/v1/admin/sourcing-requests/:requestId/report-fee/settle` now returns deterministic `settlement` metadata (`settledByUserId`, `settledAt`) for both first-time and idempotent settlement calls. Added status-event lookup in `settleReportFeeForRequest` and expanded integration coverage to assert metadata is present and stable.
+- backlog update: marked `AT-AUTO-BE-04` DONE and added `AT-AUTO-UI-12` TODO to render settlement metadata on admin queue confirmation UI.
+- quality gates: `npm run lint` ✅, `npm run typecheck` ✅, `npm run test` ❌ (pre-existing integration FK/route regressions across admin queue, report-ack, report-fee-checkout/settle, and GDPR suites), `npm run build` ✅.
+- next: AT-AUTO-UI-12 render settlement actor/timestamp on admin queue detail success state.
+
 ## 2026-03-08T16:40:47+0100
 
 - task: AT-AUTO-UI-11 settlement redirect success marker + admin queue confirmation banner.

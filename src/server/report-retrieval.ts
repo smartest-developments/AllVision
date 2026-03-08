@@ -242,6 +242,25 @@ export async function settleReportFeeForRequest(input: {
   requestId: string;
   actorUserId: string;
 }) {
+  async function readSettlementMetadata(requestId: string) {
+    const settlementEvent = await prisma.sourcingStatusEvent.findFirst({
+      where: {
+        sourcingRequestId: requestId,
+        toStatus: SourcingRequestStatus.PAYMENT_SETTLED
+      },
+      orderBy: { createdAt: "desc" },
+      select: {
+        actorUserId: true,
+        createdAt: true
+      }
+    });
+
+    return {
+      settledByUserId: settlementEvent?.actorUserId ?? null,
+      settledAt: settlementEvent?.createdAt ?? null
+    };
+  }
+
   const request = await prisma.sourcingRequest.findUnique({
     where: { id: input.requestId }
   });
@@ -262,7 +281,10 @@ export async function settleReportFeeForRequest(input: {
     request.status === SourcingRequestStatus.PAYMENT_SETTLED ||
     request.status === SourcingRequestStatus.DELIVERED
   ) {
-    return request;
+    return {
+      request,
+      ...(await readSettlementMetadata(request.id))
+    };
   }
 
   if (request.status !== SourcingRequestStatus.PAYMENT_PENDING) {
@@ -273,7 +295,7 @@ export async function settleReportFeeForRequest(input: {
     );
   }
 
-  return prisma.$transaction(async (tx) => {
+  const settledRequest = await prisma.$transaction(async (tx) => {
     const transition = await tx.sourcingRequest.updateMany({
       where: {
         id: request.id,
@@ -322,4 +344,9 @@ export async function settleReportFeeForRequest(input: {
       where: { id: request.id }
     });
   });
+
+  return {
+    request: settledRequest,
+    ...(await readSettlementMetadata(settledRequest.id))
+  };
 }

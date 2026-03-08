@@ -119,7 +119,8 @@ All API surfaces must maintain these constraints:
   - idempotent when request is already `PAYMENT_SETTLED|DELIVERED`.
   - once settled, owner report-delivery acknowledgment is unlocked via `POST /api/v1/sourcing-requests/:requestId/report/ack`.
   - supports form-submit flow via optional `redirectTo` path restricted to `/admin/sourcing-requests*`; returns `303` when valid.
-  - successful form redirects append `settled=1` query marker for deterministic admin UI confirmation state.
+  - successful form redirects append `settled=1` plus settlement metadata query markers (`settledBy`, `settledAt`) for deterministic admin UI confirmation state.
+  - `200` JSON payload includes `settlement` envelope: `{ settledByUserId: string | null, settledAt: string | null }`.
 - Responses: `200`, `401`, `403`, `404`, `409`.
 
 ## Admin Review and Report Upload

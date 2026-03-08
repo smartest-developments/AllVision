@@ -306,7 +306,28 @@ describe("Admin sourcing queue page", () => {
     expect(markup).toContain("name=\"redirectTo\"");
   });
 
-  it("renders settlement success banner when redirected with settled marker", async () => {
+  it("renders settlement success banner with settlement metadata when redirected with settled marker", async () => {
+    const { admin, request } = await seedAdminQueue("PAYMENT_PENDING");
+    const adminCookie = await issueSessionCookie(admin.id);
+    mockCookieHeader(adminCookie);
+
+    const markup = renderToStaticMarkup(
+      await AdminSourcingQueuePage({
+        searchParams: Promise.resolve({
+          requestId: request.id,
+          settled: "1",
+          settledBy: admin.id,
+          settledAt: "2026-03-08T16:41:22.000Z",
+        }),
+      }),
+    );
+
+    expect(markup).toContain("Report-fee settlement recorded successfully.");
+    expect(markup).toContain(`Settled by: ${admin.id}`);
+    expect(markup).toContain("Settled at: 2026-03-08T16:41:22.000Z");
+  });
+
+  it("renders settlement success fallback metadata when redirect omits actor/timestamp", async () => {
     const { admin, request } = await seedAdminQueue("PAYMENT_PENDING");
     const adminCookie = await issueSessionCookie(admin.id);
     mockCookieHeader(adminCookie);
@@ -321,6 +342,8 @@ describe("Admin sourcing queue page", () => {
     );
 
     expect(markup).toContain("Report-fee settlement recorded successfully.");
+    expect(markup).toContain("Settled by: N/A");
+    expect(markup).toContain("Settled at: N/A");
   });
 
   it("shows admin access required message for non-admin session", async () => {

@@ -41,3 +41,14 @@
   - `tests/integration/sourcing-timeline-route-page.test.ts` (missing ack CTA render + FK constraint creating prescription)
 - Impact: lint/typecheck/build are green, but full test gate is red so commit/push is skipped this run.
 - Next step: stabilize failing integration fixtures/cleanup ordering and timeline expectations, rerun `npm run test`, then commit pending settlement UI changes.
+
+## 2026-03-08T17:08:00+0100
+- Scope: quality-gate validation for `AT-AUTO-BE-04` settlement metadata envelope increment.
+- Blocking gate: `npm run test` fails in pre-existing integration suites not directly changed by this increment.
+- Failing suites observed:
+  - `tests/integration/admin-gdpr-delete-routes.test.ts` (empty pending queue + execute path 500).
+  - `tests/integration/admin-review-decision-route.test.ts` (`404` instead of expected `200/303`).
+  - `tests/integration/admin-sourcing-queue-page.test.ts`, `admin-sourcing-queue-route.test.ts`, `report-ack-route.test.ts`, `report-fee-checkout-route.test.ts`, `report-fee-settle-route.test.ts` (FK cleanup/seed violations).
+  - `tests/integration/sourcing-timeline-route-page.test.ts` (forbidden prescription assertion mismatch).
+- Impact: `lint`, `typecheck`, and `build` are green, but full test gate is red so commit/push is skipped.
+- Next step: stabilize integration fixture cleanup + seed ordering and review prescription-forbidden rendering expectations, then rerun full `npm run test`.

@@ -66,7 +66,7 @@ export async function POST(
   }
 
   try {
-    const updated = await settleReportFeeForRequest({
+    const settled = await settleReportFeeForRequest({
       requestId,
       actorUserId: adminUserId
     });
@@ -74,18 +74,28 @@ export async function POST(
     if (redirectTo) {
       const redirectUrl = new URL(redirectTo, request.url);
       redirectUrl.searchParams.set("settled", "1");
+      if (settled.settledByUserId) {
+        redirectUrl.searchParams.set("settledBy", settled.settledByUserId);
+      }
+      if (settled.settledAt) {
+        redirectUrl.searchParams.set("settledAt", settled.settledAt.toISOString());
+      }
       return NextResponse.redirect(redirectUrl, { status: 303 });
     }
 
     return NextResponse.json(
       {
-        requestId: updated.id,
-        status: updated.status,
+        requestId: settled.request.id,
+        status: settled.request.status,
         reportFee: {
-          required: updated.reportPaymentRequired,
-          feeCents: updated.reportFeeCents,
-          currency: updated.currency,
-          paymentState: updated.status === "PAYMENT_PENDING" ? "PENDING" : "SETTLED"
+          required: settled.request.reportPaymentRequired,
+          feeCents: settled.request.reportFeeCents,
+          currency: settled.request.currency,
+          paymentState: settled.request.status === "PAYMENT_PENDING" ? "PENDING" : "SETTLED"
+        },
+        settlement: {
+          settledByUserId: settled.settledByUserId,
+          settledAt: settled.settledAt?.toISOString() ?? null
         }
       },
       { status: 200 }

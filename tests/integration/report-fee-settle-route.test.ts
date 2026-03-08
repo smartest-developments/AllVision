@@ -133,6 +133,7 @@ describe("POST /api/v1/admin/sourcing-requests/:requestId/report-fee/settle", ()
       requestId: string;
       status: string;
       reportFee: { paymentState: string };
+      settlement: { settledByUserId: string | null; settledAt: string | null };
     };
 
     expect(response.status).toBe(200);
@@ -141,8 +142,12 @@ describe("POST /api/v1/admin/sourcing-requests/:requestId/report-fee/settle", ()
       status: "PAYMENT_SETTLED",
       reportFee: {
         paymentState: "SETTLED"
+      },
+      settlement: {
+        settledByUserId: admin.id
       }
     });
+    expect(payload.settlement.settledAt).toBeTruthy();
 
     const statusEvent = await prisma.sourcingStatusEvent.findFirst({
       where: {
@@ -218,6 +223,14 @@ describe("POST /api/v1/admin/sourcing-requests/:requestId/report-fee/settle", ()
     expect(firstResponse.status).toBe(200);
     expect(secondResponse.status).toBe(200);
 
+    const secondPayload = (await secondResponse.json()) as {
+      settlement: { settledByUserId: string | null; settledAt: string | null };
+    };
+    expect(secondPayload.settlement).toMatchObject({
+      settledByUserId: admin.id
+    });
+    expect(secondPayload.settlement.settledAt).toBeTruthy();
+
     const statusEvents = await prisma.sourcingStatusEvent.findMany({
       where: {
         sourcingRequestId: request.id,
@@ -257,9 +270,14 @@ describe("POST /api/v1/admin/sourcing-requests/:requestId/report-fee/settle", ()
     );
 
     expect(response.status).toBe(303);
-    expect(response.headers.get("location")).toBe(
-      `http://localhost/admin/sourcing-requests?requestId=${request.id}&settled=1`
-    );
+    const location = response.headers.get("location");
+    expect(location).toBeTruthy();
+    const redirected = new URL(location!);
+    expect(redirected.pathname).toBe("/admin/sourcing-requests");
+    expect(redirected.searchParams.get("requestId")).toBe(request.id);
+    expect(redirected.searchParams.get("settled")).toBe("1");
+    expect(redirected.searchParams.get("settledBy")).toBe(admin.id);
+    expect(redirected.searchParams.get("settledAt")).toBeTruthy();
   });
 
 });

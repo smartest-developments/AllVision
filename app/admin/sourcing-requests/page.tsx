@@ -72,6 +72,8 @@ type AdminQueuePageProps = {
     requestId?: string | string[];
     templateId?: string | string[];
     settled?: string | string[];
+    settledBy?: string | string[];
+    settledAt?: string | string[];
   }>;
 };
 
@@ -491,6 +493,10 @@ export default async function AdminSourcingQueuePage({
 
   const clearFiltersHref = "/admin/sourcing-requests";
   const settlementRecorded = firstParam(resolvedSearchParams?.settled) === "1";
+  const settledByUserId = firstParam(resolvedSearchParams?.settledBy);
+  const settledAtRaw = firstParam(resolvedSearchParams?.settledAt);
+  const settledAtParsed = parseIsoTimestamp(settledAtRaw || null);
+  const settledAtDisplay = settledAtParsed === null ? "N/A" : settledAtRaw;
 
   return (
     <main className="mx-auto flex min-h-screen max-w-4xl flex-col gap-6 px-6 py-16">
@@ -520,6 +526,10 @@ export default async function AdminSourcingQueuePage({
       {settlementRecorded ? (
         <section className="rounded-md border border-emerald-300 bg-emerald-50 p-3 text-sm text-emerald-900">
           Report-fee settlement recorded successfully.
+          <p className="mt-1 text-xs text-emerald-950">
+            Settled by: {settledByUserId || "N/A"}
+          </p>
+          <p className="text-xs text-emerald-950">Settled at: {settledAtDisplay}</p>
         </section>
       ) : null}
 
