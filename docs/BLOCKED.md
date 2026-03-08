@@ -54,3 +54,8 @@
 - Next step: stabilize integration fixture cleanup + seed ordering and review prescription-forbidden rendering expectations, then rerun full `npm run test`.
 
 - 2026-03-08T22:42:00+0100 - Blocked in automation run: EPERM on tracked-file writes (`app/admin/sourcing-requests/page.tsx`, `tests/integration/admin-sourcing-queue-page.test.ts`) while implementing AT-AUTO-UI-15 status-filter guidance copy. Next action: restore write permissions, then apply UI copy + tests and backlog/progress updates.
+
+## 2026-03-08T23:10:00+0100 - Push blocked by DNS
+- scope: `AT-AUTO-UI-15` changes committed locally as `1543a0c`.
+- blocker: `git push` failed (`ssh: Could not resolve hostname ssh.github.com`).
+- next: retry push when outbound DNS/network is available.
