@@ -176,6 +176,90 @@ describe("Admin sourcing queue page", () => {
     expect(markup).toContain("Quality checks:");
     expect(markup).toContain("Risk matrix:");
     expect(markup).toContain("templateId=QUALITY_RISK_ASSESSMENT");
+    expect(markup).toContain("Save template draft");
+    expect(markup).toContain("No saved draft yet.");
+    expect(markup).toContain(
+      `action=\"/api/v1/admin/sourcing-requests/${request.id}/report-template-drafts\"`,
+    );
+  });
+
+  it("loads the latest persisted template draft for selected template", async () => {
+    const { admin, request } = await seedAdminQueue("IN_REVIEW");
+    const adminCookie = await issueSessionCookie(admin.id);
+    mockCookieHeader(adminCookie);
+
+    await prisma.auditEvent.create({
+      data: {
+        actorUserId: admin.id,
+        sourcingRequestId: request.id,
+        entityType: "SourcingRequest",
+        entityId: request.id,
+        action: "REPORT_TEMPLATE_DRAFT_SAVED",
+        context: {
+          templateId: "QUALITY_RISK_ASSESSMENT",
+          templateBody: "Saved draft body from prior edit.",
+        },
+      },
+    });
+
+    const markup = renderToStaticMarkup(
+      await AdminSourcingQueuePage({
+        searchParams: Promise.resolve({
+          requestId: request.id,
+          templateId: "QUALITY_RISK_ASSESSMENT",
+        }),
+      }),
+    );
+
+    expect(markup).toContain("Loaded template: Quality risk assessment");
+    expect(markup).toContain("Saved draft body from prior edit.");
+    expect(markup).toContain("Saved draft loaded");
+  });
+
+  it("loads draft by selected template even when another template was saved later", async () => {
+    const { admin, request } = await seedAdminQueue("IN_REVIEW");
+    const adminCookie = await issueSessionCookie(admin.id);
+    mockCookieHeader(adminCookie);
+
+    await prisma.auditEvent.createMany({
+      data: [
+        {
+          actorUserId: admin.id,
+          sourcingRequestId: request.id,
+          entityType: "SourcingRequest",
+          entityId: request.id,
+          action: "ADMIN_REPORT_TEMPLATE_DRAFT_SAVED",
+          context: {
+            templateId: "QUALITY_RISK_ASSESSMENT",
+            templateBody: "Quality-specific draft body.",
+          },
+        },
+        {
+          actorUserId: admin.id,
+          sourcingRequestId: request.id,
+          entityType: "SourcingRequest",
+          entityId: request.id,
+          action: "ADMIN_REPORT_TEMPLATE_DRAFT_SAVED",
+          context: {
+            templateId: "DELIVERY_READINESS",
+            templateBody: "Most recent draft for delivery template.",
+          },
+        },
+      ],
+    });
+
+    const markup = renderToStaticMarkup(
+      await AdminSourcingQueuePage({
+        searchParams: Promise.resolve({
+          requestId: request.id,
+          templateId: "QUALITY_RISK_ASSESSMENT",
+        }),
+      }),
+    );
+
+    expect(markup).toContain("Loaded template: Quality risk assessment");
+    expect(markup).toContain("Quality-specific draft body.");
+    expect(markup).not.toContain("Most recent draft for delivery template.");
   });
 
   it("renders review action form for submitted detail requests", async () => {

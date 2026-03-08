@@ -6,6 +6,7 @@ import { NextRequest } from "next/server";
 import { GET as getAdminQueue } from "../../api/v1/admin/sourcing-requests/route";
 import { GET as getAdminQueueDetail } from "../../api/v1/admin/sourcing-requests/[requestId]/route";
 import { listAdminThroughputRequests } from "@/server/admin-sourcing-queue";
+import { listAdminReportTemplateDrafts } from "@/server/report-template-drafts";
 
 type QueueStatus = "SUBMITTED" | "IN_REVIEW";
 
@@ -477,6 +478,15 @@ export default async function AdminSourcingQueuePage({
   const selectedTemplate =
     REPORT_TEMPLATES.find((template) => template.id === filters.templateId) ??
     REPORT_TEMPLATES[0];
+  const persistedTemplateDrafts =
+    queueState.detailStatus === 200 && queueState.detailPayload
+      ? await listAdminReportTemplateDrafts(queueState.detailPayload.request.requestId)
+      : {};
+  const selectedTemplateDraft = persistedTemplateDrafts[selectedTemplate.id] ?? null;
+  const selectedTemplateBody = selectedTemplateDraft?.templateBody ?? selectedTemplate.body;
+  const selectedTemplateSavedAt = selectedTemplateDraft
+    ? formatTimestamp(selectedTemplateDraft.savedAt.toISOString())
+    : null;
 
   const clearFiltersHref = "/admin/sourcing-requests";
 
@@ -756,12 +766,31 @@ export default async function AdminSourcingQueuePage({
                 <p className="text-xs font-semibold text-neutral-700">
                   Loaded template: {selectedTemplate.name}
                 </p>
-                <textarea
-                  className="mt-2 w-full rounded-md border border-neutral-300 bg-white px-2 py-1 text-xs text-neutral-700"
-                  readOnly
-                  rows={12}
-                  value={selectedTemplate.body}
-                />
+                <p className="mt-1 text-[11px] text-neutral-600">
+                  {selectedTemplateSavedAt
+                    ? `Saved draft loaded (${selectedTemplateSavedAt}).`
+                    : "No saved draft yet. Start from this default template and save a draft."}
+                </p>
+                <form
+                  action={`/api/v1/admin/sourcing-requests/${detailRequestId}/report-template-drafts`}
+                  className="mt-2"
+                  method="post"
+                >
+                  <input name="templateId" type="hidden" value={selectedTemplate.id} />
+                  <input name="redirectTo" type="hidden" value={detailViewHref} />
+                  <textarea
+                    className="w-full rounded-md border border-neutral-300 bg-white px-2 py-1 text-xs text-neutral-700"
+                    defaultValue={selectedTemplateBody}
+                    name="templateBody"
+                    rows={12}
+                  />
+                  <button
+                    className="mt-2 rounded-md bg-neutral-900 px-3 py-2 text-xs text-white"
+                    type="submit"
+                  >
+                    Save template draft
+                  </button>
+                </form>
               </div>
                   </>
                 );

@@ -136,6 +136,16 @@ All API surfaces must maintain these constraints:
   - when `redirectTo` is a safe admin queue path, returns `303` redirect back to the queue detail context.
 - Responses: `303`, `400`, `401`, `403`, `404`, `409`.
 
+### `POST /api/v1/admin/sourcing-requests/:requestId/report-template-drafts`
+
+- Purpose: persist admin-authored report-template draft content for request-detail authoring workflows.
+- Notes:
+  - accepts `application/x-www-form-urlencoded` or `multipart/form-data` (`templateId`, `templateBody`, optional `redirectTo`).
+  - requires admin session cookie (`401` missing/invalid, `403` non-admin).
+  - persists immutable draft snapshots as audit events (`REPORT_TEMPLATE_DRAFT_SAVED`) and request detail loads the latest saved draft when `templateId` matches.
+  - when `redirectTo` is a safe admin queue path, returns `303` redirect back to request detail context.
+- Responses: `200`, `303`, `400`, `401`, `403`, `404`.
+
 ### `POST /api/v1/admin/sourcing-requests/:requestId/report-artifacts`
 
 - Purpose: attach report artifact metadata and mark request as report-ready/delivered.

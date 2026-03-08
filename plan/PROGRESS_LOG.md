@@ -1,5 +1,13 @@
 # Progress Log
 
+## 2026-03-08T12:20:00+0100
+
+- task: AT-P2-03B Add template save/persist flow for report authoring.
+- result: added admin template-draft persistence and reload flow by wiring request-detail template editor form to `POST /api/v1/admin/sourcing-requests/:requestId/report-template-drafts`, storing immutable draft snapshots via audit events, and loading latest saved draft content back into the selected template view.
+- backlog update: marked `AT-P2-03B` DONE with API/UI evidence; next priority remains `AT-P2-01B` report-fee settlement lifecycle.
+- quality gates: `npm run lint` ✅, `npm run typecheck` ✅, `npm run test` ✅, `npm run build` ✅.
+- next: AT-P2-01B implement report-fee payment intent + settlement transitions.
+
 ## 2026-03-08T10:25:00+0100
 
 - task: AT-P2-03A Add admin report-template load/preview surface on request detail.

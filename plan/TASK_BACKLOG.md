@@ -179,10 +179,10 @@ Completion signal: CI blocks merges on lint/typecheck/test/build and migration/s
 - DoD: admin request detail exposes standard template choices and deterministic template-body preview tied to URL state.
 - Evidence: `app/admin/sourcing-requests/page.tsx`, `tests/integration/admin-sourcing-queue-page.test.ts`.
 
-3b. [AT-P2-03B] Add template save/persist flow for report authoring.
+3b. [AT-P2-03B] Add template save/persist flow for report authoring. ✅ DONE
 - Size: 1-2h
 - DoD: selected/edited template draft can be persisted and reloaded for the request detail workflow.
-- Evidence: integration tests for template save/reload behavior + API contract notes.
+- Evidence: `app/admin/sourcing-requests/page.tsx`, `app/api/v1/admin/sourcing-requests/[requestId]/report-template-drafts/route.ts`, `src/server/report-template-drafts.ts`, `tests/integration/admin-sourcing-queue-page.test.ts`, `tests/integration/admin-report-template-draft-route.test.ts`, `docs/API_SPEC.md`.
 
 ## COMPLETED
 
