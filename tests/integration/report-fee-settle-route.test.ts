@@ -234,4 +234,32 @@ describe("POST /api/v1/admin/sourcing-requests/:requestId/report-fee/settle", ()
     });
     expect(auditEvents).toHaveLength(1);
   });
+
+  it("supports form-submit redirects for admin queue detail", async () => {
+    const { admin, request } = await seedPendingSettlementRequest();
+    const cookie = await issueSessionCookie(admin.id);
+
+    const response = await POST(
+      new NextRequest(
+        `http://localhost/api/v1/admin/sourcing-requests/${request.id}/report-fee/settle`,
+        {
+          method: "POST",
+          headers: {
+            cookie,
+            "content-type": "application/x-www-form-urlencoded"
+          },
+          body: `redirectTo=${encodeURIComponent(
+            `/admin/sourcing-requests?requestId=${request.id}`
+          )}`
+        }
+      ),
+      { params: Promise.resolve({ requestId: request.id }) }
+    );
+
+    expect(response.status).toBe(303);
+    expect(response.headers.get("location")).toBe(
+      `http://localhost/admin/sourcing-requests?requestId=${request.id}`
+    );
+  });
+
 });

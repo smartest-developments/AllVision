@@ -34,7 +34,7 @@ Completion signal: CI blocks merges on lint/typecheck/test/build and migration/s
 
 ### P0 (0 tasks, MVP blockers)
 
-### P1 (17 tasks)
+### P1 (18 tasks)
 
 1. [AT-P1-01] Enforce RBAC middleware (`USER`, `ADMIN`). ✅ DONE
 - Size: 1-2h
@@ -136,6 +136,12 @@ Completion signal: CI blocks merges on lint/typecheck/test/build and migration/s
 - Acceptance: admin can view pending `PENDING_REVIEW` delete requests and trigger deterministic execute action from UI.
 - DoD: `/admin/gdpr-delete-requests` renders API-backed queue cards, exposes execute forms, and shows clear non-admin access message.
 - Evidence: `app/admin/gdpr-delete-requests/page.tsx`, `app/admin/sourcing-requests/page.tsx`, `tests/integration/admin-gdpr-delete-page.test.ts`.
+
+18. [AT-AUTO-UI-10] Add admin queue settlement action for `PAYMENT_PENDING -> PAYMENT_SETTLED`. ✅ DONE
+- Size: 1-2h
+- Acceptance: admin request detail shows a deterministic settlement action when status is `PAYMENT_PENDING` and returns safely to queue detail context.
+- DoD: admin detail renders settlement form posting to the existing settlement endpoint with safe redirect path support; route and page integration tests cover JSON + form-submit contracts.
+- Evidence: `app/admin/sourcing-requests/page.tsx`, `app/api/v1/admin/sourcing-requests/[requestId]/report-fee/settle/route.ts`, `tests/integration/admin-sourcing-queue-page.test.ts`, `tests/integration/report-fee-settle-route.test.ts`, `docs/API_SPEC.md`.
 
 ### P2 (3 tasks, execution-ready but non-urgent)
 
@@ -277,6 +283,12 @@ Completion signal: CI blocks merges on lint/typecheck/test/build and migration/s
   - Source signal: GDPR deletion moved to queued admin-review contract and needed an operator-facing execution surface.
   - DoD: dedicated admin page lists pending delete requests, includes execute forms, and is covered by integration page tests plus admin API route tests.
   - Evidence: `app/admin/gdpr-delete-requests/page.tsx`, `app/api/v1/admin/gdpr/delete-requests/route.ts`, `app/api/v1/admin/gdpr/delete-requests/[requestId]/execute/route.ts`, `tests/integration/admin-gdpr-delete-page.test.ts`, `tests/integration/admin-gdpr-delete-routes.test.ts`.
+- [AT-AUTO-UI-10] Add admin queue settlement action for `PAYMENT_PENDING -> PAYMENT_SETTLED`. ✅ DONE
+  - Priority: P1
+  - Acceptance: payment-pending request detail exposes deterministic in-app settlement action without requiring manual API clients.
+  - Source signal: settlement endpoint existed (`AT-P2-01B2`) but admin queue detail lacked UI execution path and safe form redirect contract.
+  - DoD: admin detail renders settlement form for `PAYMENT_PENDING` requests, settlement route supports safe `/admin/sourcing-requests*` form redirects, and integration tests cover both page rendering and redirect contract.
+  - Evidence: `app/admin/sourcing-requests/page.tsx`, `app/api/v1/admin/sourcing-requests/[requestId]/report-fee/settle/route.ts`, `tests/integration/admin-sourcing-queue-page.test.ts`, `tests/integration/report-fee-settle-route.test.ts`, `docs/API_SPEC.md`.
 
 ## TECH_DEBT
 

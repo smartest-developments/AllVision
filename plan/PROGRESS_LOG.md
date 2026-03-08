@@ -1,5 +1,13 @@
 # Progress Log
 
+## 2026-03-08T15:35:00+0100
+
+- task: AT-AUTO-UI-10 Admin queue settlement action for `PAYMENT_PENDING -> PAYMENT_SETTLED`.
+- result: added admin request-detail settlement form on `/admin/sourcing-requests` for `PAYMENT_PENDING` requests, posting to the existing settlement endpoint with safe return to queue detail context. Extended settlement route to support form-submit `redirectTo` restricted to `/admin/sourcing-requests*` and return `303` on valid redirects while preserving JSON contract behavior.
+- backlog update: added and marked `AT-AUTO-UI-10` DONE in `plan/TASK_BACKLOG.md` under active and auto-discovered UI lanes.
+- quality gates: pending run in this automation pass.
+- next: auto-discover next UI/backend balanced increment after settlement UI execution gap closure.
+
 ## 2026-03-08T13:58:55+0100
 
 - task: AT-P2-01B2 Report-fee settlement webhook/stub + settled delivery-ack unlock.

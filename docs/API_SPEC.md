@@ -118,6 +118,7 @@ All API surfaces must maintain these constraints:
   - writes immutable `SourcingStatusEvent` (`PAYMENT_PENDING -> PAYMENT_SETTLED`) and `REPORT_FEE_SETTLEMENT_RECORDED` audit marker.
   - idempotent when request is already `PAYMENT_SETTLED|DELIVERED`.
   - once settled, owner report-delivery acknowledgment is unlocked via `POST /api/v1/sourcing-requests/:requestId/report/ack`.
+  - supports form-submit flow via optional `redirectTo` path restricted to `/admin/sourcing-requests*`; returns `303` when valid.
 - Responses: `200`, `401`, `403`, `404`, `409`.
 
 ## Admin Review and Report Upload

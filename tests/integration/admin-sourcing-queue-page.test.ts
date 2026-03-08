@@ -61,7 +61,9 @@ describe("Admin sourcing queue page", () => {
     );
   }
 
-  async function seedAdminQueue(status: "SUBMITTED" | "IN_REVIEW" = "IN_REVIEW") {
+  async function seedAdminQueue(
+    status: "SUBMITTED" | "IN_REVIEW" | "PAYMENT_PENDING" = "IN_REVIEW",
+  ) {
     const admin = await prisma.user.create({
       data: {
         email: "admin-queue-page@example.com",
@@ -281,6 +283,27 @@ describe("Admin sourcing queue page", () => {
     expect(markup).toContain("name=\"toStatus\"");
     expect(markup).toContain("value=\"IN_REVIEW\"");
     expect(markup).toContain("Mark in review");
+  });
+
+  it("renders report-fee settlement form for payment-pending requests", async () => {
+    const { admin, request } = await seedAdminQueue("PAYMENT_PENDING");
+    const adminCookie = await issueSessionCookie(admin.id);
+    mockCookieHeader(adminCookie);
+
+    const markup = renderToStaticMarkup(
+      await AdminSourcingQueuePage({
+        searchParams: Promise.resolve({
+          requestId: request.id,
+        }),
+      }),
+    );
+
+    expect(markup).toContain("Report-fee settlement");
+    expect(markup).toContain("Mark payment settled");
+    expect(markup).toContain(
+      `action=\"/api/v1/admin/sourcing-requests/${request.id}/report-fee/settle\"`,
+    );
+    expect(markup).toContain("name=\"redirectTo\"");
   });
 
   it("shows admin access required message for non-admin session", async () => {

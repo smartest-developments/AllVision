@@ -707,6 +707,26 @@ export default async function AdminSourcingQueuePage({
                 </form>
               ) : null}
 
+              {queueState.detailPayload.request.status === "PAYMENT_PENDING" ? (
+                <form
+                  action={`/api/v1/admin/sourcing-requests/${queueState.detailPayload.request.requestId}/report-fee/settle`}
+                  className="mt-4 rounded-md border border-neutral-200 bg-neutral-50 p-3"
+                  method="post"
+                >
+                  <h3 className="text-sm font-semibold">Report-fee settlement</h3>
+                  <p className="mt-1 text-xs text-neutral-600">
+                    Record settlement and unlock owner delivery acknowledgment.
+                  </p>
+                  <input name="redirectTo" type="hidden" value={detailViewHref} />
+                  <button
+                    className="mt-3 rounded-md bg-neutral-900 px-3 py-2 text-xs text-white"
+                    type="submit"
+                  >
+                    Mark payment settled
+                  </button>
+                </form>
+              ) : null}
+
               <h3 className="mt-4 text-sm font-semibold">Timeline</h3>
               {queueState.detailPayload.timeline.length === 0 ? (
                 <p className="mt-1 text-xs text-neutral-600">No timeline events recorded.</p>

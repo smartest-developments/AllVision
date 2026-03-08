@@ -6,6 +6,25 @@ import {
 } from "@/server/report-retrieval";
 import { RequestAuthError, requireRequestRole } from "@/server/request-auth";
 
+function sanitizeAdminRedirectPath(value: unknown): string | null {
+  if (typeof value !== "string") {
+    return null;
+  }
+
+  const trimmed = value.trim();
+  if (!trimmed.startsWith("/")) {
+    return null;
+  }
+  if (trimmed.startsWith("//")) {
+    return null;
+  }
+  if (!trimmed.startsWith("/admin/sourcing-requests")) {
+    return null;
+  }
+
+  return trimmed;
+}
+
 export async function POST(
   request: NextRequest,
   { params }: { params: Promise<{ requestId: string }> }
@@ -29,11 +48,33 @@ export async function POST(
     );
   }
 
+  let redirectTo: string | null = null;
+  const contentType = request.headers.get("content-type") ?? "";
+  if (
+    contentType.includes("application/x-www-form-urlencoded") ||
+    contentType.includes("multipart/form-data")
+  ) {
+    try {
+      const formData = await request.formData();
+      redirectTo = sanitizeAdminRedirectPath(formData.get("redirectTo"));
+    } catch {
+      return NextResponse.json(
+        { error: { code: "INVALID_FORM", message: "Request body must be valid form data." } },
+        { status: 400 }
+      );
+    }
+  }
+
   try {
     const updated = await settleReportFeeForRequest({
       requestId,
       actorUserId: adminUserId
     });
+
+    if (redirectTo) {
+      const redirectUrl = new URL(redirectTo, request.url);
+      return NextResponse.redirect(redirectUrl, { status: 303 });
+    }
 
     return NextResponse.json(
       {
