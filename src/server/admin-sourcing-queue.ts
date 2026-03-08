@@ -3,7 +3,12 @@ import { z } from "zod";
 
 import { prisma } from "@/server/db";
 
-const adminQueueStatusSchema = z.enum(["SUBMITTED", "IN_REVIEW"]);
+const adminQueueStatusSchema = z.enum([
+  "SUBMITTED",
+  "IN_REVIEW",
+  "PAYMENT_SETTLED",
+  "DELIVERED",
+]);
 
 export const adminQueueFiltersSchema = z.object({
   status: adminQueueStatusSchema.optional(),
@@ -42,9 +47,8 @@ export async function listAdminSourcingRequests(filters: AdminQueueFilters) {
         }
       },
       statusEvents: {
-        orderBy: { createdAt: "desc" },
-        take: 1
-      }
+        orderBy: { createdAt: "desc" }
+      },
     }
   });
 }

@@ -105,7 +105,7 @@ describe("GET /api/v1/admin/sourcing-requests", () => {
       },
     });
 
-    await prisma.sourcingRequest.create({
+    const submittedRequest = await prisma.sourcingRequest.create({
       data: {
         userId: otherUser.id,
         prescriptionId: dePrescription.id,
@@ -125,7 +125,27 @@ describe("GET /api/v1/admin/sourcing-requests", () => {
       },
     });
 
-    return { admin, inReviewRequest };
+    const settledRequest = await prisma.sourcingRequest.create({
+      data: {
+        userId: otherUser.id,
+        prescriptionId: dePrescription.id,
+        status: "PAYMENT_SETTLED",
+        reportPaymentRequired: true,
+        currency: "EUR",
+      },
+    });
+
+    await prisma.sourcingStatusEvent.create({
+      data: {
+        sourcingRequestId: settledRequest.id,
+        fromStatus: "PAYMENT_PENDING",
+        toStatus: "PAYMENT_SETTLED",
+        note: "Settlement recorded",
+        actorUserId: admin.id,
+      },
+    });
+
+    return { admin, inReviewRequest, settledRequest, submittedRequest };
   }
 
   it("returns 401 when session cookie is missing", async () => {
@@ -176,7 +196,7 @@ describe("GET /api/v1/admin/sourcing-requests", () => {
   });
 
   it("returns admin queue list and applies status/country filters", async () => {
-    const { admin, inReviewRequest } = await seedQueueData();
+    const { admin, inReviewRequest, settledRequest } = await seedQueueData();
     const adminCookie = await issueSessionCookie(admin.id);
 
     const defaultResponse = await getAdminQueue(
@@ -215,6 +235,33 @@ describe("GET /api/v1/admin/sourcing-requests", () => {
       }),
     ]);
     expect(filteredPayload.requests[0]?.latestEventAt).toBeTruthy();
+
+    const settledResponse = await getAdminQueue(
+      new NextRequest(
+        "http://localhost/api/v1/admin/sourcing-requests?status=PAYMENT_SETTLED",
+        {
+          headers: { cookie: adminCookie },
+        },
+      ),
+    );
+    const settledPayload = (await settledResponse.json()) as {
+      requests: Array<{
+        requestId: string;
+        status: string;
+        settlement: { settledByUserId: string | null; settledAt: string | null };
+      }>;
+    };
+    expect(settledResponse.status).toBe(200);
+    expect(settledPayload.requests).toEqual([
+      expect.objectContaining({
+        requestId: settledRequest.id,
+        status: "PAYMENT_SETTLED",
+        settlement: expect.objectContaining({
+          settledByUserId: admin.id,
+        }),
+      }),
+    ]);
+    expect(settledPayload.requests[0]?.settlement.settledAt).toBeTruthy();
   });
 
   it("returns admin queue detail for a specific request", async () => {

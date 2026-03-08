@@ -404,3 +404,18 @@
   - `npm run typecheck` ✅
   - `npm run test` ✅ (113/113)
   - `npm run build` ✅
+
+## 2026-03-08T22:09:51+0100 - AT-AUTO-BE-06 + AT-AUTO-UI-14 queue settlement metadata parity
+- task: complete list-level settlement metadata parity and render settled evidence directly on admin queue cards.
+- result:
+  - expanded admin queue status filter contract to include `PAYMENT_SETTLED|DELIVERED`;
+  - updated `GET /api/v1/admin/sourcing-requests` to return `request.settlement.{settledByUserId,settledAt}` for settled rows using immutable `PAYMENT_SETTLED` timeline evidence;
+  - updated admin queue UI card rendering to display settled actor/timestamp directly from list payload metadata;
+  - added integration coverage for settled list payload contract and settled queue-card rendering (`admin-sourcing-queue-route` + `admin-sourcing-queue-page` tests).
+- backlog update:
+  - marked `AT-AUTO-BE-06` and `AT-AUTO-UI-14` DONE; added `AT-AUTO-UI-15` follow-up for filter guidance copy.
+- quality gates:
+  - `npm run lint` ✅
+  - `npm run typecheck` ✅
+  - `npm run test` ✅ (114/114)
+  - `npm run build` ✅

@@ -414,11 +414,15 @@ Mitigation refs: [AT-P0-05], [AT-P0-06], [AT-P0-07], [AT-P1-06].
   - Priority: P1
   - DoD: `/admin/sourcing-requests` renders settlement confirmation from `GET /api/v1/admin/sourcing-requests/:requestId` settlement payload as fallback when `settledBy/settledAt` query params are unavailable.
   - Evidence: `app/admin/sourcing-requests/page.tsx`, `tests/integration/admin-sourcing-queue-page.test.ts`.
-- [AT-AUTO-BE-06] Include settlement metadata in admin queue list payload for settled states.
+- [AT-AUTO-BE-06] Include settlement metadata in admin queue list payload for settled states. ✅ DONE
   - Priority: P1
   - DoD: `GET /api/v1/admin/sourcing-requests` returns settlement actor/timestamp fields for `PAYMENT_SETTLED|DELIVERED` entries so queue cards can render settlement evidence without loading detail first.
-  - Evidence target: `app/api/v1/admin/sourcing-requests/route.ts`, `src/server/admin-sourcing-queue.ts`, `tests/integration/admin-sourcing-queue-route.test.ts`, `docs/API_SPEC.md`.
-- [AT-AUTO-UI-14] Show settled-state evidence directly on admin queue cards.
+  - Evidence: `app/api/v1/admin/sourcing-requests/route.ts`, `src/server/admin-sourcing-queue.ts`, `tests/integration/admin-sourcing-queue-route.test.ts`.
+- [AT-AUTO-UI-14] Show settled-state evidence directly on admin queue cards. ✅ DONE
   - Priority: P1
   - DoD: `/admin/sourcing-requests` queue cards render settlement actor/timestamp for `PAYMENT_SETTLED|DELIVERED` rows from list payload metadata and avoid requiring request-detail navigation for first-level settlement confirmation.
-  - Evidence target: `app/admin/sourcing-requests/page.tsx`, `tests/integration/admin-sourcing-queue-page.test.ts`, `docs/API_SPEC.md`.
+  - Evidence: `app/admin/sourcing-requests/page.tsx`, `tests/integration/admin-sourcing-queue-page.test.ts`.
+- [AT-AUTO-UI-15] Add status-filter help copy to clarify triage vs settled queues.
+  - Priority: P2
+  - DoD: admin queue filter panel explains when to use `SUBMITTED|IN_REVIEW` vs `PAYMENT_SETTLED|DELIVERED` filters to reduce operator misrouting.
+  - Evidence target: `app/admin/sourcing-requests/page.tsx`, `tests/integration/admin-sourcing-queue-page.test.ts`.

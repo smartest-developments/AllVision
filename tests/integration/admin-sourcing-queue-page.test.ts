@@ -318,6 +318,26 @@ describe("Admin sourcing queue page", () => {
     expect(markup).toContain("name=\"redirectTo\"");
   });
 
+  it("renders settlement metadata on queue cards for settled status filters", async () => {
+    const { admin, request } = await seedAdminQueue("PAYMENT_SETTLED");
+    const adminCookie = await issueSessionCookie(admin.id);
+    mockCookieHeader(adminCookie);
+
+    const markup = renderToStaticMarkup(
+      await AdminSourcingQueuePage({
+        searchParams: Promise.resolve({
+          status: "PAYMENT_SETTLED",
+        }),
+      }),
+    );
+
+    expect(markup).toContain(`Request ${request.id}`);
+    expect(markup).toContain("Status: PAYMENT_SETTLED");
+    expect(markup).toContain(`Settled by: ${admin.id}`);
+    expect(markup).toContain("Settled at:");
+    expect(markup).not.toContain("Settled at: N/A");
+  });
+
   it("renders settlement success banner with settlement metadata when redirected with settled marker", async () => {
     const { admin, request } = await seedAdminQueue("PAYMENT_PENDING");
     const adminCookie = await issueSessionCookie(admin.id);

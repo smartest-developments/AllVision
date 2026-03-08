@@ -8,7 +8,7 @@ import { GET as getAdminQueueDetail } from "../../api/v1/admin/sourcing-requests
 import { listAdminThroughputRequests } from "@/server/admin-sourcing-queue";
 import { listAdminReportTemplateDrafts } from "@/server/report-template-drafts";
 
-type QueueStatus = "SUBMITTED" | "IN_REVIEW";
+type QueueStatus = "SUBMITTED" | "IN_REVIEW" | "PAYMENT_SETTLED" | "DELIVERED";
 
 type AdminQueueListItem = {
   requestId: string;
@@ -18,6 +18,10 @@ type AdminQueueListItem = {
   userEmail: string;
   countryCode: string;
   latestEventAt: string | null;
+  settlement: {
+    settledByUserId: string | null;
+    settledAt: string | null;
+  };
 };
 
 type AdminQueueDetail = {
@@ -133,7 +137,12 @@ function firstParam(value: string | string[] | undefined): string {
 }
 
 function normalizeStatus(value: string): "" | QueueStatus {
-  if (value === "SUBMITTED" || value === "IN_REVIEW") {
+  if (
+    value === "SUBMITTED" ||
+    value === "IN_REVIEW" ||
+    value === "PAYMENT_SETTLED" ||
+    value === "DELIVERED"
+  ) {
     return value;
   }
 
@@ -553,6 +562,8 @@ export default async function AdminSourcingQueuePage({
               <option value="">SUBMITTED + IN_REVIEW</option>
               <option value="SUBMITTED">SUBMITTED</option>
               <option value="IN_REVIEW">IN_REVIEW</option>
+              <option value="PAYMENT_SETTLED">PAYMENT_SETTLED</option>
+              <option value="DELIVERED">DELIVERED</option>
             </select>
           </label>
 
@@ -667,6 +678,16 @@ export default async function AdminSourcingQueuePage({
                     <p className="text-xs text-neutral-600">
                       Latest event: {formatTimestamp(entry.latestEventAt)}
                     </p>
+                    {entry.status === "PAYMENT_SETTLED" || entry.status === "DELIVERED" ? (
+                      <>
+                        <p className="text-xs text-neutral-600">
+                          Settled by: {entry.settlement.settledByUserId ?? "N/A"}
+                        </p>
+                        <p className="text-xs text-neutral-600">
+                          Settled at: {formatTimestamp(entry.settlement.settledAt)}
+                        </p>
+                      </>
+                    ) : null}
                     <p className="mt-2 text-xs">
                       <Link className="underline" href={detailHref}>
                         Open request detail

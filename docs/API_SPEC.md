@@ -127,14 +127,15 @@ All API surfaces must maintain these constraints:
 
 ### `GET /api/v1/admin/sourcing-requests`
 
-- Purpose: list queued/in-review sourcing requests.
+- Purpose: list admin sourcing requests for triage and settled-state verification.
 - Query params:
-  - `status` optional (`SUBMITTED|IN_REVIEW`)
+  - `status` optional (`SUBMITTED|IN_REVIEW|PAYMENT_SETTLED|DELIVERED`)
   - `countryCode` optional ISO alpha-2 filter
   - `userEmail` optional owner email filter
 - Notes:
   - without `status`, queue defaults to pending states (`SUBMITTED|IN_REVIEW`)
-  - payload shape: `{ requests: [...] }`
+  - payload shape: `{ requests: [{ ..., settlement: { settledByUserId, settledAt } }] }`
+  - `settlement` metadata is populated only for `PAYMENT_SETTLED|DELIVERED` rows from immutable `PAYMENT_SETTLED` timeline events; otherwise fields are `null`.
   - UI binding: `/admin/sourcing-requests` consumes this contract with filter controls (`status`, `countryCode`, `userEmail`) and list-to-detail navigation.
   - SLA view note: admin queue page also computes throughput trend metrics from closed requests (`REPORT_READY|DELIVERED`) in the same filter scope, surfacing medians (`submit -> report-ready`, `submit -> delivered`) and `<24h|24-72h|>72h` buckets.
 - Responses: `200`, `400`, `401`, `403`.
