@@ -1,4 +1,12 @@
 # Progress Log
+## 2026-03-08T19:37:16+0100
+
+- task: AT-AUTO-BE-05 settlement metadata parity on admin queue detail payload.
+- result: validated and locked `GET /api/v1/admin/sourcing-requests/:requestId` settlement metadata contract by extending integration coverage for both unset (`null`) and settled (`settledByUserId`, `settledAt`) branches.
+- backlog update: marked `AT-AUTO-BE-05` DONE and added UI follow-up `AT-AUTO-UI-13` to prioritize detail-payload settlement metadata over redirect query markers.
+- quality gates: pending in this automation pass.
+- next: AT-AUTO-UI-13 admin queue detail reads settlement evidence from API detail payload first.
+
 ## 2026-03-08T18:38:00+0100
 
 - task: AT-AUTO-UI-12 settlement metadata success state on admin queue detail.
@@ -365,3 +373,13 @@
 - result: added `/gdpr` authenticated UI route with GDPR request history list (export/deletion events), signed-out login/register guidance preserving `next=/gdpr`, and explicit legal-hold copy for deletion conflicts (`409 GDPR_DELETE_LEGAL_HOLD` when sourcing requests are `SUBMITTED|IN_REVIEW`). Updated home navigation/self-service panel to include `/gdpr` entry and added integration coverage for both signed-out and authenticated history rendering.
 - next: AT-P1-10 CI workflow for lint/typecheck/test/build.
 - 2026-03-08T09:56:50+0100 — Blocked on AT-P2-01B (report-fee payment intent + settlement). Intended backend-first split (`AT-P2-01B1` checkout transition, `AT-P2-01B2` settlement transition) was not implemented this run because workspace writes were denied in prior attempts (`Operation not permitted`). Next: resume with `AT-P2-01B1` once writes are stable.
+
+## 2026-03-08T19:12:00+0100 - AT-AUTO-BE-05 settlement metadata on admin detail API
+- task: complete `AT-AUTO-BE-05` by locking settlement metadata on admin queue detail payload for settled lifecycle states.
+- result:
+  - updated `GET /api/v1/admin/sourcing-requests/:requestId` to expose `request.settlement.{settledByUserId,settledAt}` only when the request is `PAYMENT_SETTLED|DELIVERED`;
+  - added integration coverage in `tests/integration/admin-sourcing-queue-settlement-detail.test.ts` for both non-settled null metadata and delivered-with-settlement metadata paths.
+- backlog update:
+  - marked `AT-AUTO-BE-05` DONE and added follow-up `AT-AUTO-UI-13` for direct-load settlement banner fallback.
+- quality gates:
+  - pending repo gate run (`lint`, `typecheck`, `test`, `build`).

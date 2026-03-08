@@ -229,7 +229,12 @@ describe("GET /api/v1/admin/sourcing-requests", () => {
     );
 
     const payload = (await response.json()) as {
-      request: { requestId: string; status: string; countryCode: string };
+      request: {
+        requestId: string;
+        status: string;
+        countryCode: string;
+        settlement: { settledByUserId: string | null; settledAt: string | null };
+      };
       timeline: Array<{ toStatus: string }>;
       reportArtifacts: Array<unknown>;
     };
@@ -239,9 +244,78 @@ describe("GET /api/v1/admin/sourcing-requests", () => {
       requestId: inReviewRequest.id,
       status: "IN_REVIEW",
       countryCode: "NL",
+      settlement: {
+        settledByUserId: null,
+        settledAt: null,
+      },
     });
     expect(payload.timeline[0]?.toStatus).toBe("IN_REVIEW");
     expect(payload.reportArtifacts).toEqual([]);
+  });
+
+  it("includes settlement metadata for settled requests in admin queue detail", async () => {
+    const { admin } = await seedQueueData();
+    const adminCookie = await issueSessionCookie(admin.id);
+
+    const settlementPrescription = await prisma.prescription.create({
+      data: {
+        userId: admin.id,
+        countryCode: "IT",
+        payload: {
+          countryCode: "IT",
+          leftEye: { sphere: -2.25 },
+          rightEye: { sphere: -2.0 },
+          pupillaryDistance: 64,
+        },
+      },
+    });
+
+    const settledRequest = await prisma.sourcingRequest.create({
+      data: {
+        userId: admin.id,
+        prescriptionId: settlementPrescription.id,
+        status: "PAYMENT_SETTLED",
+        reportPaymentRequired: true,
+        currency: "EUR",
+      },
+    });
+
+    const settledAt = new Date("2026-03-08T18:00:00.000Z");
+    await prisma.sourcingStatusEvent.create({
+      data: {
+        sourcingRequestId: settledRequest.id,
+        fromStatus: "PAYMENT_PENDING",
+        toStatus: "PAYMENT_SETTLED",
+        note: "Settlement recorded",
+        actorUserId: admin.id,
+        createdAt: settledAt,
+      },
+    });
+
+    const response = await getAdminQueueDetail(
+      new NextRequest(`http://localhost/api/v1/admin/sourcing-requests/${settledRequest.id}`, {
+        headers: { cookie: adminCookie },
+      }),
+      { params: Promise.resolve({ requestId: settledRequest.id }) },
+    );
+
+    const payload = (await response.json()) as {
+      request: {
+        requestId: string;
+        status: string;
+        settlement: { settledByUserId: string | null; settledAt: string | null };
+      };
+    };
+
+    expect(response.status).toBe(200);
+    expect(payload.request).toMatchObject({
+      requestId: settledRequest.id,
+      status: "PAYMENT_SETTLED",
+      settlement: {
+        settledByUserId: admin.id,
+        settledAt: settledAt.toISOString(),
+      },
+    });
   });
 
   it("returns 404 on missing admin queue detail request", async () => {

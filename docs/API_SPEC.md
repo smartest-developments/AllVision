@@ -142,6 +142,9 @@ All API surfaces must maintain these constraints:
 ### `GET /api/v1/admin/sourcing-requests/:requestId`
 
 - Purpose: fetch admin queue request detail with timeline and report artifacts.
+- Notes:
+  - response includes deterministic `request.settlement` metadata for non-redirect detail loads: `{ settledByUserId: string | null, settledAt: string | null }`.
+  - settlement metadata is populated from immutable `PAYMENT_SETTLED` status events and remains `null` when settlement has not occurred.
 - Responses: `200`, `401`, `403`, `404`.
 
 ### `PATCH /api/v1/admin/sourcing-requests/:requestId/status`
@@ -226,3 +229,11 @@ All API surfaces must maintain these constraints:
   - `toStatus`
   - `note`
   - `statusEventId`
+
+### Detail settlement metadata note (AT-AUTO-BE-05)
+- `GET /api/v1/admin/sourcing-requests/:requestId` now includes:
+  - `request.settlement.settledByUserId: string | null`
+  - `request.settlement.settledAt: string | null`
+- Contract rule:
+  - settlement metadata is populated only when request status is `PAYMENT_SETTLED` or `DELIVERED`;
+  - non-settled statuses return `{ settledByUserId: null, settledAt: null }`.

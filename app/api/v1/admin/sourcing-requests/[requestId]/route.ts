@@ -36,6 +36,17 @@ export async function GET(
   const settlementEvent = detail.statusEvents.find(
     (event) => event.toStatus === "PAYMENT_SETTLED",
   );
+  const shouldExposeSettlement =
+    detail.status === "PAYMENT_SETTLED" || detail.status === "DELIVERED";
+  const settlement = shouldExposeSettlement
+    ? {
+        settledByUserId: settlementEvent?.actorUserId ?? null,
+        settledAt: settlementEvent?.createdAt ?? null,
+      }
+    : {
+        settledByUserId: null,
+        settledAt: null,
+      };
 
   return NextResponse.json(
     {
@@ -47,10 +58,7 @@ export async function GET(
         userEmail: detail.user.email,
         countryCode: detail.prescription.countryCode,
         prescriptionCreatedAt: detail.prescription.createdAt,
-        settlement: {
-          settledByUserId: settlementEvent?.actorUserId ?? null,
-          settledAt: settlementEvent?.createdAt ?? null,
-        },
+        settlement,
       },
       timeline: detail.statusEvents.map((event) => ({
         id: event.id,
