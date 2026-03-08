@@ -169,10 +169,20 @@ Completion signal: CI blocks merges on lint/typecheck/test/build and migration/s
 - DoD: admin SLA view includes median time from submit to report-ready/delivered buckets.
 - Evidence: `app/admin/sourcing-requests/page.tsx`, `src/server/admin-sourcing-queue.ts`, `tests/integration/admin-sourcing-queue-page.test.ts`.
 
-3. [AT-P2-03] Add template library for report-generation consistency.
+3. [AT-P2-03] Add template library for report-generation consistency. (split into `AT-P2-03A` + `AT-P2-03B`)
 - Size: 2-3h
 - DoD: admin can start from standard report templates.
 - Evidence: integration tests for template load/save behavior.
+
+3a. [AT-P2-03A] Add admin report-template load/preview surface on request detail. ✅ DONE
+- Size: 1-2h
+- DoD: admin request detail exposes standard template choices and deterministic template-body preview tied to URL state.
+- Evidence: `app/admin/sourcing-requests/page.tsx`, `tests/integration/admin-sourcing-queue-page.test.ts`.
+
+3b. [AT-P2-03B] Add template save/persist flow for report authoring.
+- Size: 1-2h
+- DoD: selected/edited template draft can be persisted and reloaded for the request detail workflow.
+- Evidence: integration tests for template save/reload behavior + API contract notes.
 
 ## COMPLETED
 
@@ -349,3 +359,8 @@ Mitigation refs: [AT-P0-05], [AT-P0-06], [AT-P0-07], [AT-P1-06].
   - Priority: P2
   - DoD: admin SLA view includes median time from submit to report-ready/delivered buckets.
   - Evidence target: `app/admin/sourcing-requests/page.tsx`, `src/server/admin-sourcing-queue.ts`, `tests/integration/admin-sourcing-queue-page.test.ts`.
+
+## AUTO_SPLIT_2026-03-08T09:56:50+0100_AT-P2-01B
+- [AT-P2-01B] Implement payment intent and settlement transition for report-fee checkout. (split into `AT-P2-01B1` + `AT-P2-01B2`)
+- [AT-P2-01B1] Add owner-authenticated report-fee checkout intent endpoint that transitions `REPORT_READY -> PAYMENT_PENDING` with immutable status/audit event.
+- [AT-P2-01B2] Add settlement/webhook stub endpoint that transitions `PAYMENT_PENDING -> PAYMENT_SETTLED` and unlocks delivery acknowledgment.

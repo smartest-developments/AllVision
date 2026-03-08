@@ -1,5 +1,13 @@
 # Progress Log
 
+## 2026-03-08T10:25:00+0100
+
+- task: AT-P2-03A Add admin report-template load/preview surface on request detail.
+- result: added a template-library section on `/admin/sourcing-requests` detail view with deterministic template selection (`templateId` in URL state), loaded-template highlighting, and read-only draft preview content so admins can start report authoring from a standard structure.
+- backlog update: split `AT-P2-03` into `AT-P2-03A` (DONE) and `AT-P2-03B` (TODO for save/persist behavior).
+- quality gates: pending run in this automation pass.
+- next: AT-P2-03B add template save/persist behavior for report authoring.
+
 ## 2026-03-08T08:47:03+0100
 
 - task: AT-P2-01A Expose report-fee payment state and checkout link metadata.
@@ -294,3 +302,4 @@
 - task: AT-AUTO-UI-06B dedicated GDPR status/history page
 - result: added `/gdpr` authenticated UI route with GDPR request history list (export/deletion events), signed-out login/register guidance preserving `next=/gdpr`, and explicit legal-hold copy for deletion conflicts (`409 GDPR_DELETE_LEGAL_HOLD` when sourcing requests are `SUBMITTED|IN_REVIEW`). Updated home navigation/self-service panel to include `/gdpr` entry and added integration coverage for both signed-out and authenticated history rendering.
 - next: AT-P1-10 CI workflow for lint/typecheck/test/build.
+- 2026-03-08T09:56:50+0100 — Blocked on AT-P2-01B (report-fee payment intent + settlement). Intended backend-first split (`AT-P2-01B1` checkout transition, `AT-P2-01B2` settlement transition) was not implemented this run because workspace writes were denied in prior attempts (`Operation not permitted`). Next: resume with `AT-P2-01B1` once writes are stable.

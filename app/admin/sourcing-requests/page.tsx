@@ -69,6 +69,7 @@ type AdminQueuePageProps = {
     countryCode?: string | string[];
     userEmail?: string | string[];
     requestId?: string | string[];
+    templateId?: string | string[];
   }>;
 };
 
@@ -77,6 +78,7 @@ type QueueFilters = {
   countryCode: string;
   userEmail: string;
   requestId: string;
+  templateId: string;
 };
 
 type QueueSlaSnapshot = {
@@ -149,9 +151,40 @@ function buildQueryString(filters: QueueFilters): string {
     params.set("requestId", filters.requestId);
   }
 
+  if (filters.templateId) {
+    params.set("templateId", filters.templateId);
+  }
+
   const serialized = params.toString();
   return serialized.length > 0 ? `?${serialized}` : "";
 }
+
+type ReportTemplate = {
+  id: string;
+  name: string;
+  body: string;
+};
+
+const REPORT_TEMPLATES: ReportTemplate[] = [
+  {
+    id: "LENS_PRICE_MATRIX",
+    name: "Lens price matrix",
+    body:
+      "Summary:\n- Product family:\n- Destination country:\n- Currency baseline:\n\nVendors:\n1) Vendor name:\n   - Unit price:\n   - Shipping lead time:\n   - Tradeoffs:\n2) Vendor name:\n   - Unit price:\n   - Shipping lead time:\n   - Tradeoffs:\n\nRecommendation:\n- Best value option:\n- Why:\n- Risks/notes:",
+  },
+  {
+    id: "QUALITY_RISK_ASSESSMENT",
+    name: "Quality risk assessment",
+    body:
+      "Quality checks:\n- Prescription alignment:\n- Coating/finish notes:\n- Warranty evidence:\n\nRisk matrix:\n- Risk 1: severity / mitigation\n- Risk 2: severity / mitigation\n\nConclusion:\n- Proceed / Hold\n- Required follow-up:",
+  },
+  {
+    id: "DELIVERY_READINESS",
+    name: "Delivery readiness brief",
+    body:
+      "Delivery assumptions:\n- Origin:\n- Destination:\n- Carrier options:\n\nTimeline estimate:\n- Processing window:\n- Transit window:\n- Customs notes:\n\nAction checklist:\n- Documents verified\n- Cost estimate reviewed\n- User communication sent",
+  },
+];
 
 function formatTimestamp(value: string | null): string {
   if (!value) {
@@ -415,6 +448,7 @@ export default async function AdminSourcingQueuePage({
     countryCode: firstParam(resolvedSearchParams?.countryCode),
     userEmail: firstParam(resolvedSearchParams?.userEmail),
     requestId: firstParam(resolvedSearchParams?.requestId),
+    templateId: firstParam(resolvedSearchParams?.templateId),
   };
 
   const cookieHeader = await buildCookieHeader();
@@ -425,6 +459,7 @@ export default async function AdminSourcingQueuePage({
     countryCode: filters.countryCode,
     userEmail: filters.userEmail,
     requestId: "",
+    templateId: "",
   };
   const queueSlaSnapshot =
     queueState.listStatus === 200
@@ -439,6 +474,9 @@ export default async function AdminSourcingQueuePage({
       : [];
   const throughputSnapshot = buildThroughputSnapshot(throughputRequests);
   const detailViewHref = `/admin/sourcing-requests${buildQueryString(filters)}`;
+  const selectedTemplate =
+    REPORT_TEMPLATES.find((template) => template.id === filters.templateId) ??
+    REPORT_TEMPLATES[0];
 
   const clearFiltersHref = "/admin/sourcing-requests";
 
@@ -613,6 +651,11 @@ export default async function AdminSourcingQueuePage({
 
           {queueState.detailStatus === 200 && queueState.detailPayload ? (
             <>
+              {(() => {
+                const detailRequestId = queueState.detailPayload.request.requestId;
+
+                return (
+                  <>
               <p className="mt-2 text-sm">
                 Request {queueState.detailPayload.request.requestId} ({queueState.detailPayload.request.status})
               </p>
@@ -680,6 +723,49 @@ export default async function AdminSourcingQueuePage({
                   ))}
                 </ul>
               )}
+
+              <h3 className="mt-4 text-sm font-semibold">Report template library</h3>
+              <p className="mt-1 text-xs text-neutral-600">
+                Select a standard draft template before writing the final report artifact.
+              </p>
+              <ul className="mt-2 flex flex-wrap gap-2 text-xs">
+                {REPORT_TEMPLATES.map((template) => {
+                  const templateHref = `/admin/sourcing-requests${buildQueryString({
+                    ...filters,
+                    requestId: detailRequestId,
+                    templateId: template.id,
+                  })}`;
+
+                  return (
+                    <li key={template.id}>
+                      <Link
+                        className={`rounded border px-2 py-1 ${
+                          selectedTemplate.id === template.id
+                            ? "border-neutral-900 bg-neutral-900 text-white"
+                            : "border-neutral-300 text-neutral-700"
+                        }`}
+                        href={templateHref}
+                      >
+                        {template.name}
+                      </Link>
+                    </li>
+                  );
+                })}
+              </ul>
+              <div className="mt-2 rounded-md border border-neutral-200 bg-neutral-50 p-3">
+                <p className="text-xs font-semibold text-neutral-700">
+                  Loaded template: {selectedTemplate.name}
+                </p>
+                <textarea
+                  className="mt-2 w-full rounded-md border border-neutral-300 bg-white px-2 py-1 text-xs text-neutral-700"
+                  readOnly
+                  rows={12}
+                  value={selectedTemplate.body}
+                />
+              </div>
+                  </>
+                );
+              })()}
             </>
           ) : (
             <p className="mt-2 text-sm text-neutral-700">

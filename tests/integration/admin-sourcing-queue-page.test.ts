@@ -157,6 +157,27 @@ describe("Admin sourcing queue page", () => {
     expect(markup).toContain("No report artifacts attached.");
   });
 
+  it("loads selected report template on admin request detail", async () => {
+    const { admin, request } = await seedAdminQueue("IN_REVIEW");
+    const adminCookie = await issueSessionCookie(admin.id);
+    mockCookieHeader(adminCookie);
+
+    const markup = renderToStaticMarkup(
+      await AdminSourcingQueuePage({
+        searchParams: Promise.resolve({
+          requestId: request.id,
+          templateId: "QUALITY_RISK_ASSESSMENT",
+        }),
+      }),
+    );
+
+    expect(markup).toContain("Report template library");
+    expect(markup).toContain("Loaded template: Quality risk assessment");
+    expect(markup).toContain("Quality checks:");
+    expect(markup).toContain("Risk matrix:");
+    expect(markup).toContain("templateId=QUALITY_RISK_ASSESSMENT");
+  });
+
   it("renders review action form for submitted detail requests", async () => {
     const { admin, request } = await seedAdminQueue("SUBMITTED");
     const adminCookie = await issueSessionCookie(admin.id);
