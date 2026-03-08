@@ -382,3 +382,13 @@ Mitigation refs: [AT-P0-05], [AT-P0-06], [AT-P0-07], [AT-P1-06].
   - Priority: P2
   - DoD: deterministic settlement contract updates request state to `PAYMENT_SETTLED`, records immutable audit evidence, and allows report-delivery acknowledgment path.
   - Evidence: `app/api/v1/admin/sourcing-requests/[requestId]/report-fee/settle/route.ts`, `src/server/report-retrieval.ts`, `app/page.tsx`, `app/timeline/page.tsx`, `tests/integration/report-fee-settle-route.test.ts`, `tests/integration/report-ack-route.test.ts`, `tests/integration/sourcing-request-timeline-page.test.ts`, `tests/integration/sourcing-timeline-route-page.test.ts`, `tests/integration/report-route.test.ts`, `docs/API_SPEC.md`.
+
+## RUN_UPDATE_2026-03-08T16:40:47+0100
+- [AT-AUTO-UI-11] Add settlement success confirmation banner on admin queue detail. ✅ DONE
+  - Priority: P1
+  - DoD: settlement form-submit redirects append deterministic `settled=1` marker and admin queue detail renders explicit success banner when marker is present.
+  - Evidence: `app/api/v1/admin/sourcing-requests/[requestId]/report-fee/settle/route.ts`, `app/admin/sourcing-requests/page.tsx`, `tests/integration/report-fee-settle-route.test.ts`, `tests/integration/admin-sourcing-queue-page.test.ts`, `docs/API_SPEC.md`.
+- [AT-AUTO-BE-04] Add settlement response metadata envelope for admin UI observability.
+  - Priority: P1
+  - DoD: settlement JSON response includes deterministic settlement actor and settled-at timestamp fields for admin UI/telemetry correlation.
+  - Evidence target: `app/api/v1/admin/sourcing-requests/[requestId]/report-fee/settle/route.ts`, `src/server/report-retrieval.ts`, `tests/integration/report-fee-settle-route.test.ts`, `docs/API_SPEC.md`.

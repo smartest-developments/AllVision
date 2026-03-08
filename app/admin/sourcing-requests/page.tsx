@@ -71,6 +71,7 @@ type AdminQueuePageProps = {
     userEmail?: string | string[];
     requestId?: string | string[];
     templateId?: string | string[];
+    settled?: string | string[];
   }>;
 };
 
@@ -489,6 +490,7 @@ export default async function AdminSourcingQueuePage({
     : null;
 
   const clearFiltersHref = "/admin/sourcing-requests";
+  const settlementRecorded = firstParam(resolvedSearchParams?.settled) === "1";
 
   return (
     <main className="mx-auto flex min-h-screen max-w-4xl flex-col gap-6 px-6 py-16">
@@ -514,6 +516,12 @@ export default async function AdminSourcingQueuePage({
       <p className="text-sm text-neutral-700">
         Review pending sourcing requests and open request detail for timeline/artifact context.
       </p>
+
+      {settlementRecorded ? (
+        <section className="rounded-md border border-emerald-300 bg-emerald-50 p-3 text-sm text-emerald-900">
+          Report-fee settlement recorded successfully.
+        </section>
+      ) : null}
 
       <section className="rounded-md border border-neutral-300 p-4">
         <h2 className="text-2xl font-semibold">Queue filters</h2>

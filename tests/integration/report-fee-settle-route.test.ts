@@ -258,7 +258,7 @@ describe("POST /api/v1/admin/sourcing-requests/:requestId/report-fee/settle", ()
 
     expect(response.status).toBe(303);
     expect(response.headers.get("location")).toBe(
-      `http://localhost/admin/sourcing-requests?requestId=${request.id}`
+      `http://localhost/admin/sourcing-requests?requestId=${request.id}&settled=1`
     );
   });
 

@@ -73,6 +73,7 @@ export async function POST(
 
     if (redirectTo) {
       const redirectUrl = new URL(redirectTo, request.url);
+      redirectUrl.searchParams.set("settled", "1");
       return NextResponse.redirect(redirectUrl, { status: 303 });
     }
 

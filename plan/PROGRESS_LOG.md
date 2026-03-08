@@ -1,4 +1,12 @@
 # Progress Log
+## 2026-03-08T16:40:47+0100
+
+- task: AT-AUTO-UI-11 settlement redirect success marker + admin queue confirmation banner.
+- result: updated report-fee settlement form redirect contract to append deterministic `settled=1` marker and rendered an admin queue success banner when present, so form-submit settlements have explicit in-app confirmation without manual state inspection.
+- backlog update: added and marked `AT-AUTO-UI-11` DONE in `plan/TASK_BACKLOG.md`; added backend follow-up `AT-AUTO-BE-04` TODO for settlement actor/timestamp response metadata.
+- quality gates: `npm run lint` ✅, `npm run typecheck` ✅, `npm run test` ✅, `npm run build` ✅.
+- next: AT-AUTO-BE-04 settlement metadata response contract for UI observability.
+
 
 ## 2026-03-08T15:35:00+0100
 

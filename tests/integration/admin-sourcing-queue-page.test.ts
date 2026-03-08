@@ -306,6 +306,23 @@ describe("Admin sourcing queue page", () => {
     expect(markup).toContain("name=\"redirectTo\"");
   });
 
+  it("renders settlement success banner when redirected with settled marker", async () => {
+    const { admin, request } = await seedAdminQueue("PAYMENT_PENDING");
+    const adminCookie = await issueSessionCookie(admin.id);
+    mockCookieHeader(adminCookie);
+
+    const markup = renderToStaticMarkup(
+      await AdminSourcingQueuePage({
+        searchParams: Promise.resolve({
+          requestId: request.id,
+          settled: "1",
+        }),
+      }),
+    );
+
+    expect(markup).toContain("Report-fee settlement recorded successfully.");
+  });
+
   it("shows admin access required message for non-admin session", async () => {
     const user = await prisma.user.create({
       data: {
