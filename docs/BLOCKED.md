@@ -30,3 +30,14 @@
 - Impact: new admin review-action UI/route/docs/backlog changes are implemented locally but not safe to commit alongside unrelated drift.
 - Next step: stabilize or isolate the unrelated GDPR/report-ack changes, rerun all gates, then commit this increment.
 - 2026-03-08T09:56:50+0100 — Blocked `AT-P2-01B` implementation because sandbox denied writes in this repo (`Operation not permitted`). Planned split: `AT-P2-01B1` payment-intent transition (`REPORT_READY -> PAYMENT_PENDING`) then `AT-P2-01B2` settlement transition (`PAYMENT_PENDING -> PAYMENT_SETTLED`).
+
+## 2026-03-08T16:37:05+0100
+- Scope: quality-gate validation for `AT-AUTO-UI-10` settlement UI/route increment.
+- Blocking gate: `npm run test` fails with pre-existing integration regressions unrelated to this increment.
+- Failing suites observed:
+  - `tests/integration/admin-review-decision-route.test.ts` (`500` vs expected `303` in form redirect assertion)
+  - `tests/integration/admin-sourcing-queue-route.test.ts` (FK constraint on cleanup `prescription.deleteMany`)
+  - `tests/integration/report-ack-route.test.ts` (FK constraint on `sourcingRequest.create`)
+  - `tests/integration/sourcing-timeline-route-page.test.ts` (missing ack CTA render + FK constraint creating prescription)
+- Impact: lint/typecheck/build are green, but full test gate is red so commit/push is skipped this run.
+- Next step: stabilize failing integration fixtures/cleanup ordering and timeline expectations, rerun `npm run test`, then commit pending settlement UI changes.
