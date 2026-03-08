@@ -22,9 +22,9 @@ export class SourcingRequestTransitionError extends Error {
 const transitionMatrix: Record<SourcingRequestStatus, SourcingRequestStatus[]> = {
   [SourcingRequestStatus.SUBMITTED]: [SourcingRequestStatus.IN_REVIEW, SourcingRequestStatus.CANCELLED],
   [SourcingRequestStatus.IN_REVIEW]: [SourcingRequestStatus.REPORT_READY, SourcingRequestStatus.CANCELLED],
-  [SourcingRequestStatus.REPORT_READY]: [],
+  [SourcingRequestStatus.REPORT_READY]: [SourcingRequestStatus.PAYMENT_PENDING, SourcingRequestStatus.DELIVERED],
   [SourcingRequestStatus.DELIVERED]: [],
-  [SourcingRequestStatus.PAYMENT_PENDING]: [],
+  [SourcingRequestStatus.PAYMENT_PENDING]: [SourcingRequestStatus.PAYMENT_SETTLED],
   [SourcingRequestStatus.PAYMENT_SETTLED]: [],
   [SourcingRequestStatus.CANCELLED]: []
 };

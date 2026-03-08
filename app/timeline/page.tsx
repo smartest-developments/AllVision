@@ -225,8 +225,12 @@ export default async function TimelinePage({ searchParams }: TimelinePageProps) 
               const isFocused = requestId !== "" && request.requestId === requestId;
               const reportFeeRequiresPayment =
                 request.reportFee.required && request.reportFee.paymentState === "PENDING";
-              const reportFeeCheckoutHref =
-                "/billing/report-fee?requestId=" + encodeURIComponent(request.requestId);
+              const reportFeeCheckoutAction = `/api/v1/sourcing-requests/${encodeURIComponent(
+                request.requestId,
+              )}/report-fee/checkout`;
+              const timelineRedirectTo = `/timeline?requestId=${encodeURIComponent(
+                request.requestId,
+              )}`;
               return (
                 <li
                   key={request.requestId}
@@ -262,16 +266,20 @@ export default async function TimelinePage({ searchParams }: TimelinePageProps) 
                     </form>
                   ) : null}
                   {reportFeeRequiresPayment ? (
-                    <p className="mt-2 text-xs text-neutral-700">
+                    <form className="mt-2 text-xs text-neutral-700" action={reportFeeCheckoutAction} method="post">
+                      <input type="hidden" name="redirectTo" value={timelineRedirectTo} />
                       Report fee pending ({request.reportFee.currency}{" "}
                       {request.reportFee.feeCents !== null
                         ? (request.reportFee.feeCents / 100).toFixed(2)
-                        : "TBD"}).{" "}
-                      <Link className="underline" href={reportFeeCheckoutHref}>
-                        Continue to report fee checkout
-                      </Link>
-                      .
-                    </p>
+                        : "TBD"}
+                      ).
+                      <button
+                        type="submit"
+                        className="ml-2 rounded-md border border-neutral-400 px-2 py-1 text-xs text-neutral-900"
+                      >
+                        Start report fee checkout
+                      </button>
+                    </form>
                   ) : null}
                   {request.status === "DELIVERED" ? (
                     <p className="mt-2 text-xs text-neutral-700">

@@ -1,5 +1,13 @@
 # Progress Log
 
+## 2026-03-08T13:58:55+0100
+
+- task: AT-P2-01B1 Owner-authenticated report-fee checkout intent transition + timeline/home UI checkout action.
+- result: implemented `POST /api/v1/sourcing-requests/:requestId/report-fee/checkout` to enforce owner session auth and transition `REPORT_READY -> PAYMENT_PENDING` with immutable `SourcingStatusEvent` + `REPORT_FEE_CHECKOUT_INITIATED` audit event. Updated home/timeline UI cards to show deterministic report-fee pending copy and in-place checkout submit action (replacing dead billing link), while preserving report acknowledgment only when payment is not pending.
+- backlog update: marked `AT-P2-01B` as split/in-progress and `AT-P2-01B1` as DONE with evidence; `AT-P2-01B2` remains TODO for settlement/webhook transition.
+- quality gates: `npm run test -- tests/integration/report-fee-checkout-route.test.ts tests/integration/sourcing-request-timeline-page.test.ts tests/integration/sourcing-timeline-route-page.test.ts tests/unit/sourcing-request-transition.test.ts` ✅, `npm run lint` ✅, `npm run typecheck` ✅, `npm run build` ✅.
+- next: AT-P2-01B2 settlement/webhook stub path for `PAYMENT_PENDING -> PAYMENT_SETTLED`.
+
 ## 2026-03-08T12:14:00+0100
 
 - task: AT-P2-03B Template draft persistence/reload contract hardening.

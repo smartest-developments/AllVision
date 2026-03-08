@@ -98,6 +98,17 @@ All API surfaces must maintain these constraints:
   - idempotent when request is already `DELIVERED`.
 - Responses: `200`, `401`, `403`, `404`, `409`.
 
+### `POST /api/v1/sourcing-requests/:requestId/report-fee/checkout`
+
+- Purpose: start owner-authenticated report-fee checkout intent for report-ready requests.
+- Notes:
+  - owner-only endpoint.
+  - when current state is `REPORT_READY` and `reportPaymentRequired=true`, transitions to `PAYMENT_PENDING`.
+  - writes immutable `SourcingStatusEvent` (`REPORT_READY -> PAYMENT_PENDING`) and `REPORT_FEE_CHECKOUT_INITIATED` audit marker.
+  - idempotent when request is already `PAYMENT_PENDING|PAYMENT_SETTLED|DELIVERED`.
+  - supports form-submit flow via optional `redirectTo` path and returns `303` when provided.
+- Responses: `200`, `303`, `401`, `403`, `404`, `409`.
+
 ## Admin Review and Report Upload
 
 ### `GET /api/v1/admin/sourcing-requests`

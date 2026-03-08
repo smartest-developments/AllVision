@@ -124,6 +124,54 @@ describe("Home page sourcing request timeline", () => {
     );
   });
 
+  it("renders report-fee checkout action and hides delivery acknowledgment when payment is pending", async () => {
+    const owner = await prisma.user.create({
+      data: {
+        email: "timeline-owner-payment-pending@example.com",
+        passwordHash: "hash",
+        role: "USER",
+      },
+    });
+
+    const prescription = await prisma.prescription.create({
+      data: {
+        userId: owner.id,
+        countryCode: "IT",
+        payload: {
+          countryCode: "IT",
+          leftEye: { sphere: -1.0 },
+          rightEye: { sphere: -1.25 },
+          pupillaryDistance: 61,
+        },
+      },
+    });
+
+    const request = await prisma.sourcingRequest.create({
+      data: {
+        userId: owner.id,
+        prescriptionId: prescription.id,
+        status: "REPORT_READY",
+        reportPaymentRequired: true,
+        reportFeeCents: 1990,
+        currency: "EUR",
+      },
+    });
+
+    mockedResolvePageSessionUserId.mockResolvedValue(owner.id);
+
+    const markup = renderToStaticMarkup(await HomePage());
+
+    expect(markup).toContain("Report fee pending (EUR 19.90).");
+    expect(markup).toContain(
+      `/api/v1/sourcing-requests/${request.id}/report-fee/checkout`,
+    );
+    expect(markup).toContain(
+      'name="redirectTo" value="/timeline?requestId=',
+    );
+    expect(markup).toContain("Start report fee checkout");
+    expect(markup).not.toContain(`/api/v1/sourcing-requests/${request.id}/report/ack`);
+  });
+
   it("renders sign-in guidance when session identity is absent", async () => {
     const markup = renderToStaticMarkup(await HomePage());
 

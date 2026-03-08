@@ -36,6 +36,9 @@ describe("sourcing request transition guard", () => {
       SourcingRequestStatus.IN_REVIEW,
       SourcingRequestStatus.CANCELLED
     ]);
-    expect(getAllowedTransitions(SourcingRequestStatus.REPORT_READY)).toEqual([]);
+    expect(getAllowedTransitions(SourcingRequestStatus.REPORT_READY)).toEqual([
+      SourcingRequestStatus.PAYMENT_PENDING,
+      SourcingRequestStatus.DELIVERED
+    ]);
   });
 });

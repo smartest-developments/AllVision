@@ -149,7 +149,7 @@ Completion signal: CI blocks merges on lint/typecheck/test/build and migration/s
 - DoD: owner timeline/report payloads expose deterministic `REPORT_SERVICE` fee metadata and suppress delivery acknowledgment while fee state is pending.
 - Evidence: `src/server/sourcing-request-status.ts`, `app/timeline/page.tsx`, `app/api/v1/sourcing-requests/[requestId]/report/route.ts`, `tests/integration/sourcing-request-status.test.ts`, `tests/integration/sourcing-timeline-route-page.test.ts`, `tests/integration/report-route.test.ts`.
 
-1b. [AT-P2-01B] Implement payment intent and settlement transition for report-fee checkout.
+1b. [AT-P2-01B] Implement payment intent and settlement transition for report-fee checkout. (split into `AT-P2-01B1` + `AT-P2-01B2`) ⚙️ IN_PROGRESS
 - Size: 1-2h
 - DoD: report-fee checkout confirmation transitions `REPORT_READY -> PAYMENT_PENDING -> PAYMENT_SETTLED` before delivery acknowledgement can complete.
 - Evidence: integration tests for payment intent lifecycle + settlement webhook/stub.
@@ -362,5 +362,11 @@ Mitigation refs: [AT-P0-05], [AT-P0-06], [AT-P0-07], [AT-P1-06].
 
 ## AUTO_SPLIT_2026-03-08T09:56:50+0100_AT-P2-01B
 - [AT-P2-01B] Implement payment intent and settlement transition for report-fee checkout. (split into `AT-P2-01B1` + `AT-P2-01B2`)
-- [AT-P2-01B1] Add owner-authenticated report-fee checkout intent endpoint that transitions `REPORT_READY -> PAYMENT_PENDING` with immutable status/audit event.
-- [AT-P2-01B2] Add settlement/webhook stub endpoint that transitions `PAYMENT_PENDING -> PAYMENT_SETTLED` and unlocks delivery acknowledgment.
+- [AT-P2-01B1] Add owner-authenticated report-fee checkout intent endpoint that transitions `REPORT_READY -> PAYMENT_PENDING` with immutable status/audit event. ✅ DONE
+  - Priority: P2
+  - DoD: owner can start report-fee checkout from home/timeline with owner-authenticated endpoint contract and immutable status/audit evidence.
+  - Evidence: `app/api/v1/sourcing-requests/[requestId]/report-fee/checkout/route.ts`, `src/server/report-retrieval.ts`, `app/page.tsx`, `app/timeline/page.tsx`, `tests/integration/report-fee-checkout-route.test.ts`, `tests/integration/sourcing-request-timeline-page.test.ts`, `tests/integration/sourcing-timeline-route-page.test.ts`, `tests/unit/sourcing-request-transition.test.ts`.
+- [AT-P2-01B2] Add settlement/webhook stub endpoint that transitions `PAYMENT_PENDING -> PAYMENT_SETTLED` and unlocks delivery acknowledgment. TODO
+  - Priority: P2
+  - DoD: deterministic settlement contract updates request state to `PAYMENT_SETTLED`, records immutable audit evidence, and allows report-delivery acknowledgment path.
+  - Evidence target: settlement route + server module tests + API spec updates.

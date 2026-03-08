@@ -84,64 +84,94 @@ export default async function HomePage() {
 
         {requests.length > 0 ? (
           <ul className="mt-4 space-y-3">
-            {requests.map((request) => (
-              <li
-                key={request.requestId}
-                className="rounded-md border border-neutral-200 p-3"
-              >
-                <p className="text-sm font-medium">Request {request.requestId}</p>
-                <p className="text-sm">Current status: {request.status}</p>
-                <p className="text-xs text-neutral-600">
-                  Updated: {formatTimestamp(request.updatedAt)} | Latest event:{" "}
-                  {formatTimestamp(request.latestEventAt)}
-                </p>
-                <p className="mt-2 text-xs">
-                  <Link
-                    className="underline"
-                    href={`/timeline?requestId=${encodeURIComponent(
-                      request.requestId,
-                    )}`}
-                  >
-                    Open focused timeline view
-                  </Link>
-                </p>
-                {request.status === "REPORT_READY" ? (
-                  <form
-                    className="mt-2"
-                    action={`/api/v1/sourcing-requests/${encodeURIComponent(
-                      request.requestId,
-                    )}/report/ack`}
-                    method="post"
-                  >
-                    <button
-                      type="submit"
-                      className="rounded-md border border-neutral-400 px-2 py-1 text-xs text-neutral-900"
+            {requests.map((request) => {
+              const reportFeeRequiresPayment =
+                request.reportFee.required && request.reportFee.paymentState === "PENDING";
+              const reportFeeCheckoutAction = `/api/v1/sourcing-requests/${encodeURIComponent(
+                request.requestId,
+              )}/report-fee/checkout`;
+              const timelineRedirectTo = `/timeline?requestId=${encodeURIComponent(
+                request.requestId,
+              )}`;
+              return (
+                <li
+                  key={request.requestId}
+                  className="rounded-md border border-neutral-200 p-3"
+                >
+                  <p className="text-sm font-medium">Request {request.requestId}</p>
+                  <p className="text-sm">Current status: {request.status}</p>
+                  <p className="text-xs text-neutral-600">
+                    Updated: {formatTimestamp(request.updatedAt)} | Latest event:{" "}
+                    {formatTimestamp(request.latestEventAt)}
+                  </p>
+                  <p className="mt-2 text-xs">
+                    <Link
+                      className="underline"
+                      href={`/timeline?requestId=${encodeURIComponent(
+                        request.requestId,
+                      )}`}
                     >
-                      Acknowledge report delivery
-                    </button>
-                  </form>
-                ) : null}
-                {request.status === "DELIVERED" ? (
-                  <p className="mt-2 text-xs text-neutral-700">
-                    Report delivery already acknowledged.
+                      Open focused timeline view
+                    </Link>
                   </p>
-                ) : null}
-                {request.timeline.length > 0 ? (
-                  <ul className="mt-2 list-disc pl-6 text-xs">
-                    {request.timeline.map((event) => (
-                      <li key={event.id}>
-                        {event.fromStatus ?? "START"} -&gt; {event.toStatus} (
-                        {formatTimestamp(event.createdAt)})
-                      </li>
-                    ))}
-                  </ul>
-                ) : (
-                  <p className="mt-2 text-xs text-neutral-600">
-                    No status events recorded yet.
-                  </p>
-                )}
-              </li>
-            ))}
+                  {request.status === "REPORT_READY" && !reportFeeRequiresPayment ? (
+                    <form
+                      className="mt-2"
+                      action={`/api/v1/sourcing-requests/${encodeURIComponent(
+                        request.requestId,
+                      )}/report/ack`}
+                      method="post"
+                    >
+                      <button
+                        type="submit"
+                        className="rounded-md border border-neutral-400 px-2 py-1 text-xs text-neutral-900"
+                      >
+                        Acknowledge report delivery
+                      </button>
+                    </form>
+                  ) : null}
+                  {reportFeeRequiresPayment ? (
+                    <form
+                      className="mt-2 text-xs text-neutral-700"
+                      action={reportFeeCheckoutAction}
+                      method="post"
+                    >
+                      <input type="hidden" name="redirectTo" value={timelineRedirectTo} />
+                      Report fee pending ({request.reportFee.currency}{" "}
+                      {request.reportFee.feeCents !== null
+                        ? (request.reportFee.feeCents / 100).toFixed(2)
+                        : "TBD"}
+                      ).
+                      <button
+                        type="submit"
+                        className="ml-2 rounded-md border border-neutral-400 px-2 py-1 text-xs text-neutral-900"
+                      >
+                        Start report fee checkout
+                      </button>
+                    </form>
+                  ) : null}
+                  {request.status === "DELIVERED" ? (
+                    <p className="mt-2 text-xs text-neutral-700">
+                      Report delivery already acknowledged.
+                    </p>
+                  ) : null}
+                  {request.timeline.length > 0 ? (
+                    <ul className="mt-2 list-disc pl-6 text-xs">
+                      {request.timeline.map((event) => (
+                        <li key={event.id}>
+                          {event.fromStatus ?? "START"} -&gt; {event.toStatus} (
+                          {formatTimestamp(event.createdAt)})
+                        </li>
+                      ))}
+                    </ul>
+                  ) : (
+                    <p className="mt-2 text-xs text-neutral-600">
+                      No status events recorded yet.
+                    </p>
+                  )}
+                </li>
+              );
+            })}
           </ul>
         ) : null}
       </section>

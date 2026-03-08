@@ -400,8 +400,12 @@ describe("Timeline page deep-linking", () => {
 
     expect(markup).toContain("Report fee pending (EUR 19.90).");
     expect(markup).toContain(
-      `/billing/report-fee?requestId=${reportReadyRequest.id}`,
+      `/api/v1/sourcing-requests/${reportReadyRequest.id}/report-fee/checkout`,
     );
+    expect(markup).toContain(
+      `name="redirectTo" value="/timeline?requestId=${reportReadyRequest.id}"`,
+    );
+    expect(markup).toContain("Start report fee checkout");
     expect(markup).not.toContain("Acknowledge report delivery");
   });
 });
