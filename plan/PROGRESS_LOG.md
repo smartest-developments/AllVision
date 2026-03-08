@@ -1,5 +1,13 @@
 # Progress Log
 
+## 2026-03-08T12:14:00+0100
+
+- task: AT-P2-03B Template draft persistence/reload contract hardening.
+- result: finalized admin template-draft save flow with canonical audit action `ADMIN_REPORT_TEMPLATE_DRAFT_SAVED`, added legacy-read compatibility for older draft events, and updated request-detail loading to resolve persisted drafts per selected template (not only globally latest). Added integration coverage for selected-template reload behavior when another template has a newer draft.
+- backlog update: `AT-P2-03B` remains DONE with refreshed evidence; next priority remains `AT-P2-01B` report-fee payment intent + settlement lifecycle.
+- quality gates: `npm run lint` ✅, `npm run typecheck` ✅, `npm run test` ✅ (re-run green after one transient flaky failure in `admin-sourcing-queue-page`), `npm run build` ✅.
+- next: AT-P2-01B1 owner-authenticated report-fee checkout intent transition.
+
 ## 2026-03-08T12:20:00+0100
 
 - task: AT-P2-03B Add template save/persist flow for report authoring.

@@ -154,7 +154,7 @@ describe("POST /api/v1/admin/sourcing-requests/:requestId/report-template-drafts
     const savedDraftEvent = await prisma.auditEvent.findFirst({
       where: {
         sourcingRequestId: request.id,
-        action: "REPORT_TEMPLATE_DRAFT_SAVED",
+        action: "ADMIN_REPORT_TEMPLATE_DRAFT_SAVED",
       },
       orderBy: { createdAt: "desc" },
     });

@@ -194,7 +194,7 @@ describe("Admin sourcing queue page", () => {
         sourcingRequestId: request.id,
         entityType: "SourcingRequest",
         entityId: request.id,
-        action: "REPORT_TEMPLATE_DRAFT_SAVED",
+        action: "ADMIN_REPORT_TEMPLATE_DRAFT_SAVED",
         context: {
           templateId: "QUALITY_RISK_ASSESSMENT",
           templateBody: "Saved draft body from prior edit.",

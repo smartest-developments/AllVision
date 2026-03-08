@@ -142,7 +142,7 @@ All API surfaces must maintain these constraints:
 - Notes:
   - accepts `application/x-www-form-urlencoded` or `multipart/form-data` (`templateId`, `templateBody`, optional `redirectTo`).
   - requires admin session cookie (`401` missing/invalid, `403` non-admin).
-  - persists immutable draft snapshots as audit events (`REPORT_TEMPLATE_DRAFT_SAVED`) and request detail loads the latest saved draft when `templateId` matches.
+  - persists immutable draft snapshots as audit events (`ADMIN_REPORT_TEMPLATE_DRAFT_SAVED`) and request detail loads the latest saved draft for the currently selected `templateId`.
   - when `redirectTo` is a safe admin queue path, returns `303` redirect back to request detail context.
 - Responses: `200`, `303`, `400`, `401`, `403`, `404`.
 
