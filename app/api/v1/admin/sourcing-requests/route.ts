@@ -1,6 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server";
 
 import {
+  ADMIN_QUEUE_DEFAULT_FILTER_GROUP_KEY,
   ADMIN_QUEUE_FILTER_GROUPS,
   adminQueueFiltersSchema,
   listAdminSourcingRequests,
@@ -50,6 +51,7 @@ export async function GET(request: NextRequest) {
 
   return NextResponse.json(
     {
+      defaultFilterGroupKey: ADMIN_QUEUE_DEFAULT_FILTER_GROUP_KEY,
       filterGroups: ADMIN_QUEUE_FILTER_GROUPS,
       requests: requests.map((entry) => {
         const settlementEvent = entry.statusEvents.find(

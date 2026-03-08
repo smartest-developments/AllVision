@@ -155,6 +155,9 @@ describe("Admin sourcing queue page", () => {
     expect(markup).toContain("Settlement evidence queue");
     expect(markup).toContain("SUBMITTED + IN_REVIEW");
     expect(markup).toContain("PAYMENT_SETTLED + DELIVERED");
+    expect(markup).toContain("optgroup");
+    expect(markup).toContain("label=\"Triage queue\"");
+    expect(markup).toContain("label=\"Settlement evidence queue\"");
   });
 
   it("renders request detail timeline via admin queue detail contract", async () => {

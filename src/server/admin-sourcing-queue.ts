@@ -34,6 +34,8 @@ export const ADMIN_QUEUE_FILTER_GROUPS = [
   },
 ];
 
+export const ADMIN_QUEUE_DEFAULT_FILTER_GROUP_KEY = "TRIAGE" as const;
+
 export async function listAdminSourcingRequests(filters: AdminQueueFilters) {
   const statuses: SourcingRequestStatus[] = filters.status
     ? [filters.status]

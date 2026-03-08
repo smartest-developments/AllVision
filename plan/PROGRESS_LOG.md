@@ -439,3 +439,16 @@
   - added `AT-AUTO-BE-07` (backend filter-group metadata) and `AT-AUTO-UI-16` (UI metadata consumption) as next TODO follow-ups.
 - quality gates: pending in this automation pass.
 - next: `AT-AUTO-BE-07`.
+
+## 2026-03-09T00:58:00+0100 - AT-AUTO-BE-08 + AT-AUTO-UI-17 queue default group + grouped status select
+- task: complete default queue filter-group key contract and bind grouped status options directly to API metadata.
+- result:
+  - extended `GET /api/v1/admin/sourcing-requests` payload with `defaultFilterGroupKey` while preserving deterministic `filterGroups` and settlement metadata contracts;
+  - updated admin queue page to resolve active/default group from API metadata and render grouped status options (`<optgroup>`) without hardcoded status ordering;
+  - expanded integration coverage for route/page contracts and refreshed API spec wording for the new metadata field and grouped UI binding.
+- backlog update:
+  - marked `AT-AUTO-BE-08` and `AT-AUTO-UI-17` DONE;
+  - added follow-ups `AT-AUTO-BE-09` and `AT-AUTO-UI-18` to remove remaining hardcoded filter-group labels from UI.
+- quality gates:
+  - pending run (`npm run lint`, `npm run typecheck`, `npm run test`, `npm run build`).
+- next: `AT-AUTO-BE-09`.

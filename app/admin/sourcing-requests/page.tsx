@@ -57,6 +57,7 @@ type AdminQueueArtifactItem = {
 };
 
 type AdminQueueListResponse = {
+  defaultFilterGroupKey?: QueueFilterGroupKey;
   filterGroups?: Array<{
     key: QueueFilterGroupKey;
     statuses: QueueStatus[];
@@ -188,12 +189,23 @@ function formatFilterGroupLabel(groupKey: QueueFilterGroupKey): string {
 function resolveActiveFilterGroup(
   groups: Array<{ key: QueueFilterGroupKey; statuses: QueueStatus[] }>,
   status: QueueFilters["status"],
+  defaultGroupKey: QueueFilterGroupKey,
 ): QueueFilterGroupKey {
   if (!status) {
-    return "TRIAGE";
+    return defaultGroupKey;
   }
 
-  return groups.find((group) => group.statuses.includes(status))?.key ?? "TRIAGE";
+  return groups.find((group) => group.statuses.includes(status))?.key ?? defaultGroupKey;
+}
+
+function getDefaultFilterGroups() {
+  return [
+    { key: "TRIAGE" as const, statuses: ["SUBMITTED", "IN_REVIEW"] as QueueStatus[] },
+    {
+      key: "SETTLED" as const,
+      statuses: ["PAYMENT_SETTLED", "DELIVERED"] as QueueStatus[],
+    },
+  ];
 }
 
 type ReportTemplate = {
@@ -422,7 +434,8 @@ async function loadQueueFromApi(filters: QueueFilters, cookieHeader: string) {
       listStatus: listResponse.status,
       listError: listPayload as ErrorResponse,
       listItems: [] as AdminQueueListItem[],
-      filterGroups: [] as Array<{ key: QueueFilterGroupKey; statuses: QueueStatus[] }>,
+      filterGroups: [] as ReturnType<typeof getDefaultFilterGroups>,
+      defaultFilterGroupKey: "TRIAGE" as QueueFilterGroupKey,
       detailStatus: null as number | null,
       detailError: null as ErrorResponse | null,
       detailPayload: null as AdminQueueDetailResponse | null,
@@ -434,11 +447,9 @@ async function loadQueueFromApi(filters: QueueFilters, cookieHeader: string) {
       listStatus: listResponse.status,
       listError: null,
       listItems: (listPayload as AdminQueueListResponse).requests,
-      filterGroups:
-        (listPayload as AdminQueueListResponse).filterGroups ?? [
-          { key: "TRIAGE", statuses: ["SUBMITTED", "IN_REVIEW"] },
-          { key: "SETTLED", statuses: ["PAYMENT_SETTLED", "DELIVERED"] },
-        ],
+      filterGroups: (listPayload as AdminQueueListResponse).filterGroups ?? getDefaultFilterGroups(),
+      defaultFilterGroupKey:
+        (listPayload as AdminQueueListResponse).defaultFilterGroupKey ?? "TRIAGE",
       detailStatus: null as number | null,
       detailError: null as ErrorResponse | null,
       detailPayload: null as AdminQueueDetailResponse | null,
@@ -466,11 +477,9 @@ async function loadQueueFromApi(filters: QueueFilters, cookieHeader: string) {
       listStatus: listResponse.status,
       listError: null,
       listItems: (listPayload as AdminQueueListResponse).requests,
-      filterGroups:
-        (listPayload as AdminQueueListResponse).filterGroups ?? [
-          { key: "TRIAGE", statuses: ["SUBMITTED", "IN_REVIEW"] },
-          { key: "SETTLED", statuses: ["PAYMENT_SETTLED", "DELIVERED"] },
-        ],
+      filterGroups: (listPayload as AdminQueueListResponse).filterGroups ?? getDefaultFilterGroups(),
+      defaultFilterGroupKey:
+        (listPayload as AdminQueueListResponse).defaultFilterGroupKey ?? "TRIAGE",
       detailStatus: detailResponse.status,
       detailError: detailPayload as ErrorResponse,
       detailPayload: null,
@@ -481,11 +490,9 @@ async function loadQueueFromApi(filters: QueueFilters, cookieHeader: string) {
     listStatus: listResponse.status,
     listError: null,
     listItems: (listPayload as AdminQueueListResponse).requests,
-    filterGroups:
-      (listPayload as AdminQueueListResponse).filterGroups ?? [
-        { key: "TRIAGE", statuses: ["SUBMITTED", "IN_REVIEW"] },
-        { key: "SETTLED", statuses: ["PAYMENT_SETTLED", "DELIVERED"] },
-      ],
+    filterGroups: (listPayload as AdminQueueListResponse).filterGroups ?? getDefaultFilterGroups(),
+    defaultFilterGroupKey:
+      (listPayload as AdminQueueListResponse).defaultFilterGroupKey ?? "TRIAGE",
     detailStatus: detailResponse.status,
     detailError: null,
     detailPayload: detailPayload as AdminQueueDetailResponse,
@@ -552,14 +559,18 @@ export default async function AdminSourcingQueuePage({
   const filterGroups =
     queueState.filterGroups.length > 0
       ? queueState.filterGroups
-      : [
-          { key: "TRIAGE" as const, statuses: ["SUBMITTED", "IN_REVIEW"] as QueueStatus[] },
-          {
-            key: "SETTLED" as const,
-            statuses: ["PAYMENT_SETTLED", "DELIVERED"] as QueueStatus[],
-          },
-        ];
-  const activeFilterGroup = resolveActiveFilterGroup(filterGroups, filters.status);
+      : getDefaultFilterGroups();
+  const defaultFilterGroupKey = filterGroups.some(
+    (group) => group.key === queueState.defaultFilterGroupKey,
+  )
+    ? queueState.defaultFilterGroupKey
+    : "TRIAGE";
+  const activeFilterGroup = resolveActiveFilterGroup(
+    filterGroups,
+    filters.status,
+    defaultFilterGroupKey,
+  );
+  const defaultStatuses = filterGroups.find((group) => group.key === defaultFilterGroupKey)?.statuses;
 
   return (
     <main className="mx-auto flex min-h-screen max-w-4xl flex-col gap-6 px-6 py-16">
@@ -606,11 +617,16 @@ export default async function AdminSourcingQueuePage({
               defaultValue={filters.status}
               name="status"
             >
-              <option value="">SUBMITTED + IN_REVIEW</option>
-              <option value="SUBMITTED">SUBMITTED</option>
-              <option value="IN_REVIEW">IN_REVIEW</option>
-              <option value="PAYMENT_SETTLED">PAYMENT_SETTLED</option>
-              <option value="DELIVERED">DELIVERED</option>
+              <option value="">{defaultStatuses?.join(" + ") ?? "SUBMITTED + IN_REVIEW"}</option>
+              {filterGroups.map((group) => (
+                <optgroup key={group.key} label={formatFilterGroupLabel(group.key)}>
+                  {group.statuses.map((status) => (
+                    <option key={status} value={status}>
+                      {status}
+                    </option>
+                  ))}
+                </optgroup>
+              ))}
             </select>
           </label>
 
