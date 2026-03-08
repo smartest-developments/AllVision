@@ -426,11 +426,19 @@ Mitigation refs: [AT-P0-05], [AT-P0-06], [AT-P0-07], [AT-P1-06].
   - Priority: P2
   - DoD: admin queue filter panel explains when to use `SUBMITTED|IN_REVIEW` vs `PAYMENT_SETTLED|DELIVERED` filters to reduce operator misrouting.
   - Evidence: `app/admin/sourcing-requests/page.tsx`, `tests/integration/admin-sourcing-queue-page.test.ts`, `docs/API_SPEC.md`.
-- [AT-AUTO-BE-07] Add queue filter-group metadata contract for admin list API.
+- [AT-AUTO-BE-07] Add queue filter-group metadata contract for admin list API. ✅ DONE
   - Priority: P2
   - DoD: `GET /api/v1/admin/sourcing-requests` returns deterministic filter-group metadata (`TRIAGE`, `SETTLED`) with included statuses so UI help copy can stay API-aligned.
-  - Evidence target: `app/api/v1/admin/sourcing-requests/route.ts`, `src/server/admin-sourcing-queue.ts`, `tests/integration/admin-sourcing-queue-route.test.ts`, `docs/API_SPEC.md`.
-- [AT-AUTO-UI-16] Render admin queue status filter groups from API metadata.
+  - Evidence: `app/api/v1/admin/sourcing-requests/route.ts`, `src/server/admin-sourcing-queue.ts`, `tests/integration/admin-sourcing-queue-route.test.ts`, `docs/API_SPEC.md`.
+- [AT-AUTO-UI-16] Render admin queue status filter groups from API metadata. ✅ DONE
   - Priority: P2
   - DoD: queue filter UI labels/assistive copy consume backend-provided filter groups and highlight currently selected group (`TRIAGE` or `SETTLED`).
+  - Evidence: `app/admin/sourcing-requests/page.tsx`, `tests/integration/admin-sourcing-queue-page.test.ts`.
+- [AT-AUTO-BE-08] Add explicit default queue filter-group key in list metadata.
+  - Priority: P2
+  - DoD: admin queue list payload includes deterministic default group key (`TRIAGE`) so new clients can initialize status filter intent without hardcoded assumptions.
+  - Evidence target: `app/api/v1/admin/sourcing-requests/route.ts`, `tests/integration/admin-sourcing-queue-route.test.ts`, `docs/API_SPEC.md`.
+- [AT-AUTO-UI-17] Render grouped status options from queue filter-group metadata.
+  - Priority: P2
+  - DoD: admin queue status select groups options by API metadata (`TRIAGE`, `SETTLED`) and preserves active-group highlight copy.
   - Evidence target: `app/admin/sourcing-requests/page.tsx`, `tests/integration/admin-sourcing-queue-page.test.ts`.

@@ -1,6 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server";
 
 import {
+  ADMIN_QUEUE_FILTER_GROUPS,
   adminQueueFiltersSchema,
   listAdminSourcingRequests,
 } from "@/server/admin-sourcing-queue";
@@ -49,6 +50,7 @@ export async function GET(request: NextRequest) {
 
   return NextResponse.json(
     {
+      filterGroups: ADMIN_QUEUE_FILTER_GROUPS,
       requests: requests.map((entry) => {
         const settlementEvent = entry.statusEvents.find(
           (event) => event.toStatus === "PAYMENT_SETTLED",
@@ -57,22 +59,22 @@ export async function GET(request: NextRequest) {
           entry.status === "PAYMENT_SETTLED" || entry.status === "DELIVERED";
 
         return {
-        requestId: entry.id,
-        status: entry.status,
-        createdAt: entry.createdAt,
-        updatedAt: entry.updatedAt,
-        userEmail: entry.user.email,
-        countryCode: entry.prescription.countryCode,
-        latestEventAt: entry.statusEvents[0]?.createdAt ?? null,
-        settlement: shouldExposeSettlement
-          ? {
-              settledByUserId: settlementEvent?.actorUserId ?? null,
-              settledAt: settlementEvent?.createdAt ?? null,
-            }
-          : {
-              settledByUserId: null,
-              settledAt: null,
-            },
+          requestId: entry.id,
+          status: entry.status,
+          createdAt: entry.createdAt,
+          updatedAt: entry.updatedAt,
+          userEmail: entry.user.email,
+          countryCode: entry.prescription.countryCode,
+          latestEventAt: entry.statusEvents[0]?.createdAt ?? null,
+          settlement: shouldExposeSettlement
+            ? {
+                settledByUserId: settlementEvent?.actorUserId ?? null,
+                settledAt: settlementEvent?.createdAt ?? null,
+              }
+            : {
+                settledByUserId: null,
+                settledAt: null,
+              },
         };
       }),
     },

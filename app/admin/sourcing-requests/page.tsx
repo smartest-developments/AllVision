@@ -9,6 +9,7 @@ import { listAdminThroughputRequests } from "@/server/admin-sourcing-queue";
 import { listAdminReportTemplateDrafts } from "@/server/report-template-drafts";
 
 type QueueStatus = "SUBMITTED" | "IN_REVIEW" | "PAYMENT_SETTLED" | "DELIVERED";
+type QueueFilterGroupKey = "TRIAGE" | "SETTLED";
 
 type AdminQueueListItem = {
   requestId: string;
@@ -56,6 +57,10 @@ type AdminQueueArtifactItem = {
 };
 
 type AdminQueueListResponse = {
+  filterGroups?: Array<{
+    key: QueueFilterGroupKey;
+    statuses: QueueStatus[];
+  }>;
   requests: AdminQueueListItem[];
 };
 
@@ -174,6 +179,21 @@ function buildQueryString(filters: QueueFilters): string {
 
   const serialized = params.toString();
   return serialized.length > 0 ? `?${serialized}` : "";
+}
+
+function formatFilterGroupLabel(groupKey: QueueFilterGroupKey): string {
+  return groupKey === "TRIAGE" ? "Triage queue" : "Settlement evidence queue";
+}
+
+function resolveActiveFilterGroup(
+  groups: Array<{ key: QueueFilterGroupKey; statuses: QueueStatus[] }>,
+  status: QueueFilters["status"],
+): QueueFilterGroupKey {
+  if (!status) {
+    return "TRIAGE";
+  }
+
+  return groups.find((group) => group.statuses.includes(status))?.key ?? "TRIAGE";
 }
 
 type ReportTemplate = {
@@ -402,6 +422,7 @@ async function loadQueueFromApi(filters: QueueFilters, cookieHeader: string) {
       listStatus: listResponse.status,
       listError: listPayload as ErrorResponse,
       listItems: [] as AdminQueueListItem[],
+      filterGroups: [] as Array<{ key: QueueFilterGroupKey; statuses: QueueStatus[] }>,
       detailStatus: null as number | null,
       detailError: null as ErrorResponse | null,
       detailPayload: null as AdminQueueDetailResponse | null,
@@ -413,6 +434,11 @@ async function loadQueueFromApi(filters: QueueFilters, cookieHeader: string) {
       listStatus: listResponse.status,
       listError: null,
       listItems: (listPayload as AdminQueueListResponse).requests,
+      filterGroups:
+        (listPayload as AdminQueueListResponse).filterGroups ?? [
+          { key: "TRIAGE", statuses: ["SUBMITTED", "IN_REVIEW"] },
+          { key: "SETTLED", statuses: ["PAYMENT_SETTLED", "DELIVERED"] },
+        ],
       detailStatus: null as number | null,
       detailError: null as ErrorResponse | null,
       detailPayload: null as AdminQueueDetailResponse | null,
@@ -440,6 +466,11 @@ async function loadQueueFromApi(filters: QueueFilters, cookieHeader: string) {
       listStatus: listResponse.status,
       listError: null,
       listItems: (listPayload as AdminQueueListResponse).requests,
+      filterGroups:
+        (listPayload as AdminQueueListResponse).filterGroups ?? [
+          { key: "TRIAGE", statuses: ["SUBMITTED", "IN_REVIEW"] },
+          { key: "SETTLED", statuses: ["PAYMENT_SETTLED", "DELIVERED"] },
+        ],
       detailStatus: detailResponse.status,
       detailError: detailPayload as ErrorResponse,
       detailPayload: null,
@@ -450,6 +481,11 @@ async function loadQueueFromApi(filters: QueueFilters, cookieHeader: string) {
     listStatus: listResponse.status,
     listError: null,
     listItems: (listPayload as AdminQueueListResponse).requests,
+    filterGroups:
+      (listPayload as AdminQueueListResponse).filterGroups ?? [
+        { key: "TRIAGE", statuses: ["SUBMITTED", "IN_REVIEW"] },
+        { key: "SETTLED", statuses: ["PAYMENT_SETTLED", "DELIVERED"] },
+      ],
     detailStatus: detailResponse.status,
     detailError: null,
     detailPayload: detailPayload as AdminQueueDetailResponse,
@@ -513,6 +549,17 @@ export default async function AdminSourcingQueuePage({
   const settledAtCandidate = settledAtFromQuery || detailSettlement?.settledAt || null;
   const settledAtParsed = parseIsoTimestamp(settledAtCandidate);
   const settledAtDisplay = settledAtParsed === null ? "N/A" : settledAtCandidate;
+  const filterGroups =
+    queueState.filterGroups.length > 0
+      ? queueState.filterGroups
+      : [
+          { key: "TRIAGE" as const, statuses: ["SUBMITTED", "IN_REVIEW"] as QueueStatus[] },
+          {
+            key: "SETTLED" as const,
+            statuses: ["PAYMENT_SETTLED", "DELIVERED"] as QueueStatus[],
+          },
+        ];
+  const activeFilterGroup = resolveActiveFilterGroup(filterGroups, filters.status);
 
   return (
     <main className="mx-auto flex min-h-screen max-w-4xl flex-col gap-6 px-6 py-16">
@@ -568,7 +615,13 @@ export default async function AdminSourcingQueuePage({
           </label>
 
           <p className="md:col-span-4 text-xs text-neutral-600">
-            Filter guidance: <strong>SUBMITTED + IN_REVIEW</strong> is the active triage queue, while <strong>PAYMENT_SETTLED</strong> and <strong>DELIVERED</strong> show post-settlement evidence and delivery outcomes.
+            Filter guidance (active group: <strong>{formatFilterGroupLabel(activeFilterGroup)}</strong>):{" "}
+            {filterGroups.map((group, index) => (
+              <React.Fragment key={group.key}>
+                {index > 0 ? " | " : ""}
+                <strong>{formatFilterGroupLabel(group.key)}</strong> = {group.statuses.join(" + ")}
+              </React.Fragment>
+            ))}
           </p>
 
           <label className="text-sm">

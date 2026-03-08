@@ -23,6 +23,17 @@ export const adminQueueFiltersSchema = z.object({
 
 export type AdminQueueFilters = z.infer<typeof adminQueueFiltersSchema>;
 
+export const ADMIN_QUEUE_FILTER_GROUPS = [
+  {
+    key: "TRIAGE" as const,
+    statuses: [SourcingRequestStatus.SUBMITTED, SourcingRequestStatus.IN_REVIEW],
+  },
+  {
+    key: "SETTLED" as const,
+    statuses: [SourcingRequestStatus.PAYMENT_SETTLED, SourcingRequestStatus.DELIVERED],
+  },
+];
+
 export async function listAdminSourcingRequests(filters: AdminQueueFilters) {
   const statuses: SourcingRequestStatus[] = filters.status
     ? [filters.status]

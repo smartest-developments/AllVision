@@ -1,4 +1,12 @@
 # Progress Log
+## 2026-03-08T23:25:00+0100
+
+- task: AT-AUTO-BE-07 + AT-AUTO-UI-16 admin queue filter-group metadata parity.
+- result: added deterministic `filterGroups` metadata (`TRIAGE`, `SETTLED`) to `GET /api/v1/admin/sourcing-requests` and updated `/admin/sourcing-requests` filter guidance to consume API-provided groups while surfacing active group state based on selected status.
+- backlog update: marked `AT-AUTO-BE-07` and `AT-AUTO-UI-16` DONE; added follow-up `AT-AUTO-BE-08` and `AT-AUTO-UI-17` TODO tasks for default-group metadata and grouped status option rendering.
+- quality gates: pending in this automation pass.
+- next: AT-AUTO-BE-08 default filter-group metadata key.
+
 ## 2026-03-08T21:36:37+0100
 
 - task: AT-AUTO-UI-13 settlement banner metadata precedence on admin queue detail.

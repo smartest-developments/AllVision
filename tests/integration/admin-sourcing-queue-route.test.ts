@@ -206,10 +206,15 @@ describe("GET /api/v1/admin/sourcing-requests", () => {
     );
 
     const defaultPayload = (await defaultResponse.json()) as {
+      filterGroups: Array<{ key: string; statuses: string[] }>;
       requests: Array<{ requestId: string; status: string; countryCode: string }>;
     };
 
     expect(defaultResponse.status).toBe(200);
+    expect(defaultPayload.filterGroups).toEqual([
+      { key: "TRIAGE", statuses: ["SUBMITTED", "IN_REVIEW"] },
+      { key: "SETTLED", statuses: ["PAYMENT_SETTLED", "DELIVERED"] },
+    ]);
     expect(defaultPayload.requests).toHaveLength(2);
     expect(defaultPayload.requests.every((request) => request.status !== "REPORT_READY")).toBe(true);
 

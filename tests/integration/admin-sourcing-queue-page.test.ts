@@ -150,8 +150,11 @@ describe("Admin sourcing queue page", () => {
     expect(markup).toContain("owner-queue-page@example.com");
     expect(markup).toContain("requestId=");
     expect(markup).toContain("Open request detail");
-    expect(markup).toContain("Filter guidance:");
-    expect(markup).toContain("active triage queue");
+    expect(markup).toContain("Filter guidance (active group:");
+    expect(markup).toContain("Triage queue");
+    expect(markup).toContain("Settlement evidence queue");
+    expect(markup).toContain("SUBMITTED + IN_REVIEW");
+    expect(markup).toContain("PAYMENT_SETTLED + DELIVERED");
   });
 
   it("renders request detail timeline via admin queue detail contract", async () => {
@@ -338,6 +341,7 @@ describe("Admin sourcing queue page", () => {
     expect(markup).toContain(`Settled by: ${admin.id}`);
     expect(markup).toContain("Settled at:");
     expect(markup).not.toContain("Settled at: N/A");
+    expect(markup).toContain("active group: <strong>Settlement evidence queue</strong>");
   });
 
   it("renders settlement success banner with settlement metadata when redirected with settled marker", async () => {
