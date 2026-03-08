@@ -52,3 +52,5 @@
   - `tests/integration/sourcing-timeline-route-page.test.ts` (forbidden prescription assertion mismatch).
 - Impact: `lint`, `typecheck`, and `build` are green, but full test gate is red so commit/push is skipped.
 - Next step: stabilize integration fixture cleanup + seed ordering and review prescription-forbidden rendering expectations, then rerun full `npm run test`.
+
+- 2026-03-08T22:42:00+0100 - Blocked in automation run: EPERM on tracked-file writes (`app/admin/sourcing-requests/page.tsx`, `tests/integration/admin-sourcing-queue-page.test.ts`) while implementing AT-AUTO-UI-15 status-filter guidance copy. Next action: restore write permissions, then apply UI copy + tests and backlog/progress updates.

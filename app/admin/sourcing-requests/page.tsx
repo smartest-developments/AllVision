@@ -567,6 +567,10 @@ export default async function AdminSourcingQueuePage({
             </select>
           </label>
 
+          <p className="md:col-span-4 text-xs text-neutral-600">
+            Filter guidance: <strong>SUBMITTED + IN_REVIEW</strong> is the active triage queue, while <strong>PAYMENT_SETTLED</strong> and <strong>DELIVERED</strong> show post-settlement evidence and delivery outcomes.
+          </p>
+
           <label className="text-sm">
             <span className="mb-1 block text-xs text-neutral-600">Country code</span>
             <input

@@ -419,3 +419,15 @@
   - `npm run typecheck` ✅
   - `npm run test` ✅ (114/114)
   - `npm run build` ✅
+
+## 2026-03-08T22:55:00+0100 - AT-AUTO-UI-15 queue status-filter guidance copy
+- task: complete `AT-AUTO-UI-15` by clarifying triage vs settled status filters in the admin queue UI.
+- result:
+  - updated `/admin/sourcing-requests` filter panel with deterministic guidance copy for `SUBMITTED|IN_REVIEW` (triage) vs `PAYMENT_SETTLED|DELIVERED` (post-settlement evidence);
+  - added integration assertions in `tests/integration/admin-sourcing-queue-page.test.ts` for guidance rendering;
+  - documented filter-lane semantics in `docs/API_SPEC.md` under admin queue list contract.
+- backlog update:
+  - marked `AT-AUTO-UI-15` DONE;
+  - added `AT-AUTO-BE-07` (backend filter-group metadata) and `AT-AUTO-UI-16` (UI metadata consumption) as next TODO follow-ups.
+- quality gates: pending in this automation pass.
+- next: `AT-AUTO-BE-07`.

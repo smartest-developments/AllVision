@@ -150,6 +150,8 @@ describe("Admin sourcing queue page", () => {
     expect(markup).toContain("owner-queue-page@example.com");
     expect(markup).toContain("requestId=");
     expect(markup).toContain("Open request detail");
+    expect(markup).toContain("Filter guidance:");
+    expect(markup).toContain("active triage queue");
   });
 
   it("renders request detail timeline via admin queue detail contract", async () => {
