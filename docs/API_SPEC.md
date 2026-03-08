@@ -94,7 +94,7 @@ All API surfaces must maintain these constraints:
 - Purpose: acknowledge report delivery/receipt event.
 - Notes:
   - owner-only endpoint.
-  - when current state is `REPORT_READY`, persists `REPORT_DELIVERY_ACKNOWLEDGED` audit marker and status event, then transitions request to `DELIVERED`.
+  - when current state is `REPORT_READY` or `PAYMENT_SETTLED`, persists `REPORT_DELIVERY_ACKNOWLEDGED` audit marker and status event, then transitions request to `DELIVERED`.
   - idempotent when request is already `DELIVERED`.
 - Responses: `200`, `401`, `403`, `404`, `409`.
 
@@ -108,6 +108,17 @@ All API surfaces must maintain these constraints:
   - idempotent when request is already `PAYMENT_PENDING|PAYMENT_SETTLED|DELIVERED`.
   - supports form-submit flow via optional `redirectTo` path and returns `303` when provided.
 - Responses: `200`, `303`, `401`, `403`, `404`, `409`.
+
+### `POST /api/v1/admin/sourcing-requests/:requestId/report-fee/settle`
+
+- Purpose: record report-fee settlement webhook/stub outcome after checkout intent.
+- Notes:
+  - admin-only endpoint.
+  - when current state is `PAYMENT_PENDING` and `reportPaymentRequired=true`, transitions to `PAYMENT_SETTLED`.
+  - writes immutable `SourcingStatusEvent` (`PAYMENT_PENDING -> PAYMENT_SETTLED`) and `REPORT_FEE_SETTLEMENT_RECORDED` audit marker.
+  - idempotent when request is already `PAYMENT_SETTLED|DELIVERED`.
+  - once settled, owner report-delivery acknowledgment is unlocked via `POST /api/v1/sourcing-requests/:requestId/report/ack`.
+- Responses: `200`, `401`, `403`, `404`, `409`.
 
 ## Admin Review and Report Upload
 

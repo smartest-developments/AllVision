@@ -104,4 +104,67 @@ describe("GET /api/v1/sourcing-requests/:requestId/report", () => {
       paymentState: "PENDING",
     });
   });
+
+  it("returns settled report-fee payment state when request is PAYMENT_SETTLED", async () => {
+    const owner = await prisma.user.create({
+      data: {
+        email: "owner-report-route-settled@example.com",
+        passwordHash: "hash",
+        role: "USER",
+      },
+    });
+
+    const prescription = await prisma.prescription.create({
+      data: {
+        userId: owner.id,
+        countryCode: "NL",
+        payload: {
+          countryCode: "NL",
+          leftEye: { sphere: -1.5 },
+          rightEye: { sphere: -1.25 },
+          pupillaryDistance: 62,
+        },
+      },
+    });
+
+    const request = await prisma.sourcingRequest.create({
+      data: {
+        userId: owner.id,
+        prescriptionId: prescription.id,
+        status: "PAYMENT_SETTLED",
+        reportPaymentRequired: true,
+        reportFeeCents: 2590,
+        currency: "CHF",
+      },
+    });
+
+    await prisma.reportArtifact.create({
+      data: {
+        sourcingRequestId: request.id,
+        createdByAdminId: null,
+        storageKey: "reports/report-route-settled.pdf",
+        checksumSha256: "abc123",
+        deliveryChannel: "email",
+      },
+    });
+
+    const cookie = await issueSessionCookie(owner.id);
+
+    const response = await GET(
+      new NextRequest(`http://localhost/api/v1/sourcing-requests/${request.id}/report`, {
+        method: "GET",
+        headers: { cookie },
+      }),
+      { params: Promise.resolve({ requestId: request.id }) },
+    );
+
+    const payload = (await response.json()) as {
+      reportFee: {
+        paymentState: string;
+      };
+    };
+
+    expect(response.status).toBe(200);
+    expect(payload.reportFee.paymentState).toBe("SETTLED");
+  });
 });

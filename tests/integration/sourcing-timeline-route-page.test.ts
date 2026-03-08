@@ -408,4 +408,57 @@ describe("Timeline page deep-linking", () => {
     expect(markup).toContain("Start report fee checkout");
     expect(markup).not.toContain("Acknowledge report delivery");
   });
+
+  it("renders delivery acknowledgment action after report-fee settlement", async () => {
+    const owner = await prisma.user.create({
+      data: {
+        email: "timeline-report-fee-settled-owner@example.com",
+        passwordHash: "hash",
+        role: "USER",
+      },
+    });
+
+    const prescription = await prisma.prescription.create({
+      data: {
+        userId: owner.id,
+        countryCode: "CH",
+        payload: {
+          countryCode: "CH",
+          leftEye: { sphere: -1.0 },
+          rightEye: { sphere: -0.75 },
+          pupillaryDistance: 61,
+        },
+      },
+    });
+
+    const settledRequest = await prisma.sourcingRequest.create({
+      data: {
+        userId: owner.id,
+        prescriptionId: prescription.id,
+        status: "PAYMENT_SETTLED",
+        reportPaymentRequired: true,
+        reportFeeCents: 1990,
+        currency: "EUR",
+      },
+    });
+
+    mockedResolvePageSessionIdentity.mockResolvedValue({
+      userId: owner.id,
+      role: "USER",
+    });
+
+    const markup = renderToStaticMarkup(
+      await TimelinePage({
+        searchParams: Promise.resolve({
+          requestId: settledRequest.id,
+        }),
+      }),
+    );
+
+    expect(markup).toContain("Acknowledge report delivery");
+    expect(markup).toContain(
+      `/api/v1/sourcing-requests/${settledRequest.id}/report/ack`,
+    );
+    expect(markup).not.toContain("Start report fee checkout");
+  });
 });

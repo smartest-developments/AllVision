@@ -32,7 +32,10 @@ describe("POST /api/v1/sourcing-requests/:requestId/report/ack", () => {
     return `${SESSION_COOKIE_NAME}=${token}`;
   }
 
-  async function seedReportReadyRequest() {
+  async function seedReportReadyRequest(options?: {
+    status?: "REPORT_READY" | "PAYMENT_SETTLED";
+    reportPaymentRequired?: boolean;
+  }) {
     const owner = await prisma.user.create({
       data: {
         email: "owner-ack@example.com",
@@ -65,8 +68,8 @@ describe("POST /api/v1/sourcing-requests/:requestId/report/ack", () => {
       data: {
         userId: owner.id,
         prescriptionId: prescription.id,
-        status: "REPORT_READY",
-        reportPaymentRequired: false,
+        status: options?.status ?? "REPORT_READY",
+        reportPaymentRequired: options?.reportPaymentRequired ?? false,
         currency: "EUR"
       }
     });
@@ -162,6 +165,41 @@ describe("POST /api/v1/sourcing-requests/:requestId/report/ack", () => {
       fromStatus: "REPORT_READY",
       toStatus: "DELIVERED"
     });
+  });
+
+  it("allows acknowledgment after report-fee settlement", async () => {
+    const { owner, request } = await seedReportReadyRequest({
+      status: "PAYMENT_SETTLED",
+      reportPaymentRequired: true
+    });
+    const cookie = await issueSessionCookie(owner.id);
+
+    const response = await POST(
+      new NextRequest(`http://localhost/api/v1/sourcing-requests/${request.id}/report/ack`, {
+        method: "POST",
+        headers: { cookie }
+      }),
+      { params: Promise.resolve({ requestId: request.id }) }
+    );
+
+    const payload = (await response.json()) as {
+      requestId: string;
+      status: string;
+    };
+
+    expect(response.status).toBe(200);
+    expect(payload).toMatchObject({
+      requestId: request.id,
+      status: "DELIVERED"
+    });
+
+    const statusEvent = await prisma.sourcingStatusEvent.findFirst({
+      where: {
+        sourcingRequestId: request.id,
+        toStatus: "DELIVERED"
+      }
+    });
+    expect(statusEvent?.fromStatus).toBe("PAYMENT_SETTLED");
   });
 
   it("is idempotent after first acknowledgment and does not duplicate audit/status events", async () => {

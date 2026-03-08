@@ -249,7 +249,8 @@ export default async function TimelinePage({ searchParams }: TimelinePageProps) 
                     Updated: {formatTimestamp(request.updatedAt)} | Latest event:{" "}
                     {formatTimestamp(request.latestEventAt)}
                   </p>
-                  {request.status === "REPORT_READY" && !reportFeeRequiresPayment ? (
+                  {(request.status === "REPORT_READY" || request.status === "PAYMENT_SETTLED") &&
+                  !reportFeeRequiresPayment ? (
                     <form
                       className="mt-2"
                       action={`/api/v1/sourcing-requests/${encodeURIComponent(

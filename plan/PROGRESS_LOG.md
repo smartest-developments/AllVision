@@ -2,6 +2,12 @@
 
 ## 2026-03-08T13:58:55+0100
 
+- task: AT-P2-01B2 Report-fee settlement webhook/stub + settled delivery-ack unlock.
+- result: added admin settlement endpoint `POST /api/v1/admin/sourcing-requests/:requestId/report-fee/settle` with admin session auth and deterministic transition `PAYMENT_PENDING -> PAYMENT_SETTLED`, including immutable `SourcingStatusEvent` and `REPORT_FEE_SETTLEMENT_RECORDED` audit evidence. Updated report retrieval/delivery-ack backend to allow settled requests and updated home/timeline UI to show `Acknowledge report delivery` for settled items (instead of checkout CTA). Added integration coverage for settlement route contracts, settled report payload/payment-state, settled acknowledgment transition, and settled UI rendering on both timeline surfaces.
+- backlog update: marked `AT-P2-01B2` DONE and parent `AT-P2-01B` DONE in `plan/TASK_BACKLOG.md`.
+- quality gates: pending run in this automation pass.
+- next: auto-discover next UI-forward gap after optional report-fee lifecycle closure.
+
 - task: AT-P2-01B1 Owner-authenticated report-fee checkout intent transition + timeline/home UI checkout action.
 - result: implemented `POST /api/v1/sourcing-requests/:requestId/report-fee/checkout` to enforce owner session auth and transition `REPORT_READY -> PAYMENT_PENDING` with immutable `SourcingStatusEvent` + `REPORT_FEE_CHECKOUT_INITIATED` audit event. Updated home/timeline UI cards to show deterministic report-fee pending copy and in-place checkout submit action (replacing dead billing link), while preserving report acknowledgment only when payment is not pending.
 - backlog update: marked `AT-P2-01B` as split/in-progress and `AT-P2-01B1` as DONE with evidence; `AT-P2-01B2` remains TODO for settlement/webhook transition.

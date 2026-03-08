@@ -36,6 +36,7 @@ export async function getReportArtifactForOwner(input: {
 
   if (
     request.status !== SourcingRequestStatus.REPORT_READY &&
+    request.status !== SourcingRequestStatus.PAYMENT_SETTLED &&
     request.status !== SourcingRequestStatus.DELIVERED
   ) {
     throw new ReportRetrievalError(
@@ -75,7 +76,11 @@ export async function acknowledgeReportDeliveryForOwner(input: {
     throw new ReportRetrievalError("FORBIDDEN", "Access denied.", 403);
   }
 
-  if (request.status !== SourcingRequestStatus.REPORT_READY && request.status !== SourcingRequestStatus.DELIVERED) {
+  if (
+    request.status !== SourcingRequestStatus.REPORT_READY &&
+    request.status !== SourcingRequestStatus.PAYMENT_SETTLED &&
+    request.status !== SourcingRequestStatus.DELIVERED
+  ) {
     throw new ReportRetrievalError("REPORT_NOT_READY", "Report is not available yet.", 409);
   }
 
@@ -92,7 +97,12 @@ export async function acknowledgeReportDeliveryForOwner(input: {
     const transition = await tx.sourcingRequest.updateMany({
       where: {
         id: request.id,
-        status: SourcingRequestStatus.REPORT_READY
+        status: {
+          in: [
+            SourcingRequestStatus.REPORT_READY,
+            SourcingRequestStatus.PAYMENT_SETTLED
+          ]
+        }
       },
       data: {
         status: SourcingRequestStatus.DELIVERED
@@ -214,6 +224,92 @@ export async function startReportFeeCheckoutForOwner(input: {
         context: {
           fromStatus: SourcingRequestStatus.REPORT_READY,
           toStatus: SourcingRequestStatus.PAYMENT_PENDING,
+          statusEventId: statusEvent.id,
+          product: "REPORT_SERVICE",
+          feeCents: request.reportFeeCents,
+          currency: request.currency
+        }
+      }
+    });
+
+    return tx.sourcingRequest.findUniqueOrThrow({
+      where: { id: request.id }
+    });
+  });
+}
+
+export async function settleReportFeeForRequest(input: {
+  requestId: string;
+  actorUserId: string;
+}) {
+  const request = await prisma.sourcingRequest.findUnique({
+    where: { id: input.requestId }
+  });
+
+  if (!request) {
+    throw new ReportRetrievalError("NOT_FOUND", "Sourcing request not found.", 404);
+  }
+
+  if (!request.reportPaymentRequired) {
+    throw new ReportRetrievalError(
+      "REPORT_FEE_NOT_REQUIRED",
+      "Report fee is not required for this request.",
+      409
+    );
+  }
+
+  if (
+    request.status === SourcingRequestStatus.PAYMENT_SETTLED ||
+    request.status === SourcingRequestStatus.DELIVERED
+  ) {
+    return request;
+  }
+
+  if (request.status !== SourcingRequestStatus.PAYMENT_PENDING) {
+    throw new ReportRetrievalError(
+      "PAYMENT_NOT_PENDING",
+      "Report fee settlement can be recorded only when payment is pending.",
+      409
+    );
+  }
+
+  return prisma.$transaction(async (tx) => {
+    const transition = await tx.sourcingRequest.updateMany({
+      where: {
+        id: request.id,
+        status: SourcingRequestStatus.PAYMENT_PENDING
+      },
+      data: {
+        status: SourcingRequestStatus.PAYMENT_SETTLED
+      }
+    });
+
+    if (transition.count === 0) {
+      return tx.sourcingRequest.findUniqueOrThrow({
+        where: { id: request.id }
+      });
+    }
+
+    const statusEvent = await tx.sourcingStatusEvent.create({
+      data: {
+        sourcingRequestId: request.id,
+        fromStatus: SourcingRequestStatus.PAYMENT_PENDING,
+        toStatus: SourcingRequestStatus.PAYMENT_SETTLED,
+        actorUserId: input.actorUserId,
+        note: "Report-fee settlement recorded."
+      }
+    });
+
+    await tx.auditEvent.create({
+      data: {
+        actorUserId: input.actorUserId,
+        sourcingRequestId: request.id,
+        entityType: "SourcingRequest",
+        entityId: request.id,
+        action: "REPORT_FEE_SETTLEMENT_RECORDED",
+        context: {
+          fromStatus: SourcingRequestStatus.PAYMENT_PENDING,
+          toStatus: SourcingRequestStatus.PAYMENT_SETTLED,
           statusEventId: statusEvent.id,
           product: "REPORT_SERVICE",
           feeCents: request.reportFeeCents,
