@@ -223,6 +223,10 @@ export default async function TimelinePage({ searchParams }: TimelinePageProps) 
           <ul className="mt-4 space-y-3">
             {filteredRequests.map((request) => {
               const isFocused = requestId !== "" && request.requestId === requestId;
+              const reportFeeRequiresPayment =
+                request.reportFee.required && request.reportFee.paymentState === "PENDING";
+              const reportFeeCheckoutHref =
+                "/billing/report-fee?requestId=" + encodeURIComponent(request.requestId);
               return (
                 <li
                   key={request.requestId}
@@ -241,7 +245,7 @@ export default async function TimelinePage({ searchParams }: TimelinePageProps) 
                     Updated: {formatTimestamp(request.updatedAt)} | Latest event:{" "}
                     {formatTimestamp(request.latestEventAt)}
                   </p>
-                  {request.status === "REPORT_READY" ? (
+                  {request.status === "REPORT_READY" && !reportFeeRequiresPayment ? (
                     <form
                       className="mt-2"
                       action={`/api/v1/sourcing-requests/${encodeURIComponent(
@@ -256,6 +260,18 @@ export default async function TimelinePage({ searchParams }: TimelinePageProps) 
                         Acknowledge report delivery
                       </button>
                     </form>
+                  ) : null}
+                  {reportFeeRequiresPayment ? (
+                    <p className="mt-2 text-xs text-neutral-700">
+                      Report fee pending ({request.reportFee.currency}{" "}
+                      {request.reportFee.feeCents !== null
+                        ? (request.reportFee.feeCents / 100).toFixed(2)
+                        : "TBD"}).{" "}
+                      <Link className="underline" href={reportFeeCheckoutHref}>
+                        Continue to report fee checkout
+                      </Link>
+                      .
+                    </p>
                   ) : null}
                   {request.status === "DELIVERED" ? (
                     <p className="mt-2 text-xs text-neutral-700">

@@ -70,7 +70,7 @@ All API surfaces must maintain these constraints:
 ### `GET /api/v1/sourcing-requests`
 
 - Purpose: list authenticated user sourcing requests.
-- Notes: returns owner-only request timeline entries (`requestId`, `status`, `createdAt`, `updatedAt`, `latestEventAt`, `timeline[]`) and includes `legal` copy for request-surface consistency.
+- Notes: returns owner-only request timeline entries (`requestId`, `status`, `createdAt`, `updatedAt`, `latestEventAt`, `reportFee`, `timeline[]`) and includes `legal` copy for request-surface consistency.
 - Auth note: caller identity is resolved from session cookie only; `x-user-id` headers are ignored.
 - UI consumption note: home and `/timeline` load this owner-scoped payload from active session context (no `userId` query parameter requirement); `/timeline` supports optional `requestId` focus.
 - Responses: `200`, `401`.
@@ -85,6 +85,7 @@ All API surfaces must maintain these constraints:
 ### `GET /api/v1/sourcing-requests/:requestId/report`
 
 - Purpose: retrieve secure report link/download metadata for owner.
+- Success payload now includes `reportFee` metadata with deterministic report-service payment context: `{ product: "REPORT_SERVICE", required, feeCents, currency, paymentState }`.
 - Success payload includes `legal` block (`title`, `bullets[]`, `surfaceNote`) for report-delivery legal copy consistency.
 - Responses: `200`, `401`, `403`, `404`, `429`, `501`.
 

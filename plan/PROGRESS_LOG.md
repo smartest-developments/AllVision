@@ -1,5 +1,13 @@
 # Progress Log
 
+## 2026-03-08T08:47:03+0100
+
+- task: AT-P2-01A Expose report-fee payment state and checkout link metadata.
+- result: surfaced deterministic report-fee metadata (`required`, `feeCents`, `currency`, `paymentState`) in owner timeline status payloads and `GET /api/v1/sourcing-requests/:requestId/report` response with explicit `REPORT_SERVICE` product tag; timeline UI now shows report-fee checkout CTA when payment is pending and suppresses report-delivery acknowledgment action until fee state is no longer pending.
+- backlog update: split `AT-P2-01` into `AT-P2-01A` (DONE) and `AT-P2-01B` (TODO for payment settlement lifecycle).
+- quality gates: pending run in this automation pass.
+- next: AT-P2-01B implement report-fee payment intent + settlement status transitions.
+
 ## 2026-03-08T08:12:11+0100
 
 - task: AT-P2-02B Extend SLA dashboard with delivered-time throughput trend.

@@ -351,4 +351,57 @@ describe("Timeline page deep-linking", () => {
       `/api/v1/sourcing-requests/${reportReadyRequest.id}/report/ack`,
     );
   });
+
+  it("renders report-fee checkout CTA when report payment is required", async () => {
+    const owner = await prisma.user.create({
+      data: {
+        email: "timeline-report-fee-owner@example.com",
+        passwordHash: "hash",
+        role: "USER",
+      },
+    });
+
+    const prescription = await prisma.prescription.create({
+      data: {
+        userId: owner.id,
+        countryCode: "CH",
+        payload: {
+          countryCode: "CH",
+          leftEye: { sphere: -1.0 },
+          rightEye: { sphere: -0.75 },
+          pupillaryDistance: 61,
+        },
+      },
+    });
+
+    const reportReadyRequest = await prisma.sourcingRequest.create({
+      data: {
+        userId: owner.id,
+        prescriptionId: prescription.id,
+        status: "REPORT_READY",
+        reportPaymentRequired: true,
+        reportFeeCents: 1990,
+        currency: "EUR",
+      },
+    });
+
+    mockedResolvePageSessionIdentity.mockResolvedValue({
+      userId: owner.id,
+      role: "USER",
+    });
+
+    const markup = renderToStaticMarkup(
+      await TimelinePage({
+        searchParams: Promise.resolve({
+          requestId: reportReadyRequest.id,
+        }),
+      }),
+    );
+
+    expect(markup).toContain("Report fee pending (EUR 19.90).");
+    expect(markup).toContain(
+      `/billing/report-fee?requestId=${reportReadyRequest.id}`,
+    );
+    expect(markup).not.toContain("Acknowledge report delivery");
+  });
 });

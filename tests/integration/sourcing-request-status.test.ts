@@ -94,6 +94,12 @@ describe("sourcing request status listing", () => {
     expect(result[0]).toMatchObject({
       requestId: ownerRequest.id,
       status: "IN_REVIEW",
+      reportFee: {
+        required: false,
+        feeCents: null,
+        currency: "EUR",
+        paymentState: "NOT_REQUIRED",
+      },
       timeline: [
         {
           fromStatus: "SUBMITTED",
@@ -103,5 +109,49 @@ describe("sourcing request status listing", () => {
       ],
     });
     expect(result[0].latestEventAt).toBeInstanceOf(Date);
+  });
+
+  it("exposes report-fee pending state when payment is required", async () => {
+    const owner = await prisma.user.create({
+      data: {
+        email: "status-owner-payment@example.com",
+        passwordHash: "hash",
+        role: "USER",
+      },
+    });
+
+    const ownerPrescription = await prisma.prescription.create({
+      data: {
+        userId: owner.id,
+        countryCode: "CH",
+        payload: {
+          countryCode: "CH",
+          leftEye: { sphere: -1.25 },
+          rightEye: { sphere: -1.5 },
+          pupillaryDistance: 62,
+        },
+      },
+    });
+
+    await prisma.sourcingRequest.create({
+      data: {
+        userId: owner.id,
+        prescriptionId: ownerPrescription.id,
+        status: "REPORT_READY",
+        reportPaymentRequired: true,
+        reportFeeCents: 2490,
+        currency: "CHF",
+      },
+    });
+
+    const result = await listSourcingRequestStatusesForUser(owner.id);
+
+    expect(result).toHaveLength(1);
+    expect(result[0]?.reportFee).toEqual({
+      required: true,
+      feeCents: 2490,
+      currency: "CHF",
+      paymentState: "PENDING",
+    });
   });
 });

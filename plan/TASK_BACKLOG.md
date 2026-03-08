@@ -139,10 +139,20 @@ Completion signal: CI blocks merges on lint/typecheck/test/build and migration/s
 
 ### P2 (3 tasks, execution-ready but non-urgent)
 
-1. [AT-P2-01] Add optional report-fee collection for informational service.
+1. [AT-P2-01] Add optional report-fee collection for informational service. (split into `AT-P2-01A` + `AT-P2-01B`)
 - Size: 2-3h
 - DoD: payment state links to report service product only.
 - Evidence: integration tests for payment-required toggle.
+
+1a. [AT-P2-01A] Expose report-fee payment state and checkout link metadata on timeline/report payloads. ✅ DONE
+- Size: 1-2h
+- DoD: owner timeline/report payloads expose deterministic `REPORT_SERVICE` fee metadata and suppress delivery acknowledgment while fee state is pending.
+- Evidence: `src/server/sourcing-request-status.ts`, `app/timeline/page.tsx`, `app/api/v1/sourcing-requests/[requestId]/report/route.ts`, `tests/integration/sourcing-request-status.test.ts`, `tests/integration/sourcing-timeline-route-page.test.ts`, `tests/integration/report-route.test.ts`.
+
+1b. [AT-P2-01B] Implement payment intent and settlement transition for report-fee checkout.
+- Size: 1-2h
+- DoD: report-fee checkout confirmation transitions `REPORT_READY -> PAYMENT_PENDING -> PAYMENT_SETTLED` before delivery acknowledgement can complete.
+- Evidence: integration tests for payment intent lifecycle + settlement webhook/stub.
 
 2. [AT-P2-02] Build admin SLA dashboard for sourcing request throughput. (split into `AT-P2-02A` + `AT-P2-02B`)
 - Size: 2-3h
