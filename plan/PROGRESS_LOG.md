@@ -1,4 +1,12 @@
 # Progress Log
+## 2026-03-09T23:20:00+0100
+
+- task: AT-AUTO-UI-24 report-fee pending-pricing fallback copy parity (home + timeline).
+- result: added shared formatter `formatReportFeeSummary` and replaced `TBD` placeholders on `app/page.tsx` and `app/timeline/page.tsx` with deterministic copy (`<CURRENCY> pending pricing`) when `reportFee.feeCents` is null. Added unit coverage for formatter and integration coverage on both timeline surfaces for null-fee fallback rendering.
+- backlog update: marked `AT-AUTO-UI-24` DONE and added follow-up backend task `AT-AUTO-BE-15` TODO to guarantee payment-pending fee completeness or API reason metadata.
+- quality gates: blocked in this environment (`npm`, `node`, `pnpm`, `yarn` not installed), so lint/typecheck/test/build could not be executed.
+- next: AT-AUTO-BE-15 report-fee completeness contract on sourcing-status payload.
+
 ## 2026-03-08T23:25:00+0100
 
 - task: AT-AUTO-BE-07 + AT-AUTO-UI-16 admin queue filter-group metadata parity.

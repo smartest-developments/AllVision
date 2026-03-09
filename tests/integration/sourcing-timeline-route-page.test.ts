@@ -409,6 +409,59 @@ describe("Timeline page deep-linking", () => {
     expect(markup).not.toContain("Acknowledge report delivery");
   });
 
+  it("renders pending-pricing fallback copy on focused timeline when report fee amount is unavailable", async () => {
+    const owner = await prisma.user.create({
+      data: {
+        email: "timeline-report-fee-pending-pricing-owner@example.com",
+        passwordHash: "hash",
+        role: "USER",
+      },
+    });
+
+    const prescription = await prisma.prescription.create({
+      data: {
+        userId: owner.id,
+        countryCode: "CH",
+        payload: {
+          countryCode: "CH",
+          leftEye: { sphere: -1.0 },
+          rightEye: { sphere: -0.75 },
+          pupillaryDistance: 61,
+        },
+      },
+    });
+
+    const reportReadyRequest = await prisma.sourcingRequest.create({
+      data: {
+        userId: owner.id,
+        prescriptionId: prescription.id,
+        status: "REPORT_READY",
+        reportPaymentRequired: true,
+        reportFeeCents: null,
+        currency: "EUR",
+      },
+    });
+
+    mockedResolvePageSessionIdentity.mockResolvedValue({
+      userId: owner.id,
+      role: "USER",
+    });
+
+    const markup = renderToStaticMarkup(
+      await TimelinePage({
+        searchParams: Promise.resolve({
+          requestId: reportReadyRequest.id,
+        }),
+      }),
+    );
+
+    expect(markup).toContain("Report fee pending (EUR pending pricing).");
+    expect(markup).toContain(
+      `/api/v1/sourcing-requests/${reportReadyRequest.id}/report-fee/checkout`,
+    );
+    expect(markup).toContain("Start report fee checkout");
+  });
+
   it("renders delivery acknowledgment action after report-fee settlement", async () => {
     const owner = await prisma.user.create({
       data: {

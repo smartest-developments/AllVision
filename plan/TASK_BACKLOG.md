@@ -564,3 +564,13 @@ Mitigation refs: [AT-P0-05], [AT-P0-06], [AT-P0-07], [AT-P1-06].
   - Priority: P2
   - DoD: queue UI consumes `statusMetadata.nextActionLabel` with deterministic fallback when metadata is absent.
   - Evidence target: `app/admin/sourcing-requests/page.tsx`, `tests/integration/admin-sourcing-queue-page.test.ts`.
+
+## RUN_UPDATE_2026-03-09T23:20:00+0100
+- [AT-AUTO-UI-24] Replace ambiguous report-fee pending fallback copy on timeline surfaces. ✅ DONE
+  - Priority: P1
+  - DoD: home and `/timeline` request cards render deterministic report-fee copy (`<CURRENCY> pending pricing`) when `reportFee.feeCents` is `null` instead of placeholder text.
+  - Evidence: `src/lib/report-fee.ts`, `app/page.tsx`, `app/timeline/page.tsx`, `tests/unit/report-fee.test.ts`, `tests/integration/sourcing-request-timeline-page.test.ts`, `tests/integration/sourcing-timeline-route-page.test.ts`.
+- [AT-AUTO-BE-15] Guarantee report-fee amount completeness for payment-pending requests.
+  - Priority: P1
+  - DoD: sourcing-status payload either includes non-null `reportFee.feeCents` whenever `reportFee.required && paymentState === PENDING` or emits explicit API metadata reason code for pending pricing to keep UI copy audit-safe.
+  - Evidence target: `src/server/sourcing-request-status.ts`, `tests/integration/sourcing-request-status.test.ts`, `docs/API_SPEC.md`.

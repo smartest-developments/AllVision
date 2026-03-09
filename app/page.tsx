@@ -1,6 +1,7 @@
 import React from "react";
 import Link from "next/link";
 import { getLegalCopy } from "@/legal/disclaimers";
+import { formatReportFeeSummary } from "@/lib/report-fee";
 import { resolvePageSessionUserId } from "@/server/page-auth";
 import { listSourcingRequestStatusesForUser } from "@/server/sourcing-request-status";
 
@@ -138,11 +139,7 @@ export default async function HomePage() {
                       method="post"
                     >
                       <input type="hidden" name="redirectTo" value={timelineRedirectTo} />
-                      Report fee pending ({request.reportFee.currency}{" "}
-                      {request.reportFee.feeCents !== null
-                        ? (request.reportFee.feeCents / 100).toFixed(2)
-                        : "TBD"}
-                      ).
+                      Report fee pending ({formatReportFeeSummary(request.reportFee)}).
                       <button
                         type="submit"
                         className="ml-2 rounded-md border border-neutral-400 px-2 py-1 text-xs text-neutral-900"
