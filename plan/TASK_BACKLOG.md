@@ -528,3 +528,21 @@ Mitigation refs: [AT-P0-05], [AT-P0-06], [AT-P0-07], [AT-P1-06].
   - Priority: P2
   - DoD: `/admin/sourcing-requests` status selector helper text consumes backend `statusMetadata.helperText` with deterministic fallback when metadata is absent.
   - Evidence target: `app/admin/sourcing-requests/page.tsx`, `tests/integration/admin-sourcing-queue-page.test.ts`.
+
+## RUN_UPDATE_2026-03-09T04:45:00+0100
+- [AT-AUTO-BE-12] Add API-owned status badge tone metadata for admin queue states. ✅ DONE
+  - Priority: P2
+  - DoD: admin queue list payload extends `statusMetadata` with deterministic `tone` hints (`NEUTRAL|WARNING|SUCCESS`) per status so clients avoid hardcoded visual severity mapping.
+  - Evidence: `src/server/admin-sourcing-queue.ts`, `app/api/v1/admin/sourcing-requests/route.ts`, `tests/integration/admin-sourcing-queue-route.test.ts`, `docs/API_SPEC.md`.
+- [AT-AUTO-UI-21] Render API-driven status badge tones on queue cards and status select helper text. ✅ DONE
+  - Priority: P2
+  - DoD: `/admin/sourcing-requests` applies backend-provided `statusMetadata.tone` hints to status badges and selected-filter helper copy with deterministic fallback behavior.
+  - Evidence: `app/admin/sourcing-requests/page.tsx`, `app/admin/sourcing-requests/filter-groups.ts`, `tests/integration/admin-sourcing-queue-page.test.ts`.
+- [AT-AUTO-BE-13] Add API-owned queue status transition-hint metadata.
+  - Priority: P2
+  - DoD: status metadata includes deterministic short transition hints per queue status for UI helper text parity.
+  - Evidence target: `src/server/admin-sourcing-queue.ts`, route integration tests, `docs/API_SPEC.md`.
+- [AT-AUTO-UI-22] Render transition-hint copy from API status metadata in queue cards/filters.
+  - Priority: P2
+  - DoD: queue UI uses backend transition hints and avoids hardcoded status guidance text.
+  - Evidence target: `app/admin/sourcing-requests/page.tsx`, page integration tests.

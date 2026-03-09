@@ -511,3 +511,17 @@
   - `npm run test` ✅ (115/115)
   - `npm run build` ✅
 - next: `AT-AUTO-BE-13`.
+## 2026-03-09T04:45:00+0100 - AT-AUTO-BE-12 + AT-AUTO-UI-21 API-owned status tone metadata + UI consumption
+- task: complete admin queue status-tone parity so backend status metadata drives queue visual severity and helper copy.
+- result:
+  - finalized API `statusMetadata` tone contract (`NEUTRAL|WARNING|SUCCESS`) for `SUBMITTED|IN_REVIEW|PAYMENT_SETTLED|DELIVERED` in admin queue route/module coverage;
+  - completed UI tone consumption by exporting canonical fallback status metadata from `app/admin/sourcing-requests/filter-groups.ts` and consuming it in `/admin/sourcing-requests` for status badges and selected-status tone helper copy;
+  - confirmed route/page integration assertions cover tone payload and rendered `data-status-tone` behavior.
+- backlog update:
+  - marked `AT-AUTO-BE-12` + `AT-AUTO-UI-21` DONE;
+  - queued follow-ups `AT-AUTO-BE-13` + `AT-AUTO-UI-22` for API-owned transition-hint metadata/copy.
+- quality gates:
+  - `npm run lint` ✅
+  - `npm run typecheck` ✅
+  - `npm run test` ✅ (115/115)
+  - `npm run build` ✅

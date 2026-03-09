@@ -246,3 +246,7 @@ All API surfaces must maintain these constraints:
 - Contract rule:
   - settlement metadata is populated only when request status is `PAYMENT_SETTLED` or `DELIVERED`;
   - non-settled statuses return `{ settledByUserId: null, settledAt: null }`.
+
+Update 2026-03-09:
+- Admin queue UI consumes API-owned `statusMetadata.tone` in two places: status badges on queue cards and selected-status helper text in filter controls.
+- Recommended client fallback when tone is missing/unknown: `NEUTRAL`.
