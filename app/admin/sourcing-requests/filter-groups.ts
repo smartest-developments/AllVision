@@ -15,6 +15,7 @@ export type QueueStatusMetadata = Record<
   {
     label: string;
     tone: QueueStatusTone;
+    transitionHint: string;
   }
 >;
 
@@ -39,10 +40,26 @@ export function getDefaultFilterGroups(): QueueFilterGroup[] {
 
 export function getDefaultStatusMetadata(): QueueStatusMetadata {
   return {
-    SUBMITTED: { label: "Submitted", tone: "WARNING" },
-    IN_REVIEW: { label: "In review", tone: "WARNING" },
-    PAYMENT_SETTLED: { label: "Payment settled", tone: "SUCCESS" },
-    DELIVERED: { label: "Delivered", tone: "SUCCESS" },
+    SUBMITTED: {
+      label: "Submitted",
+      tone: "WARNING",
+      transitionHint: "Awaiting first admin review and intake verification.",
+    },
+    IN_REVIEW: {
+      label: "In review",
+      tone: "WARNING",
+      transitionHint: "Admin triage in progress; prepare report artifact inputs.",
+    },
+    PAYMENT_SETTLED: {
+      label: "Payment settled",
+      tone: "SUCCESS",
+      transitionHint: "Settlement evidence confirmed; delivery acknowledgment can proceed.",
+    },
+    DELIVERED: {
+      label: "Delivered",
+      tone: "SUCCESS",
+      transitionHint: "Owner acknowledged report delivery; retain evidence for audits.",
+    },
   };
 }
 

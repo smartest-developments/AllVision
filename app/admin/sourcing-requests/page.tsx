@@ -62,7 +62,9 @@ type AdminQueueArtifactItem = {
   createdAt: string;
 };
 
-type QueueStatusMetadataMap = Partial<Record<QueueStatus, { label?: string; tone?: QueueStatusTone }>>;
+type QueueStatusMetadataMap = Partial<
+  Record<QueueStatus, { label?: string; tone?: QueueStatusTone; transitionHint?: string }>
+>;
 
 type AdminQueueListResponse = {
   defaultFilterGroupKey?: QueueFilterGroupKey;
@@ -261,6 +263,30 @@ function formatStatusToneHelperText(tone: QueueStatusTone): string {
   }
 
   return "Neutral tone: no urgency signal is attached to this state.";
+}
+
+function formatStatusTransitionHint(
+  status: QueueStatus,
+  statusMetadata: QueueStatusMetadataMap,
+): string {
+  const metadataHint = statusMetadata[status]?.transitionHint;
+  if (typeof metadataHint === "string" && metadataHint.trim().length > 0) {
+    return metadataHint;
+  }
+
+  if (status === "SUBMITTED") {
+    return "Awaiting first admin review and intake verification.";
+  }
+
+  if (status === "IN_REVIEW") {
+    return "Admin triage in progress; prepare report artifact inputs.";
+  }
+
+  if (status === "PAYMENT_SETTLED") {
+    return "Settlement evidence confirmed; delivery acknowledgment can proceed.";
+  }
+
+  return "Owner acknowledged report delivery; retain evidence for audits.";
 }
 
 function formatStatusList(
@@ -721,6 +747,11 @@ export default async function AdminSourcingQueuePage({
                 - {formatStatusToneHelperText(selectedStatusTone ?? "NEUTRAL")}
               </p>
             ) : null}
+            {filters.status ? (
+              <p className="mt-1 text-xs text-neutral-600">
+                Transition hint: {formatStatusTransitionHint(filters.status, statusMetadata)}
+              </p>
+            ) : null}
           </label>
 
           <p className="md:col-span-4 text-xs text-neutral-600">
@@ -844,6 +875,9 @@ export default async function AdminSourcingQueuePage({
                         {formatStatusLabel(entry.status, statusMetadata)}
                       </span>{" "}
                       ({entry.status})
+                    </p>
+                    <p className="text-xs text-neutral-600">
+                      Transition hint: {formatStatusTransitionHint(entry.status, statusMetadata)}
                     </p>
                     <p className="text-xs text-neutral-600">
                       Owner: {entry.userEmail} | Country: {entry.countryCode}

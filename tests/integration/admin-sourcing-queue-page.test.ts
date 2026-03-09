@@ -164,6 +164,9 @@ describe("Admin sourcing queue page", () => {
     expect(markup).toContain("label=\"Settlement evidence queue\"");
     expect(markup).toContain("Selected status tone:");
     expect(markup).toContain("Warning tone: prioritize active review and follow-up actions.");
+    expect(markup).toContain(
+      "Transition hint: Admin triage in progress; prepare report artifact inputs.",
+    );
     expect(markup.indexOf("label=\"Triage queue\"")).toBeLessThan(
       markup.indexOf("label=\"Settlement evidence queue\""),
     );
@@ -383,6 +386,9 @@ describe("Admin sourcing queue page", () => {
     expect(markup).toContain(`Request ${request.id}`);
     expect(markup).toContain("data-status-tone=\"SUCCESS\"");
     expect(markup).toContain("Payment settled");
+    expect(markup).toContain(
+      "Transition hint: Settlement evidence confirmed; delivery acknowledgment can proceed.",
+    );
     expect(markup).toContain(`Settled by: ${admin.id}`);
     expect(markup).toContain("Settled at:");
     expect(markup).not.toContain("Settled at: N/A");

@@ -41,10 +41,26 @@ export const ADMIN_QUEUE_FILTER_GROUPS = [
 ];
 
 export const ADMIN_QUEUE_STATUS_METADATA = {
-  SUBMITTED: { label: "Submitted", tone: "WARNING" },
-  IN_REVIEW: { label: "In review", tone: "WARNING" },
-  PAYMENT_SETTLED: { label: "Payment settled", tone: "SUCCESS" },
-  DELIVERED: { label: "Delivered", tone: "SUCCESS" },
+  SUBMITTED: {
+    label: "Submitted",
+    tone: "WARNING",
+    transitionHint: "Awaiting first admin review and intake verification.",
+  },
+  IN_REVIEW: {
+    label: "In review",
+    tone: "WARNING",
+    transitionHint: "Admin triage in progress; prepare report artifact inputs.",
+  },
+  PAYMENT_SETTLED: {
+    label: "Payment settled",
+    tone: "SUCCESS",
+    transitionHint: "Settlement evidence confirmed; delivery acknowledgment can proceed.",
+  },
+  DELIVERED: {
+    label: "Delivered",
+    tone: "SUCCESS",
+    transitionHint: "Owner acknowledged report delivery; retain evidence for audits.",
+  },
 } as const;
 
 export const ADMIN_QUEUE_DEFAULT_FILTER_GROUP_KEY = "TRIAGE" as const;

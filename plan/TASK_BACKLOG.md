@@ -546,3 +546,21 @@ Mitigation refs: [AT-P0-05], [AT-P0-06], [AT-P0-07], [AT-P1-06].
   - Priority: P2
   - DoD: queue UI uses backend transition hints and avoids hardcoded status guidance text.
   - Evidence target: `app/admin/sourcing-requests/page.tsx`, page integration tests.
+
+## RUN_UPDATE_2026-03-09T05:37:29+0100
+- [AT-AUTO-BE-13] Add API-owned queue status transition-hint metadata. ✅ DONE
+  - Priority: P2
+  - DoD: status metadata includes deterministic short transition hints per queue status for UI helper text parity.
+  - Evidence: `src/server/admin-sourcing-queue.ts`, `app/api/v1/admin/sourcing-requests/route.ts`, `tests/integration/admin-sourcing-queue-route.test.ts`, `docs/API_SPEC.md`.
+- [AT-AUTO-UI-22] Render transition-hint copy from API status metadata in queue cards/filters. ✅ DONE
+  - Priority: P2
+  - DoD: queue UI uses backend transition hints and avoids hardcoded status guidance text.
+  - Evidence: `app/admin/sourcing-requests/filter-groups.ts`, `app/admin/sourcing-requests/page.tsx`, `tests/integration/admin-sourcing-queue-page.test.ts`.
+- [AT-AUTO-BE-14] Add API-owned status action label metadata for admin queue states.
+  - Priority: P2
+  - DoD: status metadata includes deterministic `nextActionLabel` values so UI can replace generic status CTA hints with backend-owned copy.
+  - Evidence target: `src/server/admin-sourcing-queue.ts`, `app/api/v1/admin/sourcing-requests/route.ts`, `tests/integration/admin-sourcing-queue-route.test.ts`, `docs/API_SPEC.md`.
+- [AT-AUTO-UI-23] Render API-provided status action labels in queue filter helper and card rows.
+  - Priority: P2
+  - DoD: queue UI consumes `statusMetadata.nextActionLabel` with deterministic fallback when metadata is absent.
+  - Evidence target: `app/admin/sourcing-requests/page.tsx`, `tests/integration/admin-sourcing-queue-page.test.ts`.

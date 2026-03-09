@@ -525,3 +525,16 @@
   - `npm run typecheck` ✅
   - `npm run test` ✅ (115/115)
   - `npm run build` ✅
+
+## 2026-03-09T05:37:29+0100 - AT-AUTO-BE-13 + AT-AUTO-UI-22 API-owned transition hints
+- task: complete API/UI parity for status transition-hint copy so queue helper guidance is backend-owned.
+- result:
+  - extended admin queue `statusMetadata` contract with deterministic per-status `transitionHint` values in backend metadata;
+  - updated `/admin/sourcing-requests` to consume `transitionHint` in selected-status helper text and queue card rows with stable fallback behavior;
+  - expanded route/page integration assertions to lock `transitionHint` payload shape and rendered copy for both warning and success status lanes.
+- backlog update:
+  - marked `AT-AUTO-BE-13` and `AT-AUTO-UI-22` DONE;
+  - queued follow-up pair `AT-AUTO-BE-14` + `AT-AUTO-UI-23` for API-owned per-status action-label copy.
+- quality gates:
+  - pending run (`npm run lint`, `npm run typecheck`, `npm run test`, `npm run build`).
+- next: `AT-AUTO-BE-14`.

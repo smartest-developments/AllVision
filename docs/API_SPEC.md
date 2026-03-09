@@ -139,8 +139,9 @@ All API surfaces must maintain these constraints:
     - `TRIAGE` -> `displayOrder: 10`, `label: "Triage queue"`, `description: "Submitted and in-review requests awaiting admin triage decisions."`, statuses `SUBMITTED|IN_REVIEW`
     - `SETTLED` -> `displayOrder: 20`, `label: "Settlement evidence queue"`, `description: "Settled and delivered requests with payment-settlement evidence attached."`, statuses `PAYMENT_SETTLED|DELIVERED`
   - `defaultFilterGroupKey` provides an API-owned default status lane for clients that render grouped status controls.
-  - `statusMetadata` exposes API-owned per-status display metadata (`label`, `tone`) for `SUBMITTED|IN_REVIEW|PAYMENT_SETTLED|DELIVERED` so clients avoid hardcoded enum-to-copy or severity mapping drift.
+  - `statusMetadata` exposes API-owned per-status display metadata (`label`, `tone`, `transitionHint`) for `SUBMITTED|IN_REVIEW|PAYMENT_SETTLED|DELIVERED` so clients avoid hardcoded enum-to-copy or guidance drift.
   - `tone` enum is `NEUTRAL|WARNING|SUCCESS`; current queue mapping returns `WARNING` for `SUBMITTED|IN_REVIEW` and `SUCCESS` for `PAYMENT_SETTLED|DELIVERED`.
+  - `transitionHint` is a short deterministic state-guidance line intended for filter/helper/card UI copy.
   - `settlement` metadata is populated only for `PAYMENT_SETTLED|DELIVERED` rows from immutable `PAYMENT_SETTLED` timeline events; otherwise fields are `null`.
   - UI binding: `/admin/sourcing-requests` consumes this contract with filter controls (`status`, `countryCode`, `userEmail`) and list-to-detail navigation.
   - UI filter guidance and grouped status options consume API `filterGroups` labels/descriptions and sort by API `displayOrder` (stable fallback to source order) while highlighting the active group (`TRIAGE` or `SETTLED`) for the current status filter.
