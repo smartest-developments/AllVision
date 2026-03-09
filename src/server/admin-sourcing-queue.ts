@@ -26,10 +26,14 @@ export type AdminQueueFilters = z.infer<typeof adminQueueFiltersSchema>;
 export const ADMIN_QUEUE_FILTER_GROUPS = [
   {
     key: "TRIAGE" as const,
+    label: "Triage queue",
+    description: "Submitted and in-review requests awaiting admin triage decisions.",
     statuses: [SourcingRequestStatus.SUBMITTED, SourcingRequestStatus.IN_REVIEW],
   },
   {
     key: "SETTLED" as const,
+    label: "Settlement evidence queue",
+    description: "Settled and delivered requests with payment-settlement evidence attached.",
     statuses: [SourcingRequestStatus.PAYMENT_SETTLED, SourcingRequestStatus.DELIVERED],
   },
 ];

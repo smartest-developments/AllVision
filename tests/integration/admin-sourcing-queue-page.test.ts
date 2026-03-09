@@ -153,6 +153,8 @@ describe("Admin sourcing queue page", () => {
     expect(markup).toContain("Filter guidance (active group:");
     expect(markup).toContain("Triage queue");
     expect(markup).toContain("Settlement evidence queue");
+    expect(markup).toContain("Submitted and in-review requests awaiting admin triage decisions.");
+    expect(markup).toContain("Settled and delivered requests with payment-settlement evidence attached.");
     expect(markup).toContain("SUBMITTED + IN_REVIEW");
     expect(markup).toContain("PAYMENT_SETTLED + DELIVERED");
     expect(markup).toContain("optgroup");

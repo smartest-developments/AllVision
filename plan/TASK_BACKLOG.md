@@ -442,13 +442,21 @@ Mitigation refs: [AT-P0-05], [AT-P0-06], [AT-P0-07], [AT-P1-06].
   - Priority: P2
   - DoD: admin queue status select groups options by API metadata (`TRIAGE`, `SETTLED`) and preserves active-group highlight copy.
   - Evidence: `app/admin/sourcing-requests/page.tsx`, `tests/integration/admin-sourcing-queue-page.test.ts`.
-- [AT-AUTO-BE-09] Expose API-owned filter-group display labels for admin queue metadata.
+- [AT-AUTO-BE-09] Expose API-owned filter-group display labels for admin queue metadata. ✅ DONE
   - Priority: P2
   - DoD: admin queue list payload includes deterministic display labels per filter group so clients can avoid hardcoded group-title copy.
-  - Evidence target: `app/api/v1/admin/sourcing-requests/route.ts`, `tests/integration/admin-sourcing-queue-route.test.ts`, `docs/API_SPEC.md`.
-- [AT-AUTO-UI-18] Consume filter-group display labels from API metadata in queue filter panel.
+  - Evidence: `src/server/admin-sourcing-queue.ts`, `app/api/v1/admin/sourcing-requests/route.ts`, `tests/integration/admin-sourcing-queue-route.test.ts`, `docs/API_SPEC.md`.
+- [AT-AUTO-UI-18] Consume filter-group display labels from API metadata in queue filter panel. ✅ DONE
   - Priority: P2
   - DoD: admin queue filter panel renders group labels from API metadata (with safe fallback) while preserving active-group highlighting and grouped status options.
+  - Evidence: `app/admin/sourcing-requests/page.tsx`, `tests/integration/admin-sourcing-queue-page.test.ts`.
+- [AT-AUTO-BE-10] Add API-owned filter-group display order metadata.
+  - Priority: P2
+  - DoD: list payload includes deterministic `displayOrder` on each filter group so clients do not assume server array ordering semantics.
+  - Evidence target: `src/server/admin-sourcing-queue.ts`, `app/api/v1/admin/sourcing-requests/route.ts`, `tests/integration/admin-sourcing-queue-route.test.ts`, `docs/API_SPEC.md`.
+- [AT-AUTO-UI-19] Respect API filter-group display order when rendering grouped status controls.
+  - Priority: P2
+  - DoD: admin queue filter panel sorts groups by API `displayOrder` (with stable fallback) before rendering labels/guidance/options.
   - Evidence target: `app/admin/sourcing-requests/page.tsx`, `tests/integration/admin-sourcing-queue-page.test.ts`.
 
 ## RUN_UPDATE_2026-03-09T00:41:20+0100
@@ -460,11 +468,19 @@ Mitigation refs: [AT-P0-05], [AT-P0-06], [AT-P0-07], [AT-P1-06].
   - Priority: P2
   - DoD: admin queue status select groups options by API metadata (`TRIAGE`, `SETTLED`) and preserves active-group highlight copy.
   - Evidence: `app/admin/sourcing-requests/page.tsx`, `tests/integration/admin-sourcing-queue-page.test.ts`.
-- [AT-AUTO-BE-09] Add filter-group descriptions in admin queue API metadata.
+- [AT-AUTO-BE-09] Add filter-group descriptions in admin queue API metadata. ✅ DONE
   - Priority: P2
   - DoD: list payload includes per-group human-readable description string to avoid UI hardcoded guidance text.
-  - Evidence target: `app/api/v1/admin/sourcing-requests/route.ts`, `src/server/admin-sourcing-queue.ts`, `tests/integration/admin-sourcing-queue-route.test.ts`.
-- [AT-AUTO-UI-18] Render API-driven filter-group descriptions in admin queue filter guidance.
+  - Evidence: `src/server/admin-sourcing-queue.ts`, `app/api/v1/admin/sourcing-requests/route.ts`, `tests/integration/admin-sourcing-queue-route.test.ts`.
+- [AT-AUTO-UI-18] Render API-driven filter-group descriptions in admin queue filter guidance. ✅ DONE
   - Priority: P2
   - DoD: `/admin/sourcing-requests` reads group description text from API metadata and avoids static guidance copy drift.
+  - Evidence: `app/admin/sourcing-requests/page.tsx`, `tests/integration/admin-sourcing-queue-page.test.ts`.
+- [AT-AUTO-BE-10] Add filter-group display order metadata in admin queue API payload.
+  - Priority: P2
+  - DoD: list payload includes deterministic `displayOrder` for each filter group to prevent ordering drift across clients.
+  - Evidence target: `src/server/admin-sourcing-queue.ts`, `app/api/v1/admin/sourcing-requests/route.ts`, `tests/integration/admin-sourcing-queue-route.test.ts`.
+- [AT-AUTO-UI-19] Apply API-provided filter-group display order in admin queue filter UI.
+  - Priority: P2
+  - DoD: queue filter guidance/optgroups respect API `displayOrder` while preserving fallback behavior for malformed metadata.
   - Evidence target: `app/admin/sourcing-requests/page.tsx`, `tests/integration/admin-sourcing-queue-page.test.ts`.

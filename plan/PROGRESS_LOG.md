@@ -453,3 +453,16 @@
   - pending run (`npm run lint`, `npm run typecheck`, `npm run test`, `npm run build`).
 - next: `AT-AUTO-BE-09`.
 - 2026-03-09T00:41:20+0100 - Blocked planning reconcile run: route/page code already satisfies `AT-AUTO-BE-08` + `AT-AUTO-UI-17`, but backlog/progress canonicalization and any code/docs updates were blocked by write restrictions on tracked planning files in this run context. Quality gates remained green (`lint`, `typecheck`, `test`, `build`).
+
+## 2026-03-09T01:37:17+0100 - AT-AUTO-BE-09 + AT-AUTO-UI-18 API-owned filter-group labels/descriptions
+- task: complete backend + UI parity for filter-group copy so admin queue labels and guidance text are fully API-owned.
+- result:
+  - extended admin queue filter-group metadata with deterministic `label` and `description` fields in `src/server/admin-sourcing-queue.ts`, preserving existing keys/statuses/default-group behavior;
+  - updated `/admin/sourcing-requests` filter panel to consume API-provided labels/descriptions (with safe fallback labels) for `<optgroup>` titles and guidance copy, removing remaining hardcoded text drift;
+  - expanded integration assertions in queue route/page tests for label/description contract and UI rendering coverage.
+- backlog update:
+  - marked `AT-AUTO-BE-09` and `AT-AUTO-UI-18` DONE;
+  - queued `AT-AUTO-BE-10` + `AT-AUTO-UI-19` as next backend/UI follow-up pair (display-order metadata and UI ordering consumption).
+- quality gates:
+  - pending run (`npm run lint`, `npm run typecheck`, `npm run test`, `npm run build`).
+- next: `AT-AUTO-BE-10`.

@@ -134,14 +134,14 @@ All API surfaces must maintain these constraints:
   - `userEmail` optional owner email filter
 - Notes:
   - without `status`, queue defaults to pending states (`SUBMITTED|IN_REVIEW`)
-  - payload shape: `{ defaultFilterGroupKey: "TRIAGE", filterGroups: [{ key, statuses }], requests: [{ ..., settlement: { settledByUserId, settledAt } }] }`
+  - payload shape: `{ defaultFilterGroupKey: "TRIAGE", filterGroups: [{ key, label, description, statuses }], requests: [{ ..., settlement: { settledByUserId, settledAt } }] }`
   - `filterGroups` metadata is deterministic and API-owned:
-    - `TRIAGE` -> `SUBMITTED|IN_REVIEW`
-    - `SETTLED` -> `PAYMENT_SETTLED|DELIVERED`
+    - `TRIAGE` -> `label: "Triage queue"`, `description: "Submitted and in-review requests awaiting admin triage decisions."`, statuses `SUBMITTED|IN_REVIEW`
+    - `SETTLED` -> `label: "Settlement evidence queue"`, `description: "Settled and delivered requests with payment-settlement evidence attached."`, statuses `PAYMENT_SETTLED|DELIVERED`
   - `defaultFilterGroupKey` provides an API-owned default status lane for clients that render grouped status controls.
   - `settlement` metadata is populated only for `PAYMENT_SETTLED|DELIVERED` rows from immutable `PAYMENT_SETTLED` timeline events; otherwise fields are `null`.
   - UI binding: `/admin/sourcing-requests` consumes this contract with filter controls (`status`, `countryCode`, `userEmail`) and list-to-detail navigation.
-  - UI filter guidance and grouped status options consume API `filterGroups` metadata and highlight the active group (`TRIAGE` or `SETTLED`) for the current status filter.
+  - UI filter guidance and grouped status options consume API `filterGroups` labels/descriptions and highlight the active group (`TRIAGE` or `SETTLED`) for the current status filter.
   - SLA view note: admin queue page also computes throughput trend metrics from closed requests (`REPORT_READY|DELIVERED`) in the same filter scope, surfacing medians (`submit -> report-ready`, `submit -> delivered`) and `<24h|24-72h|>72h` buckets.
 - Responses: `200`, `400`, `401`, `403`.
 

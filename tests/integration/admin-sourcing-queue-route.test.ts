@@ -214,8 +214,18 @@ describe("GET /api/v1/admin/sourcing-requests", () => {
     expect(defaultResponse.status).toBe(200);
     expect(defaultPayload.defaultFilterGroupKey).toBe("TRIAGE");
     expect(defaultPayload.filterGroups).toEqual([
-      { key: "TRIAGE", statuses: ["SUBMITTED", "IN_REVIEW"] },
-      { key: "SETTLED", statuses: ["PAYMENT_SETTLED", "DELIVERED"] },
+      {
+        key: "TRIAGE",
+        label: "Triage queue",
+        description: "Submitted and in-review requests awaiting admin triage decisions.",
+        statuses: ["SUBMITTED", "IN_REVIEW"],
+      },
+      {
+        key: "SETTLED",
+        label: "Settlement evidence queue",
+        description: "Settled and delivered requests with payment-settlement evidence attached.",
+        statuses: ["PAYMENT_SETTLED", "DELIVERED"],
+      },
     ]);
     expect(defaultPayload.requests).toHaveLength(2);
     expect(defaultPayload.requests.every((request) => request.status !== "REPORT_READY")).toBe(true);

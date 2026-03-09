@@ -60,6 +60,8 @@ type AdminQueueListResponse = {
   defaultFilterGroupKey?: QueueFilterGroupKey;
   filterGroups?: Array<{
     key: QueueFilterGroupKey;
+    label?: string;
+    description?: string;
     statuses: QueueStatus[];
   }>;
   requests: AdminQueueListItem[];
@@ -182,12 +184,13 @@ function buildQueryString(filters: QueueFilters): string {
   return serialized.length > 0 ? `?${serialized}` : "";
 }
 
-function formatFilterGroupLabel(groupKey: QueueFilterGroupKey): string {
-  return groupKey === "TRIAGE" ? "Triage queue" : "Settlement evidence queue";
-}
-
 function resolveActiveFilterGroup(
-  groups: Array<{ key: QueueFilterGroupKey; statuses: QueueStatus[] }>,
+  groups: Array<{
+    key: QueueFilterGroupKey;
+    label?: string;
+    description?: string;
+    statuses: QueueStatus[];
+  }>,
   status: QueueFilters["status"],
   defaultGroupKey: QueueFilterGroupKey,
 ): QueueFilterGroupKey {
@@ -200,12 +203,29 @@ function resolveActiveFilterGroup(
 
 function getDefaultFilterGroups() {
   return [
-    { key: "TRIAGE" as const, statuses: ["SUBMITTED", "IN_REVIEW"] as QueueStatus[] },
+    {
+      key: "TRIAGE" as const,
+      label: "Triage queue",
+      description: "Submitted and in-review requests awaiting admin triage decisions.",
+      statuses: ["SUBMITTED", "IN_REVIEW"] as QueueStatus[],
+    },
     {
       key: "SETTLED" as const,
+      label: "Settlement evidence queue",
+      description: "Settled and delivered requests with payment-settlement evidence attached.",
       statuses: ["PAYMENT_SETTLED", "DELIVERED"] as QueueStatus[],
     },
   ];
+}
+
+function formatFilterGroupLabel(group: {
+  key: QueueFilterGroupKey;
+  label?: string;
+}): string {
+  if (group.label && group.label.trim().length > 0) {
+    return group.label;
+  }
+  return group.key === "TRIAGE" ? "Triage queue" : "Settlement evidence queue";
 }
 
 type ReportTemplate = {
@@ -571,6 +591,12 @@ export default async function AdminSourcingQueuePage({
     defaultFilterGroupKey,
   );
   const defaultStatuses = filterGroups.find((group) => group.key === defaultFilterGroupKey)?.statuses;
+  const activeFilterGroupLabel =
+    formatFilterGroupLabel(
+      filterGroups.find((group) => group.key === activeFilterGroup) ?? {
+        key: activeFilterGroup,
+      },
+    );
 
   return (
     <main className="mx-auto flex min-h-screen max-w-4xl flex-col gap-6 px-6 py-16">
@@ -619,7 +645,7 @@ export default async function AdminSourcingQueuePage({
             >
               <option value="">{defaultStatuses?.join(" + ") ?? "SUBMITTED + IN_REVIEW"}</option>
               {filterGroups.map((group) => (
-                <optgroup key={group.key} label={formatFilterGroupLabel(group.key)}>
+                <optgroup key={group.key} label={formatFilterGroupLabel(group)}>
                   {group.statuses.map((status) => (
                     <option key={status} value={status}>
                       {status}
@@ -631,11 +657,12 @@ export default async function AdminSourcingQueuePage({
           </label>
 
           <p className="md:col-span-4 text-xs text-neutral-600">
-            Filter guidance (active group: <strong>{formatFilterGroupLabel(activeFilterGroup)}</strong>):{" "}
+            Filter guidance (active group: <strong>{activeFilterGroupLabel}</strong>):{" "}
             {filterGroups.map((group, index) => (
               <React.Fragment key={group.key}>
                 {index > 0 ? " | " : ""}
-                <strong>{formatFilterGroupLabel(group.key)}</strong> = {group.statuses.join(" + ")}
+                <strong>{formatFilterGroupLabel(group)}</strong> = {group.statuses.join(" + ")}
+                {group.description ? ` (${group.description})` : ""}
               </React.Fragment>
             ))}
           </p>
