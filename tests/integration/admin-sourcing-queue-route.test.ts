@@ -207,7 +207,13 @@ describe("GET /api/v1/admin/sourcing-requests", () => {
 
     const defaultPayload = (await defaultResponse.json()) as {
       defaultFilterGroupKey: string;
-      filterGroups: Array<{ key: string; statuses: string[] }>;
+      filterGroups: Array<{
+        key: string;
+        displayOrder: number;
+        label: string;
+        description: string;
+        statuses: string[];
+      }>;
       requests: Array<{ requestId: string; status: string; countryCode: string }>;
     };
 
@@ -216,12 +222,14 @@ describe("GET /api/v1/admin/sourcing-requests", () => {
     expect(defaultPayload.filterGroups).toEqual([
       {
         key: "TRIAGE",
+        displayOrder: 10,
         label: "Triage queue",
         description: "Submitted and in-review requests awaiting admin triage decisions.",
         statuses: ["SUBMITTED", "IN_REVIEW"],
       },
       {
         key: "SETTLED",
+        displayOrder: 20,
         label: "Settlement evidence queue",
         description: "Settled and delivered requests with payment-settlement evidence attached.",
         statuses: ["PAYMENT_SETTLED", "DELIVERED"],

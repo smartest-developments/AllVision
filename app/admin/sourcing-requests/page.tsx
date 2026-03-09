@@ -5,11 +5,15 @@ import { NextRequest } from "next/server";
 
 import { GET as getAdminQueue } from "../../api/v1/admin/sourcing-requests/route";
 import { GET as getAdminQueueDetail } from "../../api/v1/admin/sourcing-requests/[requestId]/route";
+import {
+  getDefaultFilterGroups,
+  sortFilterGroupsByDisplayOrder,
+  type QueueFilterGroup,
+  type QueueFilterGroupKey,
+  type QueueStatus,
+} from "./filter-groups";
 import { listAdminThroughputRequests } from "@/server/admin-sourcing-queue";
 import { listAdminReportTemplateDrafts } from "@/server/report-template-drafts";
-
-type QueueStatus = "SUBMITTED" | "IN_REVIEW" | "PAYMENT_SETTLED" | "DELIVERED";
-type QueueFilterGroupKey = "TRIAGE" | "SETTLED";
 
 type AdminQueueListItem = {
   requestId: string;
@@ -58,12 +62,7 @@ type AdminQueueArtifactItem = {
 
 type AdminQueueListResponse = {
   defaultFilterGroupKey?: QueueFilterGroupKey;
-  filterGroups?: Array<{
-    key: QueueFilterGroupKey;
-    label?: string;
-    description?: string;
-    statuses: QueueStatus[];
-  }>;
+  filterGroups?: QueueFilterGroup[];
   requests: AdminQueueListItem[];
 };
 
@@ -185,12 +184,7 @@ function buildQueryString(filters: QueueFilters): string {
 }
 
 function resolveActiveFilterGroup(
-  groups: Array<{
-    key: QueueFilterGroupKey;
-    label?: string;
-    description?: string;
-    statuses: QueueStatus[];
-  }>,
+  groups: QueueFilterGroup[],
   status: QueueFilters["status"],
   defaultGroupKey: QueueFilterGroupKey,
 ): QueueFilterGroupKey {
@@ -199,23 +193,6 @@ function resolveActiveFilterGroup(
   }
 
   return groups.find((group) => group.statuses.includes(status))?.key ?? defaultGroupKey;
-}
-
-function getDefaultFilterGroups() {
-  return [
-    {
-      key: "TRIAGE" as const,
-      label: "Triage queue",
-      description: "Submitted and in-review requests awaiting admin triage decisions.",
-      statuses: ["SUBMITTED", "IN_REVIEW"] as QueueStatus[],
-    },
-    {
-      key: "SETTLED" as const,
-      label: "Settlement evidence queue",
-      description: "Settled and delivered requests with payment-settlement evidence attached.",
-      statuses: ["PAYMENT_SETTLED", "DELIVERED"] as QueueStatus[],
-    },
-  ];
 }
 
 function formatFilterGroupLabel(group: {
@@ -577,23 +554,24 @@ export default async function AdminSourcingQueuePage({
   const settledAtParsed = parseIsoTimestamp(settledAtCandidate);
   const settledAtDisplay = settledAtParsed === null ? "N/A" : settledAtCandidate;
   const filterGroups =
-    queueState.filterGroups.length > 0
-      ? queueState.filterGroups
-      : getDefaultFilterGroups();
+    queueState.filterGroups.length > 0 ? queueState.filterGroups : getDefaultFilterGroups();
+  const orderedFilterGroups = sortFilterGroupsByDisplayOrder(filterGroups);
   const defaultFilterGroupKey = filterGroups.some(
     (group) => group.key === queueState.defaultFilterGroupKey,
   )
     ? queueState.defaultFilterGroupKey
     : "TRIAGE";
   const activeFilterGroup = resolveActiveFilterGroup(
-    filterGroups,
+    orderedFilterGroups,
     filters.status,
     defaultFilterGroupKey,
   );
-  const defaultStatuses = filterGroups.find((group) => group.key === defaultFilterGroupKey)?.statuses;
+  const defaultStatuses = orderedFilterGroups.find(
+    (group) => group.key === defaultFilterGroupKey,
+  )?.statuses;
   const activeFilterGroupLabel =
     formatFilterGroupLabel(
-      filterGroups.find((group) => group.key === activeFilterGroup) ?? {
+      orderedFilterGroups.find((group) => group.key === activeFilterGroup) ?? {
         key: activeFilterGroup,
       },
     );
@@ -644,7 +622,7 @@ export default async function AdminSourcingQueuePage({
               name="status"
             >
               <option value="">{defaultStatuses?.join(" + ") ?? "SUBMITTED + IN_REVIEW"}</option>
-              {filterGroups.map((group) => (
+              {orderedFilterGroups.map((group) => (
                 <optgroup key={group.key} label={formatFilterGroupLabel(group)}>
                   {group.statuses.map((status) => (
                     <option key={status} value={status}>
@@ -658,7 +636,7 @@ export default async function AdminSourcingQueuePage({
 
           <p className="md:col-span-4 text-xs text-neutral-600">
             Filter guidance (active group: <strong>{activeFilterGroupLabel}</strong>):{" "}
-            {filterGroups.map((group, index) => (
+            {orderedFilterGroups.map((group, index) => (
               <React.Fragment key={group.key}>
                 {index > 0 ? " | " : ""}
                 <strong>{formatFilterGroupLabel(group)}</strong> = {group.statuses.join(" + ")}

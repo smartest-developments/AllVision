@@ -466,3 +466,16 @@
 - quality gates:
   - pending run (`npm run lint`, `npm run typecheck`, `npm run test`, `npm run build`).
 - next: `AT-AUTO-BE-10`.
+
+## 2026-03-09T02:36:30+0100 - AT-AUTO-BE-10 + AT-AUTO-UI-19 filter-group display-order contract
+- task: complete API-owned display-order metadata and ensure admin queue UI respects it before rendering grouped status controls.
+- result:
+  - extended admin queue filter-group contract with deterministic `displayOrder` fields so list consumers do not depend on server array order;
+  - updated `/admin/sourcing-requests` to sort groups by `displayOrder` with a stable fallback when metadata is missing/invalid;
+  - added direct coverage for order-sorting behavior in page tests and contract coverage in route tests; refreshed API spec contract notes.
+- backlog update:
+  - marked `AT-AUTO-BE-10` and `AT-AUTO-UI-19` DONE;
+  - queued `AT-AUTO-BE-11` + `AT-AUTO-UI-20` for API-owned per-status display label parity.
+- quality gates:
+  - pending run (`npm run lint`, `npm run typecheck`, `npm run test`, `npm run build`).
+- next: `AT-AUTO-BE-11`.

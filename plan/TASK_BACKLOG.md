@@ -484,3 +484,21 @@ Mitigation refs: [AT-P0-05], [AT-P0-06], [AT-P0-07], [AT-P1-06].
   - Priority: P2
   - DoD: queue filter guidance/optgroups respect API `displayOrder` while preserving fallback behavior for malformed metadata.
   - Evidence target: `app/admin/sourcing-requests/page.tsx`, `tests/integration/admin-sourcing-queue-page.test.ts`.
+
+## RUN_UPDATE_2026-03-09T02:36:30+0100
+- [AT-AUTO-BE-10] Add filter-group display order metadata in admin queue API payload. ✅ DONE
+  - Priority: P2
+  - DoD: list payload includes deterministic `displayOrder` for each filter group to prevent ordering drift across clients.
+  - Evidence: `src/server/admin-sourcing-queue.ts`, `app/api/v1/admin/sourcing-requests/route.ts`, `tests/integration/admin-sourcing-queue-route.test.ts`, `docs/API_SPEC.md`.
+- [AT-AUTO-UI-19] Apply API-provided filter-group display order in admin queue filter UI. ✅ DONE
+  - Priority: P2
+  - DoD: queue filter guidance/optgroups respect API `displayOrder` while preserving fallback behavior for malformed metadata.
+  - Evidence: `app/admin/sourcing-requests/page.tsx`, `tests/integration/admin-sourcing-queue-page.test.ts`.
+- [AT-AUTO-BE-11] Add API-owned status display labels in queue metadata.
+  - Priority: P2
+  - DoD: admin queue list payload exposes deterministic `statusMetadata` map (`status -> label`) so clients stop hardcoding raw enum labels.
+  - Evidence target: `src/server/admin-sourcing-queue.ts`, `app/api/v1/admin/sourcing-requests/route.ts`, `tests/integration/admin-sourcing-queue-route.test.ts`, `docs/API_SPEC.md`.
+- [AT-AUTO-UI-20] Render queue status options/cards using API status display labels.
+  - Priority: P2
+  - DoD: admin queue filter select and queue cards consume API `statusMetadata` labels with safe fallback to raw status values.
+  - Evidence target: `app/admin/sourcing-requests/page.tsx`, `tests/integration/admin-sourcing-queue-page.test.ts`.

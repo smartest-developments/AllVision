@@ -5,6 +5,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { SESSION_COOKIE_NAME, hashToken } from "@/server/auth";
 import { prisma } from "@/server/db";
 import { cookies } from "next/headers";
+import { sortFilterGroupsByDisplayOrder } from "../../app/admin/sourcing-requests/filter-groups";
 import AdminSourcingQueuePage from "../../app/admin/sourcing-requests/page";
 
 vi.mock("next/headers", () => ({
@@ -160,6 +161,41 @@ describe("Admin sourcing queue page", () => {
     expect(markup).toContain("optgroup");
     expect(markup).toContain("label=\"Triage queue\"");
     expect(markup).toContain("label=\"Settlement evidence queue\"");
+    expect(markup.indexOf("label=\"Triage queue\"")).toBeLessThan(
+      markup.indexOf("label=\"Settlement evidence queue\""),
+    );
+  });
+
+  it("sorts queue filter groups by API displayOrder with stable fallback", () => {
+    const sorted = sortFilterGroupsByDisplayOrder([
+      {
+        key: "SETTLED",
+        displayOrder: 30,
+        label: "Settlement evidence queue",
+        description: "settled",
+        statuses: ["PAYMENT_SETTLED", "DELIVERED"],
+      },
+      {
+        key: "TRIAGE",
+        displayOrder: 10,
+        label: "Triage queue",
+        description: "triage",
+        statuses: ["SUBMITTED", "IN_REVIEW"],
+      },
+      {
+        key: "TRIAGE",
+        displayOrder: undefined,
+        label: "Fallback queue",
+        description: "no order",
+        statuses: ["SUBMITTED", "IN_REVIEW"],
+      },
+    ]);
+
+    expect(sorted.map((group) => group.label)).toEqual([
+      "Triage queue",
+      "Settlement evidence queue",
+      "Fallback queue",
+    ]);
   });
 
   it("renders request detail timeline via admin queue detail contract", async () => {
