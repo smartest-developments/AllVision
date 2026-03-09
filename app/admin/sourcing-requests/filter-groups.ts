@@ -1,5 +1,6 @@
 export type QueueStatus = "SUBMITTED" | "IN_REVIEW" | "PAYMENT_SETTLED" | "DELIVERED";
 export type QueueFilterGroupKey = "TRIAGE" | "SETTLED";
+export type QueueStatusTone = "NEUTRAL" | "WARNING" | "SUCCESS";
 
 export type QueueFilterGroup = {
   key: QueueFilterGroupKey;
@@ -9,7 +10,13 @@ export type QueueFilterGroup = {
   statuses: QueueStatus[];
 };
 
-export type QueueStatusMetadata = Record<QueueStatus, { label: string }>;
+export type QueueStatusMetadata = Record<
+  QueueStatus,
+  {
+    label: string;
+    tone: QueueStatusTone;
+  }
+>;
 
 export function getDefaultFilterGroups(): QueueFilterGroup[] {
   return [
@@ -32,10 +39,10 @@ export function getDefaultFilterGroups(): QueueFilterGroup[] {
 
 export function getDefaultStatusMetadata(): QueueStatusMetadata {
   return {
-    SUBMITTED: { label: "Submitted" },
-    IN_REVIEW: { label: "In review" },
-    PAYMENT_SETTLED: { label: "Payment settled" },
-    DELIVERED: { label: "Delivered" },
+    SUBMITTED: { label: "Submitted", tone: "WARNING" },
+    IN_REVIEW: { label: "In review", tone: "WARNING" },
+    PAYMENT_SETTLED: { label: "Payment settled", tone: "SUCCESS" },
+    DELIVERED: { label: "Delivered", tone: "SUCCESS" },
   };
 }
 

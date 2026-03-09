@@ -7,10 +7,12 @@ import { GET as getAdminQueue } from "../../api/v1/admin/sourcing-requests/route
 import { GET as getAdminQueueDetail } from "../../api/v1/admin/sourcing-requests/[requestId]/route";
 import {
   getDefaultFilterGroups,
+  getDefaultStatusMetadata,
   sortFilterGroupsByDisplayOrder,
   type QueueFilterGroup,
   type QueueFilterGroupKey,
   type QueueStatus,
+  type QueueStatusTone,
 } from "./filter-groups";
 import { listAdminThroughputRequests } from "@/server/admin-sourcing-queue";
 import { listAdminReportTemplateDrafts } from "@/server/report-template-drafts";
@@ -60,7 +62,7 @@ type AdminQueueArtifactItem = {
   createdAt: string;
 };
 
-type QueueStatusMetadataMap = Partial<Record<QueueStatus, { label?: string }>>;
+type QueueStatusMetadataMap = Partial<Record<QueueStatus, { label?: string; tone?: QueueStatusTone }>>;
 
 type AdminQueueListResponse = {
   defaultFilterGroupKey?: QueueFilterGroupKey;
@@ -218,6 +220,47 @@ function formatStatusLabel(
   }
 
   return status;
+}
+
+function formatStatusTone(
+  status: QueueStatus,
+  statusMetadata: QueueStatusMetadataMap,
+): QueueStatusTone {
+  const metadataTone = statusMetadata[status]?.tone;
+  if (metadataTone === "WARNING" || metadataTone === "SUCCESS" || metadataTone === "NEUTRAL") {
+    return metadataTone;
+  }
+
+  if (status === "SUBMITTED" || status === "IN_REVIEW") {
+    return "WARNING";
+  }
+
+  if (status === "PAYMENT_SETTLED" || status === "DELIVERED") {
+    return "SUCCESS";
+  }
+
+  return "NEUTRAL";
+}
+
+function statusToneBadgeClassName(tone: QueueStatusTone): string {
+  if (tone === "WARNING") {
+    return "border-amber-300 bg-amber-50 text-amber-900";
+  }
+  if (tone === "SUCCESS") {
+    return "border-emerald-300 bg-emerald-50 text-emerald-900";
+  }
+  return "border-neutral-300 bg-neutral-100 text-neutral-800";
+}
+
+function formatStatusToneHelperText(tone: QueueStatusTone): string {
+  if (tone === "WARNING") {
+    return "Warning tone: prioritize active review and follow-up actions.";
+  }
+  if (tone === "SUCCESS") {
+    return "Success tone: state is post-settlement evidence or delivery complete.";
+  }
+
+  return "Neutral tone: no urgency signal is attached to this state.";
 }
 
 function formatStatusList(
@@ -582,7 +625,13 @@ export default async function AdminSourcingQueuePage({
   const filterGroups =
     queueState.filterGroups.length > 0 ? queueState.filterGroups : getDefaultFilterGroups();
   const orderedFilterGroups = sortFilterGroupsByDisplayOrder(filterGroups);
-  const statusMetadata = queueState.statusMetadata ?? {};
+  const statusMetadata = {
+    ...getDefaultStatusMetadata(),
+    ...(queueState.statusMetadata ?? {}),
+  };
+  const selectedStatusTone = filters.status
+    ? formatStatusTone(filters.status, statusMetadata)
+    : null;
   const defaultFilterGroupKey = filterGroups.some(
     (group) => group.key === queueState.defaultFilterGroupKey,
   )
@@ -659,6 +708,19 @@ export default async function AdminSourcingQueuePage({
                 </optgroup>
               ))}
             </select>
+            {filters.status ? (
+              <p className="mt-1 text-xs text-neutral-600">
+                Selected status tone:{" "}
+                <strong>
+                  {selectedStatusTone === "WARNING"
+                    ? "WARNING"
+                    : selectedStatusTone === "SUCCESS"
+                      ? "SUCCESS"
+                      : "NEUTRAL"}
+                </strong>{" "}
+                - {formatStatusToneHelperText(selectedStatusTone ?? "NEUTRAL")}
+              </p>
+            ) : null}
           </label>
 
           <p className="md:col-span-4 text-xs text-neutral-600">
@@ -774,7 +836,14 @@ export default async function AdminSourcingQueuePage({
                   >
                     <p className="text-sm font-medium">Request {entry.requestId}</p>
                     <p className="text-sm">
-                      Status: {formatStatusLabel(entry.status, statusMetadata)} ({entry.status})
+                      Status:{" "}
+                      <span
+                        className={`inline-flex rounded-full border px-2 py-0.5 text-xs font-medium ${statusToneBadgeClassName(formatStatusTone(entry.status, statusMetadata))}`}
+                        data-status-tone={formatStatusTone(entry.status, statusMetadata)}
+                      >
+                        {formatStatusLabel(entry.status, statusMetadata)}
+                      </span>{" "}
+                      ({entry.status})
                     </p>
                     <p className="text-xs text-neutral-600">
                       Owner: {entry.userEmail} | Country: {entry.countryCode}

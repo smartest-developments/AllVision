@@ -510,3 +510,21 @@ Mitigation refs: [AT-P0-05], [AT-P0-06], [AT-P0-07], [AT-P1-06].
   - Priority: P2
   - DoD: `/admin/sourcing-requests` applies backend-provided `statusMetadata.tone` hints to status badges/helper copy with deterministic fallback when tone metadata is absent.
   - Evidence target: `app/admin/sourcing-requests/page.tsx`, `tests/integration/admin-sourcing-queue-page.test.ts`.
+
+## RUN_UPDATE_2026-03-09T04:12:00+0100
+- [AT-AUTO-BE-12] Add API-owned status badge tone metadata for admin queue states. ✅ DONE
+  - Priority: P2
+  - DoD: admin queue list payload extends `statusMetadata` with deterministic `tone` hints (`NEUTRAL|WARNING|SUCCESS`) per status so clients avoid hardcoded visual severity mapping.
+  - Evidence: `src/server/admin-sourcing-queue.ts`, `app/api/v1/admin/sourcing-requests/route.ts`, `tests/integration/admin-sourcing-queue-route.test.ts`, `docs/API_SPEC.md`.
+- [AT-AUTO-UI-21] Render API-driven status badge tones on queue cards and status select helper text. ✅ DONE
+  - Priority: P2
+  - DoD: `/admin/sourcing-requests` applies backend-provided `statusMetadata.tone` hints to status badges/helper copy with deterministic fallback when tone metadata is absent.
+  - Evidence: `app/admin/sourcing-requests/filter-groups.ts`, `app/admin/sourcing-requests/page.tsx`, `tests/integration/admin-sourcing-queue-page.test.ts`.
+- [AT-AUTO-BE-13] Add API-owned status short guidance copy metadata for queue states.
+  - Priority: P2
+  - DoD: admin queue list payload extends `statusMetadata` with deterministic per-status guidance copy (`helperText`) so status-select helper content remains backend-owned.
+  - Evidence target: `src/server/admin-sourcing-queue.ts`, `app/api/v1/admin/sourcing-requests/route.ts`, `tests/integration/admin-sourcing-queue-route.test.ts`, `docs/API_SPEC.md`.
+- [AT-AUTO-UI-22] Render API-provided status helper copy in queue filters.
+  - Priority: P2
+  - DoD: `/admin/sourcing-requests` status selector helper text consumes backend `statusMetadata.helperText` with deterministic fallback when metadata is absent.
+  - Evidence target: `app/admin/sourcing-requests/page.tsx`, `tests/integration/admin-sourcing-queue-page.test.ts`.

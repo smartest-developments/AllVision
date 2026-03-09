@@ -41,10 +41,10 @@ export const ADMIN_QUEUE_FILTER_GROUPS = [
 ];
 
 export const ADMIN_QUEUE_STATUS_METADATA = {
-  SUBMITTED: { label: "Submitted" },
-  IN_REVIEW: { label: "In review" },
-  PAYMENT_SETTLED: { label: "Payment settled" },
-  DELIVERED: { label: "Delivered" },
+  SUBMITTED: { label: "Submitted", tone: "WARNING" },
+  IN_REVIEW: { label: "In review", tone: "WARNING" },
+  PAYMENT_SETTLED: { label: "Payment settled", tone: "SUCCESS" },
+  DELIVERED: { label: "Delivered", tone: "SUCCESS" },
 } as const;
 
 export const ADMIN_QUEUE_DEFAULT_FILTER_GROUP_KEY = "TRIAGE" as const;

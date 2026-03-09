@@ -147,7 +147,8 @@ describe("Admin sourcing queue page", () => {
 
     expect(markup).toContain("Admin sourcing queue");
     expect(markup).toContain(`Request ${request.id}`);
-    expect(markup).toContain("Status: In review (IN_REVIEW)");
+    expect(markup).toContain("data-status-tone=\"WARNING\"");
+    expect(markup).toContain("In review");
     expect(markup).toContain("owner-queue-page@example.com");
     expect(markup).toContain("requestId=");
     expect(markup).toContain("Open request detail");
@@ -161,6 +162,8 @@ describe("Admin sourcing queue page", () => {
     expect(markup).toContain("optgroup");
     expect(markup).toContain("label=\"Triage queue\"");
     expect(markup).toContain("label=\"Settlement evidence queue\"");
+    expect(markup).toContain("Selected status tone:");
+    expect(markup).toContain("Warning tone: prioritize active review and follow-up actions.");
     expect(markup.indexOf("label=\"Triage queue\"")).toBeLessThan(
       markup.indexOf("label=\"Settlement evidence queue\""),
     );
@@ -378,7 +381,8 @@ describe("Admin sourcing queue page", () => {
     );
 
     expect(markup).toContain(`Request ${request.id}`);
-    expect(markup).toContain("Status: Payment settled (PAYMENT_SETTLED)");
+    expect(markup).toContain("data-status-tone=\"SUCCESS\"");
+    expect(markup).toContain("Payment settled");
     expect(markup).toContain(`Settled by: ${admin.id}`);
     expect(markup).toContain("Settled at:");
     expect(markup).not.toContain("Settled at: N/A");

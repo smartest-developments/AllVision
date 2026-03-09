@@ -495,3 +495,19 @@
   - `npm run test` ✅ (115/115)
   - `npm run build` ✅
 - next: `AT-AUTO-BE-12`.
+
+## 2026-03-09T04:12:00+0100 - AT-AUTO-BE-12 + AT-AUTO-UI-21 API-owned status tones
+- task: complete API/UI parity for queue status severity tones and remove client hardcoded status tone mapping.
+- result:
+  - extended admin queue `statusMetadata` contract to include deterministic `tone` values for each status and returned this metadata via `GET /api/v1/admin/sourcing-requests`;
+  - updated `/admin/sourcing-requests` to render tone badges on queue cards and a status-select helper line derived from API tone metadata with safe fallback behavior;
+  - added fallback status metadata defaults in `filter-groups` so UI behavior remains deterministic when metadata is absent or partial.
+- backlog update:
+  - marked `AT-AUTO-BE-12` and `AT-AUTO-UI-21` DONE;
+  - added follow-up pair `AT-AUTO-BE-13` + `AT-AUTO-UI-22` for API-owned per-status helper copy metadata.
+- quality gates:
+  - `npm run lint` ✅
+  - `npm run typecheck` ✅
+  - `npm run test` ✅ (115/115)
+  - `npm run build` ✅
+- next: `AT-AUTO-BE-13`.
