@@ -40,6 +40,13 @@ export const ADMIN_QUEUE_FILTER_GROUPS = [
   },
 ];
 
+export const ADMIN_QUEUE_STATUS_METADATA = {
+  SUBMITTED: { label: "Submitted" },
+  IN_REVIEW: { label: "In review" },
+  PAYMENT_SETTLED: { label: "Payment settled" },
+  DELIVERED: { label: "Delivered" },
+} as const;
+
 export const ADMIN_QUEUE_DEFAULT_FILTER_GROUP_KEY = "TRIAGE" as const;
 
 export async function listAdminSourcingRequests(filters: AdminQueueFilters) {

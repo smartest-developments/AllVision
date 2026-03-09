@@ -9,6 +9,8 @@ export type QueueFilterGroup = {
   statuses: QueueStatus[];
 };
 
+export type QueueStatusMetadata = Record<QueueStatus, { label: string }>;
+
 export function getDefaultFilterGroups(): QueueFilterGroup[] {
   return [
     {
@@ -26,6 +28,15 @@ export function getDefaultFilterGroups(): QueueFilterGroup[] {
       statuses: ["PAYMENT_SETTLED", "DELIVERED"],
     },
   ];
+}
+
+export function getDefaultStatusMetadata(): QueueStatusMetadata {
+  return {
+    SUBMITTED: { label: "Submitted" },
+    IN_REVIEW: { label: "In review" },
+    PAYMENT_SETTLED: { label: "Payment settled" },
+    DELIVERED: { label: "Delivered" },
+  };
 }
 
 function normalizeDisplayOrder(value: number | undefined): number | null {

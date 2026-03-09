@@ -494,11 +494,19 @@ Mitigation refs: [AT-P0-05], [AT-P0-06], [AT-P0-07], [AT-P1-06].
   - Priority: P2
   - DoD: queue filter guidance/optgroups respect API `displayOrder` while preserving fallback behavior for malformed metadata.
   - Evidence: `app/admin/sourcing-requests/page.tsx`, `tests/integration/admin-sourcing-queue-page.test.ts`.
-- [AT-AUTO-BE-11] Add API-owned status display labels in queue metadata.
+- [AT-AUTO-BE-11] Add API-owned status display labels in queue metadata. ✅ DONE
   - Priority: P2
   - DoD: admin queue list payload exposes deterministic `statusMetadata` map (`status -> label`) so clients stop hardcoding raw enum labels.
-  - Evidence target: `src/server/admin-sourcing-queue.ts`, `app/api/v1/admin/sourcing-requests/route.ts`, `tests/integration/admin-sourcing-queue-route.test.ts`, `docs/API_SPEC.md`.
-- [AT-AUTO-UI-20] Render queue status options/cards using API status display labels.
+  - Evidence: `src/server/admin-sourcing-queue.ts`, `app/api/v1/admin/sourcing-requests/route.ts`, `tests/integration/admin-sourcing-queue-route.test.ts`, `docs/API_SPEC.md`.
+- [AT-AUTO-UI-20] Render queue status options/cards using API status display labels. ✅ DONE
   - Priority: P2
   - DoD: admin queue filter select and queue cards consume API `statusMetadata` labels with safe fallback to raw status values.
+  - Evidence: `app/admin/sourcing-requests/page.tsx`, `tests/integration/admin-sourcing-queue-page.test.ts`.
+- [AT-AUTO-BE-12] Add API-owned status badge tone metadata for admin queue states.
+  - Priority: P2
+  - DoD: admin queue list payload extends `statusMetadata` with deterministic `tone` hints (`NEUTRAL|WARNING|SUCCESS`) per status so clients avoid hardcoded visual severity mapping.
+  - Evidence target: `src/server/admin-sourcing-queue.ts`, `app/api/v1/admin/sourcing-requests/route.ts`, `tests/integration/admin-sourcing-queue-route.test.ts`, `docs/API_SPEC.md`.
+- [AT-AUTO-UI-21] Render API-driven status badge tones on queue cards and status select helper text.
+  - Priority: P2
+  - DoD: `/admin/sourcing-requests` applies backend-provided `statusMetadata.tone` hints to status badges/helper copy with deterministic fallback when tone metadata is absent.
   - Evidence target: `app/admin/sourcing-requests/page.tsx`, `tests/integration/admin-sourcing-queue-page.test.ts`.

@@ -139,6 +139,7 @@ All API surfaces must maintain these constraints:
     - `TRIAGE` -> `displayOrder: 10`, `label: "Triage queue"`, `description: "Submitted and in-review requests awaiting admin triage decisions."`, statuses `SUBMITTED|IN_REVIEW`
     - `SETTLED` -> `displayOrder: 20`, `label: "Settlement evidence queue"`, `description: "Settled and delivered requests with payment-settlement evidence attached."`, statuses `PAYMENT_SETTLED|DELIVERED`
   - `defaultFilterGroupKey` provides an API-owned default status lane for clients that render grouped status controls.
+  - `statusMetadata` exposes API-owned per-status display labels (`SUBMITTED|IN_REVIEW|PAYMENT_SETTLED|DELIVERED`) so clients avoid hardcoded enum-to-copy mapping drift.
   - `settlement` metadata is populated only for `PAYMENT_SETTLED|DELIVERED` rows from immutable `PAYMENT_SETTLED` timeline events; otherwise fields are `null`.
   - UI binding: `/admin/sourcing-requests` consumes this contract with filter controls (`status`, `countryCode`, `userEmail`) and list-to-detail navigation.
   - UI filter guidance and grouped status options consume API `filterGroups` labels/descriptions and sort by API `displayOrder` (stable fallback to source order) while highlighting the active group (`TRIAGE` or `SETTLED`) for the current status filter.

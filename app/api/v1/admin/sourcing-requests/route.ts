@@ -3,6 +3,7 @@ import { NextResponse, type NextRequest } from "next/server";
 import {
   ADMIN_QUEUE_DEFAULT_FILTER_GROUP_KEY,
   ADMIN_QUEUE_FILTER_GROUPS,
+  ADMIN_QUEUE_STATUS_METADATA,
   adminQueueFiltersSchema,
   listAdminSourcingRequests,
 } from "@/server/admin-sourcing-queue";
@@ -53,6 +54,7 @@ export async function GET(request: NextRequest) {
     {
       defaultFilterGroupKey: ADMIN_QUEUE_DEFAULT_FILTER_GROUP_KEY,
       filterGroups: ADMIN_QUEUE_FILTER_GROUPS,
+      statusMetadata: ADMIN_QUEUE_STATUS_METADATA,
       requests: requests.map((entry) => {
         const settlementEvent = entry.statusEvents.find(
           (event) => event.toStatus === "PAYMENT_SETTLED",

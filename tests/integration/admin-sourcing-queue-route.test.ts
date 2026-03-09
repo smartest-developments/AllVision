@@ -214,6 +214,7 @@ describe("GET /api/v1/admin/sourcing-requests", () => {
         description: string;
         statuses: string[];
       }>;
+      statusMetadata: Record<string, { label: string }>;
       requests: Array<{ requestId: string; status: string; countryCode: string }>;
     };
 
@@ -235,6 +236,12 @@ describe("GET /api/v1/admin/sourcing-requests", () => {
         statuses: ["PAYMENT_SETTLED", "DELIVERED"],
       },
     ]);
+    expect(defaultPayload.statusMetadata).toEqual({
+      SUBMITTED: { label: "Submitted" },
+      IN_REVIEW: { label: "In review" },
+      PAYMENT_SETTLED: { label: "Payment settled" },
+      DELIVERED: { label: "Delivered" },
+    });
     expect(defaultPayload.requests).toHaveLength(2);
     expect(defaultPayload.requests.every((request) => request.status !== "REPORT_READY")).toBe(true);
 

@@ -479,3 +479,19 @@
 - quality gates:
   - pending run (`npm run lint`, `npm run typecheck`, `npm run test`, `npm run build`).
 - next: `AT-AUTO-BE-11`.
+
+## 2026-03-09T03:40:48+0100 - AT-AUTO-BE-11 + AT-AUTO-UI-20 API-owned status labels
+- task: complete API/UI parity for status display labels so admin queue surfaces stop hardcoding raw status enum copy.
+- result:
+  - added deterministic `statusMetadata` labels in admin queue backend contract (`SUBMITTED`, `IN_REVIEW`, `PAYMENT_SETTLED`, `DELIVERED`) and returned them from `GET /api/v1/admin/sourcing-requests`;
+  - updated `/admin/sourcing-requests` filter select/default summary/guidance and queue cards to consume API-owned labels with safe fallback to raw statuses;
+  - expanded route/page integration coverage to lock metadata contract and rendered label behavior in queue filters/cards.
+- backlog update:
+  - marked `AT-AUTO-BE-11` and `AT-AUTO-UI-20` DONE;
+  - added next follow-up pair `AT-AUTO-BE-12` + `AT-AUTO-UI-21` for API-owned status tone metadata and UI tone consumption.
+- quality gates:
+  - `npm run lint` ✅
+  - `npm run typecheck` ✅
+  - `npm run test` ✅ (115/115)
+  - `npm run build` ✅
+- next: `AT-AUTO-BE-12`.

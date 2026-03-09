@@ -60,9 +60,12 @@ type AdminQueueArtifactItem = {
   createdAt: string;
 };
 
+type QueueStatusMetadataMap = Partial<Record<QueueStatus, { label?: string }>>;
+
 type AdminQueueListResponse = {
   defaultFilterGroupKey?: QueueFilterGroupKey;
   filterGroups?: QueueFilterGroup[];
+  statusMetadata?: QueueStatusMetadataMap;
   requests: AdminQueueListItem[];
 };
 
@@ -203,6 +206,25 @@ function formatFilterGroupLabel(group: {
     return group.label;
   }
   return group.key === "TRIAGE" ? "Triage queue" : "Settlement evidence queue";
+}
+
+function formatStatusLabel(
+  status: QueueStatus,
+  statusMetadata: QueueStatusMetadataMap,
+): string {
+  const metadataLabel = statusMetadata[status]?.label;
+  if (typeof metadataLabel === "string" && metadataLabel.trim().length > 0) {
+    return metadataLabel;
+  }
+
+  return status;
+}
+
+function formatStatusList(
+  statuses: QueueStatus[],
+  statusMetadata: QueueStatusMetadataMap,
+): string {
+  return statuses.map((status) => formatStatusLabel(status, statusMetadata)).join(" + ");
 }
 
 type ReportTemplate = {
@@ -433,6 +455,7 @@ async function loadQueueFromApi(filters: QueueFilters, cookieHeader: string) {
       listItems: [] as AdminQueueListItem[],
       filterGroups: [] as ReturnType<typeof getDefaultFilterGroups>,
       defaultFilterGroupKey: "TRIAGE" as QueueFilterGroupKey,
+      statusMetadata: {} as QueueStatusMetadataMap,
       detailStatus: null as number | null,
       detailError: null as ErrorResponse | null,
       detailPayload: null as AdminQueueDetailResponse | null,
@@ -447,6 +470,7 @@ async function loadQueueFromApi(filters: QueueFilters, cookieHeader: string) {
       filterGroups: (listPayload as AdminQueueListResponse).filterGroups ?? getDefaultFilterGroups(),
       defaultFilterGroupKey:
         (listPayload as AdminQueueListResponse).defaultFilterGroupKey ?? "TRIAGE",
+      statusMetadata: (listPayload as AdminQueueListResponse).statusMetadata ?? {},
       detailStatus: null as number | null,
       detailError: null as ErrorResponse | null,
       detailPayload: null as AdminQueueDetailResponse | null,
@@ -477,6 +501,7 @@ async function loadQueueFromApi(filters: QueueFilters, cookieHeader: string) {
       filterGroups: (listPayload as AdminQueueListResponse).filterGroups ?? getDefaultFilterGroups(),
       defaultFilterGroupKey:
         (listPayload as AdminQueueListResponse).defaultFilterGroupKey ?? "TRIAGE",
+      statusMetadata: (listPayload as AdminQueueListResponse).statusMetadata ?? {},
       detailStatus: detailResponse.status,
       detailError: detailPayload as ErrorResponse,
       detailPayload: null,
@@ -490,6 +515,7 @@ async function loadQueueFromApi(filters: QueueFilters, cookieHeader: string) {
     filterGroups: (listPayload as AdminQueueListResponse).filterGroups ?? getDefaultFilterGroups(),
     defaultFilterGroupKey:
       (listPayload as AdminQueueListResponse).defaultFilterGroupKey ?? "TRIAGE",
+    statusMetadata: (listPayload as AdminQueueListResponse).statusMetadata ?? {},
     detailStatus: detailResponse.status,
     detailError: null,
     detailPayload: detailPayload as AdminQueueDetailResponse,
@@ -556,6 +582,7 @@ export default async function AdminSourcingQueuePage({
   const filterGroups =
     queueState.filterGroups.length > 0 ? queueState.filterGroups : getDefaultFilterGroups();
   const orderedFilterGroups = sortFilterGroupsByDisplayOrder(filterGroups);
+  const statusMetadata = queueState.statusMetadata ?? {};
   const defaultFilterGroupKey = filterGroups.some(
     (group) => group.key === queueState.defaultFilterGroupKey,
   )
@@ -621,12 +648,12 @@ export default async function AdminSourcingQueuePage({
               defaultValue={filters.status}
               name="status"
             >
-              <option value="">{defaultStatuses?.join(" + ") ?? "SUBMITTED + IN_REVIEW"}</option>
+              <option value="">{defaultStatuses ? formatStatusList(defaultStatuses, statusMetadata) : "SUBMITTED + IN_REVIEW"}</option>
               {orderedFilterGroups.map((group) => (
                 <optgroup key={group.key} label={formatFilterGroupLabel(group)}>
                   {group.statuses.map((status) => (
                     <option key={status} value={status}>
-                      {status}
+                      {formatStatusLabel(status, statusMetadata)}
                     </option>
                   ))}
                 </optgroup>
@@ -639,7 +666,7 @@ export default async function AdminSourcingQueuePage({
             {orderedFilterGroups.map((group, index) => (
               <React.Fragment key={group.key}>
                 {index > 0 ? " | " : ""}
-                <strong>{formatFilterGroupLabel(group)}</strong> = {group.statuses.join(" + ")}
+                <strong>{formatFilterGroupLabel(group)}</strong> = {formatStatusList(group.statuses, statusMetadata)}
                 {group.description ? ` (${group.description})` : ""}
               </React.Fragment>
             ))}
@@ -746,7 +773,9 @@ export default async function AdminSourcingQueuePage({
                     key={entry.requestId}
                   >
                     <p className="text-sm font-medium">Request {entry.requestId}</p>
-                    <p className="text-sm">Status: {entry.status}</p>
+                    <p className="text-sm">
+                      Status: {formatStatusLabel(entry.status, statusMetadata)} ({entry.status})
+                    </p>
                     <p className="text-xs text-neutral-600">
                       Owner: {entry.userEmail} | Country: {entry.countryCode}
                     </p>
