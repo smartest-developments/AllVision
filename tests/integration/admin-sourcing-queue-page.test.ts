@@ -167,6 +167,7 @@ describe("Admin sourcing queue page", () => {
     expect(markup).toContain(
       "Transition hint: Admin triage in progress; prepare report artifact inputs.",
     );
+    expect(markup).toContain("Next action: Upload report artifact");
     expect(markup.indexOf("label=\"Triage queue\"")).toBeLessThan(
       markup.indexOf("label=\"Settlement evidence queue\""),
     );
@@ -220,6 +221,7 @@ describe("Admin sourcing queue page", () => {
     expect(markup).toContain("Request detail");
     expect(markup).toContain(`Request ${request.id} (IN_REVIEW)`);
     expect(markup).toContain("SUBMITTED -&gt; IN_REVIEW");
+    expect(markup).toContain("Next action: Upload report artifact");
     expect(markup).toContain("No report artifacts attached.");
   });
 

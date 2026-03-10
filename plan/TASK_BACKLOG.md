@@ -574,3 +574,17 @@ Mitigation refs: [AT-P0-05], [AT-P0-06], [AT-P0-07], [AT-P1-06].
   - Priority: P1
   - DoD: sourcing-status payload either includes non-null `reportFee.feeCents` whenever `reportFee.required && paymentState === PENDING` or emits explicit API metadata reason code for pending pricing to keep UI copy audit-safe.
   - Evidence target: `src/server/sourcing-request-status.ts`, `tests/integration/sourcing-request-status.test.ts`, `docs/API_SPEC.md`.
+
+## RUN_UPDATE_2026-03-10T08:45:00+0100
+- [AT-AUTO-BE-14] Add API-owned status action label metadata for admin queue states. ✅ DONE
+  - Priority: P2
+  - DoD: status metadata includes deterministic `nextActionLabel` values so UI can replace generic status CTA hints with backend-owned copy.
+  - Evidence: `src/server/admin-sourcing-queue.ts`, `app/api/v1/admin/sourcing-requests/route.ts`, `tests/integration/admin-sourcing-queue-route.test.ts`, `docs/API_SPEC.md`.
+- [AT-AUTO-UI-23] Render API-provided status action labels in queue filter helper and card rows. ✅ DONE
+  - Priority: P2
+  - DoD: queue UI consumes `statusMetadata.nextActionLabel` with deterministic fallback when metadata is absent.
+  - Evidence: `app/admin/sourcing-requests/filter-groups.ts`, `app/admin/sourcing-requests/page.tsx`, `tests/integration/admin-sourcing-queue-page.test.ts`.
+- [AT-AUTO-UI-25] Render pending-pricing reason metadata in timeline fee copy.
+  - Priority: P1
+  - DoD: timeline surfaces consume backend reason metadata (from `AT-AUTO-BE-15`) to render deterministic, audit-safe pending-pricing copy variants without hardcoded guessing.
+  - Evidence target: `src/lib/report-fee.ts`, `app/page.tsx`, `app/timeline/page.tsx`, timeline integration tests.

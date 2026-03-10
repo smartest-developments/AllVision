@@ -1,4 +1,12 @@
 # Progress Log
+## 2026-03-10T08:45:00+0100
+
+- task: AT-AUTO-BE-14 + AT-AUTO-UI-23 admin queue status next-action metadata parity.
+- result: extended admin queue `statusMetadata` contract with backend-owned `nextActionLabel` values for all queue statuses, updated `/admin/sourcing-requests` to render next-action hints in both status-filter helper text and queue-card rows with deterministic fallback copy, and expanded integration coverage for route/page contracts.
+- backlog update: marked `AT-AUTO-BE-14` and `AT-AUTO-UI-23` DONE; added balanced UI follow-up `AT-AUTO-UI-25` to consume upcoming pending-pricing reason metadata from `AT-AUTO-BE-15`.
+- quality gates: blocked in this environment (`npm` not installed in PATH), so lint/typecheck/test/build could not be executed.
+- next: AT-AUTO-BE-15 report-fee completeness contract for payment-pending timelines.
+
 ## 2026-03-09T23:20:00+0100
 
 - task: AT-AUTO-UI-24 report-fee pending-pricing fallback copy parity (home + timeline).

@@ -63,7 +63,10 @@ type AdminQueueArtifactItem = {
 };
 
 type QueueStatusMetadataMap = Partial<
-  Record<QueueStatus, { label?: string; tone?: QueueStatusTone; transitionHint?: string }>
+  Record<
+    QueueStatus,
+    { label?: string; tone?: QueueStatusTone; transitionHint?: string; nextActionLabel?: string }
+  >
 >;
 
 type AdminQueueListResponse = {
@@ -287,6 +290,33 @@ function formatStatusTransitionHint(
   }
 
   return "Owner acknowledged report delivery; retain evidence for audits.";
+}
+
+function formatStatusNextActionLabel(
+  status: QueueStatus,
+  statusMetadata: QueueStatusMetadataMap,
+): string {
+  const metadataNextActionLabel = statusMetadata[status]?.nextActionLabel;
+  if (
+    typeof metadataNextActionLabel === "string" &&
+    metadataNextActionLabel.trim().length > 0
+  ) {
+    return metadataNextActionLabel;
+  }
+
+  if (status === "SUBMITTED") {
+    return "Start review";
+  }
+
+  if (status === "IN_REVIEW") {
+    return "Upload report artifact";
+  }
+
+  if (status === "PAYMENT_SETTLED") {
+    return "Confirm delivery acknowledgment";
+  }
+
+  return "Archive evidence";
 }
 
 function formatStatusList(
@@ -752,6 +782,11 @@ export default async function AdminSourcingQueuePage({
                 Transition hint: {formatStatusTransitionHint(filters.status, statusMetadata)}
               </p>
             ) : null}
+            {filters.status ? (
+              <p className="mt-1 text-xs text-neutral-600">
+                Next action: {formatStatusNextActionLabel(filters.status, statusMetadata)}
+              </p>
+            ) : null}
           </label>
 
           <p className="md:col-span-4 text-xs text-neutral-600">
@@ -878,6 +913,9 @@ export default async function AdminSourcingQueuePage({
                     </p>
                     <p className="text-xs text-neutral-600">
                       Transition hint: {formatStatusTransitionHint(entry.status, statusMetadata)}
+                    </p>
+                    <p className="text-xs text-neutral-600">
+                      Next action: {formatStatusNextActionLabel(entry.status, statusMetadata)}
                     </p>
                     <p className="text-xs text-neutral-600">
                       Owner: {entry.userEmail} | Country: {entry.countryCode}

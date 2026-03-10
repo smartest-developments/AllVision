@@ -16,6 +16,7 @@ export type QueueStatusMetadata = Record<
     label: string;
     tone: QueueStatusTone;
     transitionHint: string;
+    nextActionLabel: string;
   }
 >;
 
@@ -44,21 +45,25 @@ export function getDefaultStatusMetadata(): QueueStatusMetadata {
       label: "Submitted",
       tone: "WARNING",
       transitionHint: "Awaiting first admin review and intake verification.",
+      nextActionLabel: "Start review",
     },
     IN_REVIEW: {
       label: "In review",
       tone: "WARNING",
       transitionHint: "Admin triage in progress; prepare report artifact inputs.",
+      nextActionLabel: "Upload report artifact",
     },
     PAYMENT_SETTLED: {
       label: "Payment settled",
       tone: "SUCCESS",
       transitionHint: "Settlement evidence confirmed; delivery acknowledgment can proceed.",
+      nextActionLabel: "Confirm delivery acknowledgment",
     },
     DELIVERED: {
       label: "Delivered",
       tone: "SUCCESS",
       transitionHint: "Owner acknowledged report delivery; retain evidence for audits.",
+      nextActionLabel: "Archive evidence",
     },
   };
 }

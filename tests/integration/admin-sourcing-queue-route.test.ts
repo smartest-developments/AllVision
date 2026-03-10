@@ -216,7 +216,7 @@ describe("GET /api/v1/admin/sourcing-requests", () => {
       }>;
       statusMetadata: Record<
         string,
-        { label: string; tone: string; transitionHint: string }
+        { label: string; tone: string; transitionHint: string; nextActionLabel: string }
       >;
       requests: Array<{ requestId: string; status: string; countryCode: string }>;
     };
@@ -244,21 +244,25 @@ describe("GET /api/v1/admin/sourcing-requests", () => {
         label: "Submitted",
         tone: "WARNING",
         transitionHint: "Awaiting first admin review and intake verification.",
+        nextActionLabel: "Start review",
       },
       IN_REVIEW: {
         label: "In review",
         tone: "WARNING",
         transitionHint: "Admin triage in progress; prepare report artifact inputs.",
+        nextActionLabel: "Upload report artifact",
       },
       PAYMENT_SETTLED: {
         label: "Payment settled",
         tone: "SUCCESS",
         transitionHint: "Settlement evidence confirmed; delivery acknowledgment can proceed.",
+        nextActionLabel: "Confirm delivery acknowledgment",
       },
       DELIVERED: {
         label: "Delivered",
         tone: "SUCCESS",
         transitionHint: "Owner acknowledged report delivery; retain evidence for audits.",
+        nextActionLabel: "Archive evidence",
       },
     });
     expect(defaultPayload.requests).toHaveLength(2);
