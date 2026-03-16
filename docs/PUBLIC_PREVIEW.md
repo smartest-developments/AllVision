@@ -8,3 +8,4 @@ Status: public preview via local app tunnel
 Notes:
 - `/public-preview` renders demo-safe, non-personal data.
 - No authentication, API, or database calls occur on this page.
+ - Robots safety: site-wide robots disallow with an allow-list exception for `/public-preview`; the preview page also sets `noindex, nofollow` via metadata.

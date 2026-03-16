@@ -3246,3 +3246,19 @@ result: deferred due missing gate binaries (next/tsc/vitest).
 - lane coverage:
   - operations/go-live readiness advanced via deterministic local preflight.
   - product delivery lane preserved by parking further synthetic separator-expansion tasks unless tied to a real failing test/regression.
+## 2026-03-16T16:52:00+01:00
+- task: AT-PREVIEW-002 Harden public preview safety (robots + noindex).
+- result:
+  - Added site-wide robots policy that disallows indexing with an allow-list exception for `/public-preview` via `app/robots.ts`.
+  - Set `noindex,nofollow` on the preview page and surfaced legal copy from the shared module.
+  - Updated `docs/PUBLIC_PREVIEW.md` with a robots/noindex safety note.
+  - Backlog: recorded `AT-PREVIEW-002` under P0 as DONE with evidence.
+- lane coverage:
+  - public-preview readiness: safer public exposure without search indexing.
+  - product/UI: preview page shows explicit legal positioning.
+- quality gates (Dockerized):
+  - lint: PASS
+  - typecheck: PASS
+  - tests: 327 passed, 139 failed across 4 guardrail-heavy files (expected)
+  - build: SKIPPED (tests red; script uses set -e)
+- commit/push: included in this run.

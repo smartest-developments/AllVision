@@ -45,7 +45,7 @@ Completion signal: CI blocks merges on lint/typecheck/test/build and migration/s
 - DoD: a preview environment/path is defined with demo-safe data, URL strategy, and lightweight runbook for external review.
 - Evidence: `README.md`, `docs/PUBLIC_PREVIEW.md`, backlog updates.
 
-### P0 (4 tasks, 1 MVP blocker + 3 readiness unblockers)
+### P0 (6 tasks, 1 MVP blocker + 5 readiness increments)
 
 1. [AT-P0-08] Validate paid report delivery end-to-end flow contract. ✅ DONE
 - Size: 1-2h
@@ -68,6 +68,18 @@ Completion signal: CI blocks merges on lint/typecheck/test/build and migration/s
 - DoD: repository exposes a Docker-based gates runner that mounts the repo and runs install + prisma generate + lint + typecheck + tests + build without requiring local Node/npm.
 - Evidence: `scripts/run-gates-in-docker.sh`, `README.md` (Docker gates runner section).
 
+
+5. [AT-OPS-005] Add liveness and readiness endpoints. ✅ DONE
+- Size: 0.5h
+- DoD: expose `/api/health` (liveness) and `/api/ready` (DB connectivity) route handlers.
+- Evidence: `app/api/health/route.ts`, `app/api/ready/route.ts`, `docs/API_SPEC.md`.
+
+6. [AT-PREVIEW-002] Harden public preview safety (robots + noindex). ✅ DONE
+- Size: 0.5h
+- DoD: add site-wide robots policy that disallows indexing, with an allow-list exception for `/public-preview`, and set `noindex,nofollow` on the preview page.
+- Evidence: `app/robots.ts`, `app/public-preview/page.tsx`, `docs/PUBLIC_PREVIEW.md` (robots note).
+
+
 ### P1 (18 tasks)
 
 1. [AT-P1-01] Enforce RBAC middleware (`USER`, `ADMIN`). ✅ DONE
@@ -86,7 +98,7 @@ Completion signal: CI blocks merges on lint/typecheck/test/build and migration/s
 - DoD: users view only own request timeline and current state.
 - Evidence: `app/api/v1/sourcing-requests/route.ts`, `src/server/sourcing-request-status.ts`, `tests/integration/sourcing-request-status.test.ts`, `tests/integration/sourcing-request-status-route.test.ts`.
 
-4. [AT-P1-04] Build admin queue for pending and in-review sourcing requests. (split into `AT-P1-04A` + `AT-P1-04B`)
+4. [AT-P1-04] Build admin queue for pending and in-review sourcing requests. (split into `AT-P1-04A` + `AT-P1-04B`) ✅ DONE
 - Size: 2-3h
 - DoD: admin-only list/detail retrieval with basic filters.
 - Evidence: integration tests for visibility and filters.

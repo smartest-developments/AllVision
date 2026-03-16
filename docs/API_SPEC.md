@@ -264,3 +264,15 @@ All API surfaces must maintain these constraints:
 Update 2026-03-09:
 - Admin queue UI consumes API-owned `statusMetadata.tone` in two places: status badges on queue cards and selected-status helper text in filter controls.
 - Recommended client fallback when tone is missing/unknown: `NEUTRAL`.
+
+## Health & Readiness
+
+### `GET /api/health`
+- Purpose: liveness check for the app runtime.
+- Contract: returns `{ status: "ok", service: "AllVision", now, uptimeSec }`.
+- Responses: `200`.
+
+### `GET /api/ready`
+- Purpose: readiness check verifying backing services.
+- Contract: returns `200` with `{ status: "ready", checks: { db: "ok" }, now }` when PostgreSQL is reachable; otherwise `503` with `{ status: "degraded", checks: { db: "fail" }, error }`.
+- Responses: `200`, `503`.
