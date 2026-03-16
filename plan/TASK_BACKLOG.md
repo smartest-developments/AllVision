@@ -524,6 +524,12 @@ Mitigation refs: [AT-P0-05], [AT-P0-06], [AT-P0-07], [AT-P1-06].
   - DoD: `/admin/sourcing-requests` applies backend-provided `statusMetadata.tone` hints to status badges/helper copy with deterministic fallback when tone metadata is absent.
   - Evidence target: `app/admin/sourcing-requests/page.tsx`, `tests/integration/admin-sourcing-queue-page.test.ts`.
 
+## BACKLOG_HYGIENE_SUMMARY_2026-03-16
+- Collapsed repetitive settlement-note guardrail families into two meta entries to reduce noise while preserving completed coverage intent:
+  - [AT-AUTO-BE-SETTLEMENT-NOTE-CANONICALIZATION] Backend redirect settlement-note canonicalization variants (lines 4–92). ✅ DONE
+  - [AT-AUTO-UI-SETTLEMENT-NOTE-PRECEDENCE] Timeline payload settlement-note precedence/display variants (lines 4–92). ✅ DONE
+- Rationale: hundreds of near-identical automation-generated tasks obscured CURRENT_FOCUS and MVP readiness. Detailed variant history remains in git; future additions should be batched under these meta entries.
+
 ## RUN_UPDATE_2026-03-09T04:12:00+0100
 - [AT-AUTO-BE-12] Add API-owned status badge tone metadata for admin queue states. ✅ DONE
   - Priority: P2
@@ -3271,3 +3277,7 @@ Mitigation refs: [AT-P0-05], [AT-P0-06], [AT-P0-07], [AT-P1-06].
 - queue policy update:
   - keep `AT-AUTO-BE/UI-*` serial separator expansions parked unless a failing test or user-visible bug demands them.
   - keep next execution focus on dependency restore + full paid-delivery flow verification.
+5. [AT-OPS-004] Run Prisma migrations in Docker gates runner. ✅ DONE
+- Size: 0.25h
+- DoD: `scripts/run-gates-in-docker.sh` applies migrations via `npm run prisma:migrate:deploy` before tests to ensure schema exists.
+- Evidence: `scripts/run-gates-in-docker.sh`, `plan/PROGRESS_LOG.md` (gates output shows migrations applied).

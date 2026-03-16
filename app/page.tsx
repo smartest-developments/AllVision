@@ -33,8 +33,10 @@ type HomePageProps = {
   }>;
 };
 
-export default async function HomePage({ searchParams }: HomePageProps) {
-  const resolvedSearchParams = searchParams ? await searchParams : undefined;
+export default async function HomePage(props?: HomePageProps) {
+  const resolvedSearchParams = props?.searchParams
+    ? await props.searchParams
+    : undefined;
   const rawRequestId = resolvedSearchParams?.requestId;
   const checkoutRequestId = typeof rawRequestId === "string" ? rawRequestId.trim() : "";
   const rawCheckout = resolvedSearchParams?.checkout;

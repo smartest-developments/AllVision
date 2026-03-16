@@ -41,9 +41,9 @@ exec docker run --rm -t \
     set -euo pipefail
     npm ci
     npm run prisma:generate
+    npm run prisma:migrate:deploy
     npm run lint
     npm run typecheck
     npm run test
     npm run build
   '
-

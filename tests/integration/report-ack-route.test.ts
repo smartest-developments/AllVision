@@ -4,6 +4,22 @@ import { beforeEach, describe, expect, it } from "vitest";
 
 import { hashToken, SESSION_COOKIE_NAME } from "@/server/auth";
 import { prisma } from "@/server/db";
+// Top-level helper so all describe blocks in this large file can issue a session cookie
+// without redefining the function in each block.
+async function issueSessionCookie(userId: string): Promise<string> {
+  const token = `session-${randomUUID()}`;
+  await prisma.session.create({
+    data: {
+      userId,
+      tokenHash: hashToken(token),
+      expiresAt: new Date(Date.now() + 60 * 60 * 1000),
+      ipHash: null,
+      userAgentHash: null,
+    },
+  });
+
+  return `${SESSION_COOKIE_NAME}=${token}`;
+}
 import { POST } from "../../app/api/v1/sourcing-requests/[requestId]/report/ack/route";
 
 describe("POST /api/v1/sourcing-requests/:requestId/report/ack", () => {

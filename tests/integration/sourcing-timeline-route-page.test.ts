@@ -11,6 +11,19 @@ vi.mock("@/server/page-auth", () => ({
 
 const mockedResolvePageSessionIdentity = vi.mocked(resolvePageSessionIdentity);
 
+// Global cleanup to avoid cross-describe state leakage in this large file.
+beforeEach(async () => {
+  mockedResolvePageSessionIdentity.mockReset();
+  mockedResolvePageSessionIdentity.mockResolvedValue(null);
+  await prisma.auditEvent.deleteMany();
+  await prisma.reportArtifact.deleteMany();
+  await prisma.sourcingStatusEvent.deleteMany();
+  await prisma.sourcingRequest.deleteMany();
+  await prisma.prescription.deleteMany();
+  await prisma.session.deleteMany();
+  await prisma.user.deleteMany();
+});
+
 describe("Timeline page deep-linking", () => {
   beforeEach(async () => {
     mockedResolvePageSessionIdentity.mockReset();
