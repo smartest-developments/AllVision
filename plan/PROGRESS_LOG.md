@@ -3346,3 +3346,17 @@ result: deferred due missing gate binaries (next/tsc/vitest).
   - release-readiness/backlog: backlog is leaner; focus is clearer.
   - quality: gates executed in container; results captured for trend.
 - commit/push: included in this run.
+## 2026-03-16T20:20:00+01:00
+- task: AT-PORT-004A mobile viewport baseline + i18n switcher label
+- result:
+  - added responsive viewport metadata via Next.js `export const viewport` so iPhone-size screens render at device width without desktop scaling.
+  - localized the language switcher label and link texts using EN/IT dictionaries.
+  - no route or API changes; safe UI-only increment toward mobile-friendly multilingual surface.
+- backlog update:
+  - added AT-PORT-004A under P0 as DONE with evidence pointers.
+- lane coverage:
+  - product/UI: mobile usability baseline improved; multilingual polish on nav switcher.
+  - release readiness: reduces preview-only feel on mobile, aligns with CURRENT_FOCUS.
+- quality gates (dockerized):
+  - started: `scripts/run-gates-in-docker.sh` (npm ci → prisma generate → migrate → lint → typecheck → tests → build). Long-running; prior runs report lint/typecheck PASS, long-tail guardrail tests red, build skipped when tests fail.
+  - note: no schema or server changes in this increment; risk limited to UI render.

@@ -543,3 +543,7 @@ Mitigation refs: [AT-P0-05], [AT-P0-06], [AT-P0-07], [AT-P1-06].
 - Size: 0.5-1h
 - DoD: admin queue and admin GDPR delete pages use localized nav labels where available and include the LanguageSwitcher; user GDPR page uses localized nav and includes the LanguageSwitcher. No breaking text changes for tests; EN remains default.
 - Evidence: `app/admin/sourcing-requests/page.tsx`, `app/admin/gdpr-delete-requests/page.tsx`, `app/gdpr/page.tsx`.
+9. [AT-PORT-004A] Mobile viewport baseline + localized language switcher label. ✅ DONE
+- Size: 0.2h
+- DoD: add responsive viewport metadata via Next.js `viewport` export so iPhone-size screens render at device width; localize the language switcher label/links using the i18n dictionaries.
+- Evidence: `app/layout.tsx` (`export const viewport`), `src/components/LanguageSwitcher.tsx` (i18n labels), manual mobile check guidance in PROGRESS_LOG.
