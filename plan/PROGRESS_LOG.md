@@ -3262,3 +3262,18 @@ result: deferred due missing gate binaries (next/tsc/vitest).
   - tests: 327 passed, 139 failed across 4 guardrail-heavy files (expected)
   - build: SKIPPED (tests red; script uses set -e)
 - commit/push: included in this run.
+
+## 2026-03-16T17:11:57+01:00
+- task: BH-20260316-COLLAPSE-P1 Backlog hygiene: remove P1 DONE duplicates.
+- result:
+  - Collapsed the verbose P1 DONE list in plan/TASK_BACKLOG.md into a short note to eliminate duplication with COMPLETED/RUN_UPDATE sections.
+  - Added a BACKLOG_HYGIENE_SUMMARY_2026-03-16 note documenting the de-duplication.
+  - Ran Dockerized quality gates against local DB (port 5433).
+    - lint: PASS
+    - typecheck: PASS
+    - tests: 327 passed, 139 failed (guardrail family depth; non-MVP)
+    - build: SKIPPED (tests red; script uses set -e)
+- lane coverage:
+  - release-readiness/backlog: backlog is leaner; focus is clearer.
+  - quality: gates executed in container; results captured for trend.
+- commit/push: included in this run.

@@ -82,112 +82,11 @@ Completion signal: CI blocks merges on lint/typecheck/test/build and migration/s
 
 ### P1 (18 tasks)
 
-1. [AT-P1-01] Enforce RBAC middleware (`USER`, `ADMIN`). ✅ DONE
-- Size: 1-2h
-- Acceptance: admin endpoints deterministically return `401` for missing identity and `403` for non-admin role headers.
-- DoD: admin routes blocked server-side for non-admin users.
-- Evidence: `src/server/request-auth.ts`, `app/api/v1/admin/sourcing-requests/[requestId]/report-artifacts/route.ts`, `tests/integration/admin-report-artifact-route-auth.test.ts`.
+All P1 tasks for this milestone have been completed and moved under the COMPLETED and RUN_UPDATE sections to avoid duplication.
 
-2. [AT-P1-02] Add sensitive-data access restrictions for prescription records. ✅ DONE
-- Size: 1-2h
-- DoD: only owner/admin can read prescription payload.
-- Evidence: `app/api/v1/prescriptions/[prescriptionId]/route.ts`, `src/server/prescriptions.ts`, `src/server/request-auth.ts`, `tests/integration/prescription-detail-route.test.ts`.
-
-3. [AT-P1-03] Expose user-facing sourcing request status endpoint. ✅ DONE
-- Size: 1-2h
-- DoD: users view only own request timeline and current state.
-- Evidence: `app/api/v1/sourcing-requests/route.ts`, `src/server/sourcing-request-status.ts`, `tests/integration/sourcing-request-status.test.ts`, `tests/integration/sourcing-request-status-route.test.ts`.
-
-4. [AT-P1-04] Build admin queue for pending and in-review sourcing requests. (split into `AT-P1-04A` + `AT-P1-04B`) ✅ DONE
-- Size: 2-3h
-- DoD: admin-only list/detail retrieval with basic filters.
-- Evidence: integration tests for visibility and filters.
-
-4a. [AT-P1-04A] Add admin queue API list/detail contract with filter params. ✅ DONE
-- Priority: P1
-- Size: 1-2h
-- DoD: admin-only queue endpoints return deterministic list/detail payloads with validated filter inputs.
-- Evidence: `app/api/v1/admin/sourcing-requests/route.ts`, `app/api/v1/admin/sourcing-requests/[requestId]/route.ts`, `src/server/admin-sourcing-queue.ts`, `tests/integration/admin-sourcing-queue-route.test.ts`, `docs/API_SPEC.md`.
-
-4b. [AT-P1-04B] Add admin queue UI surface bound to API list/detail contract. ✅ DONE
-- Priority: P1
-- Size: 1-2h
-- DoD: admin-only queue page renders pending/in-review requests with filter controls backed by API responses.
-- Evidence: `app/admin/sourcing-requests/page.tsx`, `tests/integration/admin-sourcing-queue-page.test.ts`.
-
-5. [AT-P1-05] Add admin action logging for review decisions and report uploads. ✅ DONE
-- Size: 1-2h
-- DoD: admin review/upload actions emit immutable audit events.
-- Evidence: `src/server/report-artifacts.ts`, `src/server/admin-review-decisions.ts`, `app/api/v1/admin/sourcing-requests/[requestId]/route.ts`, `tests/integration/admin-report-artifact.test.ts`, `tests/integration/admin-sourcing-queue-route.test.ts`.
-
-6. [AT-P1-06] Add report delivery acknowledgment endpoint. ✅ DONE
-- Size: 1-2h
-- DoD: retrieval acknowledgment writes delivery audit evidence.
-- Evidence: `src/server/report-retrieval.ts`, `app/api/v1/sourcing-requests/[requestId]/report/ack/route.ts`, `tests/integration/report-ack-route.test.ts`, `docs/API_SPEC.md`.
-
-7. [AT-P1-07] Centralize legal disclaimer and informational-only copy blocks. ✅ DONE
-- Size: 1-2h
-- DoD: disclaimer appears on intake, request, and report-delivery surfaces.
-- Evidence: `src/legal/disclaimers.ts`, `app/page.tsx`, `app/api/v1/prescriptions/route.ts`, `app/api/v1/sourcing-requests/[requestId]/report/route.ts`, `tests/unit/legal-disclaimers.test.ts`
-
-8. [AT-P1-08] Implement GDPR export request flow. ✅ DONE
-- Size: 2-3h
-- DoD: authenticated export request is queued and tracked.
-- Evidence: `app/api/v1/gdpr/export/route.ts`, `src/server/gdpr-export-requests.ts`, `tests/integration/gdpr-export-route.test.ts`, `docs/API_SPEC.md`.
-
-9. [AT-P1-09] Implement GDPR deletion flow (soft-delete then purge/anonymize workflow). ✅ DONE
-- Size: 2-3h
-- DoD: deletion lifecycle recorded with legal-hold checks.
-- Evidence: `app/api/v1/gdpr/delete/route.ts`, `src/server/gdpr-delete-requests.ts`, `tests/integration/gdpr-delete-route.test.ts`, `docs/API_SPEC.md`.
-
-10. [AT-P1-09B] Implement admin-reviewed soft-delete execution and purge/anonymize workflow. ✅ DONE
-- Size: 2-3h
-- DoD: queued deletion requests can be executed with deterministic anonymization/purge steps and immutable audit trace.
-- Evidence: `src/server/gdpr-delete-requests.ts`, `app/api/v1/admin/gdpr/delete-requests/route.ts`, `app/api/v1/admin/gdpr/delete-requests/[requestId]/execute/route.ts`, `tests/integration/admin-gdpr-delete-routes.test.ts`, `docs/API_SPEC.md`, `docs/GDPR.md`.
-
-11. [AT-P1-10] Add CI workflow for lint/typecheck/test/build. ✅ DONE
-- Size: 1-2h
-- DoD: PRs fail on red gate.
-- Evidence: `.github/workflows/ci.yml` (Node 22 + Postgres service + prisma migrate + lint/typecheck/test/build gate sequence).
-
-12. [AT-P1-11] Add schema drift and migration checks in CI. ✅ DONE
-- Size: 1-2h
-- DoD: CI fails on drift or missing migration.
-- Evidence: `.github/workflows/ci.yml` (`prisma migrate status` + `prisma migrate diff --exit-code`).
-
-13. [AT-P1-12] Add dependency vulnerability scanning. ✅ DONE
-- Size: 1-2h
-- DoD: high/critical findings fail CI unless waived.
-- Evidence: `.github/workflows/ci.yml` (`npm audit --audit-level=high --omit=dev`).
-
-14. [AT-P1-13] Build authenticated sourcing-request timeline UI surface. ✅ DONE
-- Size: 2-3h
-- DoD: authenticated users can see request status history cards with timestamps and legal copy.
-- Evidence: UI component/page tests plus API consumption contract assertions.
-
-15. [AT-AUTO-UI-07] Add report-delivery acknowledgment UI action on timeline surfaces. ✅ DONE
-- Size: 1-2h
-- Acceptance: report-ready requests render a deterministic UI action that posts to owner-only delivery-ack endpoint.
-- DoD: home + `/timeline` surfaces expose report-ready acknowledgment control and integration coverage validates action wiring.
-- Evidence: `app/page.tsx`, `app/timeline/page.tsx`, `tests/integration/sourcing-request-timeline-page.test.ts`, `tests/integration/sourcing-timeline-route-page.test.ts`.
-
-16. [AT-AUTO-UI-08] Add admin queue review-action form for `SUBMITTED -> IN_REVIEW`. ✅ DONE
-- Size: 1-2h
-- Acceptance: admin queue detail shows a deterministic review-action form for submitted requests and posts to existing status decision route.
-- DoD: admins can trigger `IN_REVIEW` transition from request detail without manual API clients; form path preserves current queue filters on return.
-- Evidence: `app/admin/sourcing-requests/page.tsx`, `app/api/v1/admin/sourcing-requests/[requestId]/status/route.ts`, `tests/integration/admin-sourcing-queue-page.test.ts`, `tests/integration/admin-review-decision-route.test.ts`.
-
-17. [AT-AUTO-UI-09] Add admin GDPR delete-review queue page and execute action. ✅ DONE
-- Size: 1-2h
-- Acceptance: admin can view pending `PENDING_REVIEW` delete requests and trigger deterministic execute action from UI.
-- DoD: `/admin/gdpr-delete-requests` renders API-backed queue cards, exposes execute forms, and shows clear non-admin access message.
-- Evidence: `app/admin/gdpr-delete-requests/page.tsx`, `app/admin/sourcing-requests/page.tsx`, `tests/integration/admin-gdpr-delete-page.test.ts`.
-
-18. [AT-AUTO-UI-10] Add admin queue settlement action for `PAYMENT_PENDING -> PAYMENT_SETTLED`. ✅ DONE
-- Size: 1-2h
-- Acceptance: admin request detail shows a deterministic settlement action when status is `PAYMENT_PENDING` and returns safely to queue detail context.
-- DoD: admin detail renders settlement form posting to the existing settlement endpoint with safe redirect path support; route and page integration tests cover JSON + form-submit contracts.
-- Evidence: `app/admin/sourcing-requests/page.tsx`, `app/api/v1/admin/sourcing-requests/[requestId]/report-fee/settle/route.ts`, `tests/integration/admin-sourcing-queue-page.test.ts`, `tests/integration/report-fee-settle-route.test.ts`, `docs/API_SPEC.md`.
+Notes:
+- The previous explicit P1 task list was removed on 2026-03-16 for backlog hygiene.
+- Future P1 items should only appear here while active; once done, move them to COMPLETED.
 
 ### P2 (3 tasks, execution-ready but non-urgent)
 
@@ -543,6 +442,7 @@ Mitigation refs: [AT-P0-05], [AT-P0-06], [AT-P0-07], [AT-P1-06].
   - Evidence target: `app/admin/sourcing-requests/page.tsx`, `tests/integration/admin-sourcing-queue-page.test.ts`.
 
 ## BACKLOG_HYGIENE_SUMMARY_2026-03-16
+- Removed duplicate P1 DONE entries now covered by COMPLETED; collapsed the P1 list to a short note.
 - Collapsed repetitive settlement-note guardrail families into two meta entries to reduce noise while preserving completed coverage intent:
   - [AT-AUTO-BE-SETTLEMENT-NOTE-CANONICALIZATION] Backend redirect settlement-note canonicalization variants (lines 4–92). ✅ DONE
   - [AT-AUTO-UI-SETTLEMENT-NOTE-PRECEDENCE] Timeline payload settlement-note precedence/display variants (lines 4–92). ✅ DONE
