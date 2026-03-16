@@ -84,3 +84,11 @@ The script mounts the repo into `node:22`, defaults `DATABASE_URL` to `host.dock
 - `/plan/PROGRESS_LOG.md`
 - `/plan/HEALTH_SCORE.md`
 - `/plan/PRODUCT_READINESS_SCORE.md`
+
+
+## Public Preview
+
+- Demo-safe, read-only preview route: `/public-preview`
+- Local URL: http://localhost:3000/public-preview
+- Safety: Renders mock data only; no API or DB calls.
+- When deployed to a public host, update `docs/PUBLIC_PREVIEW.md` with the public URL.

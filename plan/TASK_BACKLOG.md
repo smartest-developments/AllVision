@@ -40,10 +40,10 @@ Completion signal: CI blocks merges on lint/typecheck/test/build and migration/s
 
 ## ACTIVE_TASKS
 
-0. [AT-PREVIEW-001] Public preview baseline. TODO
+0. [AT-PREVIEW-001] Public preview baseline. ✅ DONE
 - Size: 1-2h
 - DoD: a preview environment/path is defined with demo-safe data, URL strategy, and lightweight runbook for external review.
-- Evidence: `README.md`, deployment/preview docs, backlog updates.
+- Evidence: `README.md`, `docs/PUBLIC_PREVIEW.md`, backlog updates.
 
 ### P0 (4 tasks, 1 MVP blocker + 3 readiness unblockers)
 

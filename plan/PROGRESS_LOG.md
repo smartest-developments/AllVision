@@ -1,3 +1,21 @@
+
+## 2026-03-16T15:44:28+01:00
+- task: AT-PREVIEW-001 Public preview baseline.
+- result:
+  - Added `app/public-preview/page.tsx` (read-only demo route).
+  - Added `docs/PUBLIC_PREVIEW.md` with Title and local URL.
+  - Updated `README.md` with a Public Preview section.
+  - Ran Dockerized gates: lint PASS, typecheck PASS, tests RUN with known long-tail guardrail failures.
+- lane coverage:
+  - product/UI: preview surface available without auth.
+  - release-readiness: documented preview URL for RepoLoopHQ.
+- quality gates (Dockerized):
+  - lint: PASS
+  - typecheck: PASS
+  - tests: RUN (expect red in guardrail suite)
+  - build: SKIPPED (set -e after tests)
+- commit/push: included in this run.
+
 ## 2026-03-16T15:20:00+0100
 - task: AT-OPS-004 Run migrations in Docker gates runner + typecheck/test hygiene.
 - result:
