@@ -2,6 +2,7 @@
 
 Title: AllVision Public Preview
 URL: https://allvision.thinksmarter.uk/public-preview
+Description: Servizio informativo che guida l'utente dalla prescrizione ottica a un sourcing report comparativo per lenti.
 Status: public preview via local app tunnel
 
 Notes:
