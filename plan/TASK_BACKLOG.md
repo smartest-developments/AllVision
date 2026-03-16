@@ -32,11 +32,17 @@ Completion signal: CI blocks merges on lint/typecheck/test/build and migration/s
 
 ## CURRENT_FOCUS (2026-03-16)
 
-- P0: restore local repo readiness by installing dependencies and rerunning `npm run lint`, `npm run typecheck`, `npm run test`, and `npm run build`.
-- P0: validate one end-to-end flow from report-ready request to fee checkout, settlement, and user acknowledgment.
-- P1: improve user/admin UI credibility on home, timeline, and admin queue surfaces.
-- P1: define a safe public preview route so the app can be checked live during development.
-- Automation guardrail: prefer MVP completion and real flow verification over synthetic serial guardrail tasks unless a failing test or production risk justifies them.
+- P0: move from demo-safe preview to a production-credible multilingual app surface with real runtime behavior, not static showcase pages.
+- P0: make the UI feel like a standalone optics/sourcing product with its own visual system; generic portfolio similarity is now a blocker.
+- P0: prove one end-to-end user journey on a deployable build, not only inside preview-only routes.
+- P1: keep repo/toolchain readiness attached to actual shipping work.
+- Automation guardrail: public-preview or guardrail-only work does not count as MVP completion unless it materially advances multilingual production readiness.
+
+## PORTFOLIO_RESET_2026-03-16
+
+- `AT-PORT-001` [TODO, P0]: multilingual foundation across landing, intake, timeline, admin queue, sourcing report, and legal copy.
+- `AT-PORT-002` [TODO, P0]: distinctive AllVision visual system and UX pass so the app no longer looks like a shared portfolio template.
+- `AT-PORT-003` [TODO, P0]: replace preview-first assumptions with a production-grade deploy path and real interactive app readiness.
 
 ## ACTIVE_TASKS
 
