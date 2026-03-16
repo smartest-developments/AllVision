@@ -35,9 +35,15 @@ Completion signal: CI blocks merges on lint/typecheck/test/build and migration/s
 - P0: restore local repo readiness by installing dependencies and rerunning `npm run lint`, `npm run typecheck`, `npm run test`, and `npm run build`.
 - P0: validate one end-to-end flow from report-ready request to fee checkout, settlement, and user acknowledgment.
 - P1: improve user/admin UI credibility on home, timeline, and admin queue surfaces.
+- P1: define a safe public preview route so the app can be checked live during development.
 - Automation guardrail: prefer MVP completion and real flow verification over synthetic serial guardrail tasks unless a failing test or production risk justifies them.
 
 ## ACTIVE_TASKS
+
+0. [AT-PREVIEW-001] Public preview baseline. TODO
+- Size: 1-2h
+- DoD: a preview environment/path is defined with demo-safe data, URL strategy, and lightweight runbook for external review.
+- Evidence: `README.md`, deployment/preview docs, backlog updates.
 
 ### P0 (4 tasks, 1 MVP blocker + 3 readiness unblockers)
 
