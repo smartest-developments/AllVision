@@ -10,6 +10,8 @@ import {
 } from "@/lib/report-fee";
 import { resolvePageSessionUserId, resolvePageSessionIdentity } from "@/server/page-auth";
 import { listSourcingRequestStatusesForUser } from "@/server/sourcing-request-status";
+import { getRequestLocale, getDictionary } from "@/i18n";
+import LanguageSwitcher from "@/components/LanguageSwitcher";
 
 function formatTimestamp(value: Date | null): string {
   if (!value) {
@@ -87,11 +89,13 @@ export default async function HomePage(props?: HomePageProps) {
     typeof rawSettlementNote === "string" && rawSettlementNote.trim() !== ""
       ? rawSettlementNote.trim()
       : null;
+  const locale = await getRequestLocale();
+  const t = getDictionary(locale);
   const [sessionIdentity, userId] = await Promise.all([
     resolvePageSessionIdentity(),
     resolvePageSessionUserId(),
   ]);
-  const legal = getLegalCopy("request");
+  const legal = getLegalCopy("request", locale);
   const requests = userId ? await listSourcingRequestStatusesForUser(userId) : [];
   const timelineHref = "/timeline";
   const signInHref = `/auth/login?next=${encodeURIComponent(timelineHref)}`;
@@ -99,20 +103,19 @@ export default async function HomePage(props?: HomePageProps) {
 
   return (
     <main className="mx-auto flex min-h-screen max-w-3xl flex-col gap-6 px-6 py-16">
-      <nav aria-label="Authenticated navigation" className="flex flex-wrap items-center gap-4 text-sm text-neutral-700">
-        <Link className="underline" href="/">Home</Link>
-        <Link className="underline" href={timelineHref}>Timeline</Link>
-        {sessionIdentity?.role === "ADMIN" ? (
-          <Link className="underline" href="/admin/sourcing-requests">Admin</Link>
-        ) : null}
-        <Link className="underline" href="/gdpr">GDPR</Link>
-      </nav>
-      <h1 className="text-4xl font-semibold">AllVision</h1>
-      <p className="text-lg">
-        Documentation-first bootstrap. This service provides informational
-        price-comparison and sourcing reports for eyeglass lenses in the EU and
-        Switzerland.
-      </p>
+      <div className="flex flex-wrap items-center gap-4 text-sm text-neutral-700">
+        <nav aria-label="Authenticated navigation" className="flex flex-wrap items-center gap-4">
+          <Link className="underline" href="/">{t.nav.home}</Link>
+          <Link className="underline" href={timelineHref}>{t.nav.timeline}</Link>
+          {sessionIdentity?.role === "ADMIN" ? (
+            <Link className="underline" href="/admin/sourcing-requests">{t.nav.admin}</Link>
+          ) : null}
+          <Link className="underline" href="/gdpr">{t.nav.gdpr}</Link>
+        </nav>
+        <LanguageSwitcher />
+      </div>
+      <h1 className="text-4xl font-semibold">{t.home.title}</h1>
+      <p className="text-lg">{t.home.tagline}</p>
       <p className="text-sm text-neutral-700">
         View the dedicated timeline page at{" "}
         <Link className="underline" href={timelineHref}>
@@ -128,10 +131,8 @@ export default async function HomePage(props?: HomePageProps) {
       </ul>
 
       <section className="rounded-md border border-neutral-300 p-4">
-        <h2 className="text-2xl font-semibold">Sourcing request timeline</h2>
-        <p className="mt-2 text-sm text-neutral-700">
-          Authenticated preview: timeline cards load from your current session.
-        </p>
+        <h2 className="text-2xl font-semibold">{t.home.timelineTitle}</h2>
+        <p className="mt-2 text-sm text-neutral-700">{t.home.timelineIntro}</p>
 
         {!userId ? (
           <p className="mt-4 text-sm text-neutral-700">

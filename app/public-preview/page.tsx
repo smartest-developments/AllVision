@@ -1,20 +1,25 @@
 import type { Metadata } from "next";
 import { getLegalCopy } from "@/legal/disclaimers";
+import { getRequestLocale, getDictionary } from "@/i18n";
+import LanguageSwitcher from "@/components/LanguageSwitcher";
 
 export const metadata: Metadata = {
   title: "AllVision — Public Preview",
   robots: { index: false, follow: false },
 };
 
-export default function PublicPreviewPage() {
-  const legal = getLegalCopy("request");
+export default async function PublicPreviewPage() {
+  const locale = await getRequestLocale();
+  const t = getDictionary(locale);
+  const legal = getLegalCopy("request", locale);
   return (
     <main className="mx-auto max-w-3xl px-6 py-16 space-y-6">
       <header className="space-y-2">
-        <h1 className="text-4xl font-semibold">AllVision — Public Preview</h1>
-        <p className="text-sm text-neutral-700">
-          Read-only demo with mock data. No authentication, API, or database calls.
-        </p>
+        <div className="flex items-center justify-between gap-4">
+          <h1 className="text-4xl font-semibold">{t.preview.title}</h1>
+          <LanguageSwitcher />
+        </div>
+        <p className="text-sm text-neutral-700">{t.preview.subtitle}</p>
       </header>
 
       <section className="rounded-md border border-neutral-200 bg-neutral-50 p-4">

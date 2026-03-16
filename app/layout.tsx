@@ -1,19 +1,21 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import "@/server/env";
+import { getRequestLocale } from "@/i18n";
 
 export const metadata: Metadata = {
   title: "AllVision",
   description: "Informational lens sourcing reports for EU + Switzerland"
 };
 
-export default function RootLayout({
-  children
+export default async function RootLayout({
+  children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const locale = await getRequestLocale();
   return (
-    <html lang="en">
+    <html lang={locale}>
       <body>{children}</body>
     </html>
   );

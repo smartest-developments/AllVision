@@ -14,6 +14,8 @@ import {
   getPrescriptionForViewer,
   PrescriptionAccessError
 } from "@/server/prescriptions";
+import { getRequestLocale, getDictionary } from "@/i18n";
+import LanguageSwitcher from "@/components/LanguageSwitcher";
 
 type TimelinePageProps = {
   searchParams?: Promise<{
@@ -40,6 +42,8 @@ function formatTimestamp(value: Date | null): string {
 
 export default async function TimelinePage({ searchParams }: TimelinePageProps) {
   const resolvedSearchParams = searchParams ? await searchParams : undefined;
+  const locale = await getRequestLocale();
+  const t = getDictionary(locale);
   const sessionIdentity = await resolvePageSessionIdentity();
   const userId = sessionIdentity?.userId ?? null;
   const rawRequestId = resolvedSearchParams?.requestId;
@@ -95,7 +99,7 @@ export default async function TimelinePage({ searchParams }: TimelinePageProps) 
     typeof rawSettlementNote === "string" && rawSettlementNote.trim() !== ""
       ? rawSettlementNote.trim()
       : null;
-  const legal = getLegalCopy("request");
+  const legal = getLegalCopy("request", locale);
   const requests = userId ? await listSourcingRequestStatusesForUser(userId) : [];
   const filteredRequests = requestId
     ? requests.filter((request) => request.requestId === requestId)
@@ -188,22 +192,21 @@ export default async function TimelinePage({ searchParams }: TimelinePageProps) 
 
   return (
     <main className="mx-auto flex min-h-screen max-w-3xl flex-col gap-6 px-6 py-16">
-      <nav aria-label="Authenticated navigation" className="flex flex-wrap items-center gap-4 text-sm text-neutral-700">
-        <Link className="underline" href={homeHref}>Home</Link>
-        <Link className="underline" href={timelineHref}>Timeline</Link>
-        {sessionIdentity?.role === "ADMIN" ? (
-          <Link className="underline" href="/admin/sourcing-requests">Admin</Link>
-        ) : null}
-        <Link className="underline" href="/gdpr">GDPR</Link>
-      </nav>
-      <h1 className="text-4xl font-semibold">Sourcing timeline</h1>
+      <div className="flex flex-wrap items-center gap-4 text-sm text-neutral-700">
+        <nav aria-label="Authenticated navigation" className="flex flex-wrap items-center gap-4">
+          <Link className="underline" href={homeHref}>{t.nav.home}</Link>
+          <Link className="underline" href={timelineHref}>{t.nav.timeline}</Link>
+          {sessionIdentity?.role === "ADMIN" ? (
+            <Link className="underline" href="/admin/sourcing-requests">{t.nav.admin}</Link>
+          ) : null}
+          <Link className="underline" href="/gdpr">{t.nav.gdpr}</Link>
+        </nav>
+        <LanguageSwitcher />
+      </div>
+      <h1 className="text-4xl font-semibold">{t.timeline.title}</h1>
+      <p className="text-sm text-neutral-700">{t.timeline.subtitle}</p>
       <p className="text-sm text-neutral-700">
-        Owner-scoped request timeline with optional request deep-linking.
-      </p>
-      <p className="text-sm text-neutral-700">
-        <Link className="underline" href={homeHref}>
-          Return to home
-        </Link>
+        <Link className="underline" href={homeHref}>{t.timeline.returnHome}</Link>
       </p>
       <ul className="list-disc pl-6 text-sm">
         {legal.bullets.map((bullet) => (
@@ -219,14 +222,14 @@ export default async function TimelinePage({ searchParams }: TimelinePageProps) 
             type="text"
             name="requestId"
             defaultValue={requestId}
-            placeholder="request-id (optional)"
+            placeholder={t.timeline.placeholders.requestId}
             className="min-w-0 flex-1 rounded-md border border-neutral-300 px-3 py-2 text-sm"
           />
           <button
             type="submit"
             className="rounded-md bg-neutral-900 px-3 py-2 text-sm text-white"
           >
-            Load timeline
+            {t.timeline.loadTimeline}
           </button>
         </form>
         <form className="mt-3 flex gap-2" method="get">
@@ -235,7 +238,7 @@ export default async function TimelinePage({ searchParams }: TimelinePageProps) 
             type="text"
             name="prescriptionId"
             defaultValue={prescriptionId}
-            placeholder="prescription-id (optional)"
+            placeholder={t.timeline.placeholders.prescriptionId}
             className="min-w-0 flex-1 rounded-md border border-neutral-300 px-3 py-2 text-sm"
           />
           <button

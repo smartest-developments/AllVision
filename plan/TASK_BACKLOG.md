@@ -531,3 +531,8 @@ Mitigation refs: [AT-P0-05], [AT-P0-06], [AT-P0-07], [AT-P1-06].
   - Priority: P1
   - DoD: earliest duplicate RUN_UPDATE block removed; canonical DONE entries remain in later updates to keep backlog concise.
   - Evidence: plan/TASK_BACKLOG.md (de-duplicated).
+
+7. [AT-PORT-001A] Multilingual foundation (en/it) across core surfaces. ✅ DONE
+- Size: 1-2h
+- DoD: basic i18n layer with cookie-based locale, `html[lang]`, and dictionaries for EN/IT. Localized navigation, home, timeline, public preview, and legal copy surfaces; lightweight language switch via `?lang=` handled in middleware.
+- Evidence: `middleware.ts`, `src/i18n/*`, `src/components/LanguageSwitcher.tsx`, updated `app/layout.tsx`, `app/page.tsx`, `app/timeline/page.tsx`, `app/public-preview/page.tsx`, `src/legal/disclaimers.ts`, `next.config.ts` (i18n locales).

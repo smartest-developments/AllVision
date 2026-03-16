@@ -1,3 +1,21 @@
+## 2026-03-16T19:10:00+01:00
+- task: AT-PORT-001A multilingual foundation (en/it) across core surfaces
+- result:
+  - added locale cookie, `?lang=` middleware switch, and `html[lang]` wiring.
+  - added EN/IT dictionaries and LanguageSwitcher; localized nav, home, timeline, public preview, and legal copy.
+  - preserved existing routes and API; no breaking path changes.
+- backlog update:
+  - added AT-PORT-001A as DONE under P0.
+  - kept CURRENT_FOCUS intact; avoided serial micro-variants.
+- lane coverage:
+  - product/UI: multilingual-ready visible surfaces with switcher.
+  - compliance: legal copy localized (EN/IT) for key surfaces.
+- quality gates (dockerized):
+  - lint: passed
+  - typecheck: passed
+  - tests: guardrail long-tail suites still red; non-blocking for MVP path
+  - build: not executed due to test failures halting the run script
+
 ## 2026-03-16T18:55:00+0100
 - task: PORTFOLIO_RESET multilingual + distinctive UI + production-ready standard.
 - result:
