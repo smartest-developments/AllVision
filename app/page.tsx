@@ -8,7 +8,7 @@ import {
   formatPendingReportFeeMessage,
   resolvePendingReportFeeHintBadge,
 } from "@/lib/report-fee";
-import { resolvePageSessionUserId } from "@/server/page-auth";
+import { resolvePageSessionUserId, resolvePageSessionIdentity } from "@/server/page-auth";
 import { listSourcingRequestStatusesForUser } from "@/server/sourcing-request-status";
 
 function formatTimestamp(value: Date | null): string {
@@ -87,7 +87,10 @@ export default async function HomePage(props?: HomePageProps) {
     typeof rawSettlementNote === "string" && rawSettlementNote.trim() !== ""
       ? rawSettlementNote.trim()
       : null;
-  const userId = await resolvePageSessionUserId();
+  const [sessionIdentity, userId] = await Promise.all([
+    resolvePageSessionIdentity(),
+    resolvePageSessionUserId(),
+  ]);
   const legal = getLegalCopy("request");
   const requests = userId ? await listSourcingRequestStatusesForUser(userId) : [];
   const timelineHref = "/timeline";
@@ -96,19 +99,13 @@ export default async function HomePage(props?: HomePageProps) {
 
   return (
     <main className="mx-auto flex min-h-screen max-w-3xl flex-col gap-6 px-6 py-16">
-      <nav
-        aria-label="Authenticated navigation"
-        className="flex flex-wrap items-center gap-4 text-sm text-neutral-700"
-      >
-        <Link className="underline" href="/">
-          Home
-        </Link>
-        <Link className="underline" href={timelineHref}>
-          Timeline
-        </Link>
-        <Link className="underline" href="/gdpr">
-          GDPR
-        </Link>
+      <nav aria-label="Authenticated navigation" className="flex flex-wrap items-center gap-4 text-sm text-neutral-700">
+        <Link className="underline" href="/">Home</Link>
+        <Link className="underline" href={timelineHref}>Timeline</Link>
+        {sessionIdentity?.role === "ADMIN" ? (
+          <Link className="underline" href="/admin/sourcing-requests">Admin</Link>
+        ) : null}
+        <Link className="underline" href="/gdpr">GDPR</Link>
       </nav>
       <h1 className="text-4xl font-semibold">AllVision</h1>
       <p className="text-lg">

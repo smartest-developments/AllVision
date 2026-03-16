@@ -448,6 +448,24 @@ Mitigation refs: [AT-P0-05], [AT-P0-06], [AT-P0-07], [AT-P1-06].
   - [AT-AUTO-UI-SETTLEMENT-NOTE-PRECEDENCE] Timeline payload settlement-note precedence/display variants (lines 4–92). ✅ DONE
 - Rationale: hundreds of near-identical automation-generated tasks obscured CURRENT_FOCUS and MVP readiness. Detailed variant history remains in git; future additions should be batched under these meta entries.
 
+## RUN_UPDATE_2026-03-09T04:12:00+0100
+- [AT-AUTO-BE-12] Add API-owned status badge tone metadata for admin queue states. ✅ DONE
+  - Priority: P2
+  - DoD: admin queue list payload extends `statusMetadata` with deterministic `tone` hints (`NEUTRAL|WARNING|SUCCESS`) per status so clients avoid hardcoded visual severity mapping.
+  - Evidence: `src/server/admin-sourcing-queue.ts`, `app/api/v1/admin/sourcing-requests/route.ts`, `tests/integration/admin-sourcing-queue-route.test.ts`, `docs/API_SPEC.md`.
+- [AT-AUTO-UI-21] Render API-driven status badge tones on queue cards and status select helper text. ✅ DONE
+  - Priority: P2
+  - DoD: `/admin/sourcing-requests` applies backend-provided `statusMetadata.tone` hints to status badges/helper copy with deterministic fallback when tone metadata is absent.
+  - Evidence: `app/admin/sourcing-requests/filter-groups.ts`, `app/admin/sourcing-requests/page.tsx`, `tests/integration/admin-sourcing-queue-page.test.ts`.
+- [AT-AUTO-BE-13] Add API-owned status short guidance copy metadata for queue states.
+  - Priority: P2
+  - DoD: admin queue list payload extends `statusMetadata` with deterministic per-status guidance copy (`helperText`) so status-select helper content remains backend-owned.
+  - Evidence target: `src/server/admin-sourcing-queue.ts`, `app/api/v1/admin/sourcing-requests/route.ts`, `tests/integration/admin-sourcing-queue-route.test.ts`, `docs/API_SPEC.md`.
+- [AT-AUTO-UI-22] Render API-provided status helper copy in queue filters.
+  - Priority: P2
+  - DoD: `/admin/sourcing-requests` status selector helper text consumes backend `statusMetadata.helperText` with deterministic fallback when metadata is absent.
+  - Evidence target: `app/admin/sourcing-requests/page.tsx`, `tests/integration/admin-sourcing-queue-page.test.ts`.
+
 ## RUN_UPDATE_2026-03-09T04:45:00+0100
 - [AT-AUTO-BE-12] Add API-owned status badge tone metadata for admin queue states. ✅ DONE
   - Priority: P2
@@ -518,10 +536,3 @@ Mitigation refs: [AT-P0-05], [AT-P0-06], [AT-P0-07], [AT-P1-06].
 - [AT-AUTO-BE-15] Guarantee report-fee amount completeness for payment-pending requests. ✅ DONE
   - Priority: P1
   - DoD: sourcing-status payload either includes non-null `reportFee.feeCents` whenever `reportFee.required && paymentState === PENDING` or emits explicit API metadata reason code for pending pricing to keep UI copy audit-safe.
-
-
-## RUN_UPDATE_2026-03-16T17:56:20+01:00
-- [BH-20260316-TRIM2] Remove duplicate RUN_UPDATE block (2026-03-09T04:12:00) for [AT-AUTO-BE-12] and [AT-AUTO-UI-21]. ✅ DONE
-  - Priority: P1
-  - DoD: earliest duplicate RUN_UPDATE block removed; canonical DONE entries remain in later updates to keep backlog concise.
-  - Evidence: plan/TASK_BACKLOG.md (de-duplicated).

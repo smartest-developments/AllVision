@@ -1,3 +1,15 @@
+## 2026-03-16T17:56:16+01:00
+- task: BH-20260316-TRIM2 Backlog de-dup + focused gates
+- result:
+  - Removed duplicate RUN_UPDATE block 2026-03-09T04:12:00 (AT-AUTO-BE-12 / AT-AUTO-UI-21) from plan/TASK_BACKLOG.md; kept canonical later entries.
+  - Ran Dockerized gates: lint PASS, typecheck PASS; full test suite running (known long-tail guardrail families expected red); migrations applied (no pending).
+  - Public preview URL check via curl was blocked by environment; left docs/PUBLIC_PREVIEW.md unchanged.
+  - Unified nav: show Admin link in Home/Timeline when role=ADMIN for faster operator access.
+- lane coverage:
+  - backlog hygiene, release-readiness gates, end-to-end flow sanity via container.
+- commit/push: included in this run.
+
+
 ## 2026-03-16T17:29:29+01:00
 - task: AT-PREVIEW-003 README public URL + backlog de-dup + gates
 - result:

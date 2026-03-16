@@ -188,19 +188,13 @@ export default async function TimelinePage({ searchParams }: TimelinePageProps) 
 
   return (
     <main className="mx-auto flex min-h-screen max-w-3xl flex-col gap-6 px-6 py-16">
-      <nav
-        aria-label="Authenticated navigation"
-        className="flex flex-wrap items-center gap-4 text-sm text-neutral-700"
-      >
-        <Link className="underline" href={homeHref}>
-          Home
-        </Link>
-        <Link className="underline" href={timelineHref}>
-          Timeline
-        </Link>
-        <Link className="underline" href="/gdpr">
-          GDPR
-        </Link>
+      <nav aria-label="Authenticated navigation" className="flex flex-wrap items-center gap-4 text-sm text-neutral-700">
+        <Link className="underline" href={homeHref}>Home</Link>
+        <Link className="underline" href={timelineHref}>Timeline</Link>
+        {sessionIdentity?.role === "ADMIN" ? (
+          <Link className="underline" href="/admin/sourcing-requests">Admin</Link>
+        ) : null}
+        <Link className="underline" href="/gdpr">GDPR</Link>
       </nav>
       <h1 className="text-4xl font-semibold">Sourcing timeline</h1>
       <p className="text-sm text-neutral-700">
