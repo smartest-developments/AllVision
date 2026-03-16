@@ -5,7 +5,7 @@ Model: Offshore informational sourcing report service (EU + Switzerland)
 
 ## Score Summary
 
-- Overall Readiness: 74/100
+- Overall Readiness: 75/100
 - Status: MVP flows implemented; guardrail suite still red in places
 
 ## Category Scores
@@ -24,12 +24,12 @@ Model: Offshore informational sourcing report service (EU + Switzerland)
 - Core P0 scope implemented: identity, prescription intake, sourcing lifecycle, admin review, report delivery, and GDPR flows all exist with API routes and tests.
 - Paid report fee flow verified end-to-end (checkout → settlement → delivery ack) via integration tests.
 - CI enforces lint/typecheck/test/build; Dockerized local gates provide reproducible validation without local Node.
-- Public preview route exists (`/public-preview`) and is documented in docs/PUBLIC_PREVIEW.md.
+- Public preview route exists (`/public-preview`), and a public URL is recorded and verified in `docs/PUBLIC_PREVIEW.md`.
 - Long-tail guardrail tests around copy/metadata precedence remain red; they don't block MVP usage but do affect overall readiness confidence.
 
 ## Next Moves to Reach 80+
 
 1. Triage and either relax or parameterize brittle guardrail cases; keep one representative suite per family.
-2. Stabilize one public, hosted preview URL and record it in docs/PUBLIC_PREVIEW.md.
+2. Keep the public, hosted preview URL stable (monitor uptime) and ensure reviewers can access it consistently.
 3. Add minimal status-badge tone/labels in UI using backend metadata (already available) for clearer operator cues.
 4. Keep backlog trimmed to product-visible increments; avoid serial micro-variants unless a regression is observed.

@@ -1,3 +1,14 @@
+## 2026-03-16T17:29:29+01:00
+- task: AT-PREVIEW-003 README public URL + backlog de-dup + gates
+- result:
+  - README now surfaces public preview URL; `docs/PUBLIC_PREVIEW.md` status updated with last verified timestamp.
+  - Removed duplicate `[AT-AUTO-UI-23]` backlog block; canonical DONE entry preserved under 2026-03-10 update.
+  - Ran Dockerized quality gates: lint PASS, typecheck PASS, tests RUN (long-tail guardrail families expected red), build deferred.
+- lane coverage:
+  - preview/publication-readiness: clearer path to live demo; RepoLoopHQ can surface URL.
+  - backlog hygiene: duplicate removed; backlog remains concise.
+- commit/push: included in this run.
+
 
 ## 2026-03-16T16:19:05+01:00
 - task: BH-20260316-PRUNE Backlog hygiene + readiness refresh.

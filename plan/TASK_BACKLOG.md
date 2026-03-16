@@ -497,10 +497,6 @@ Mitigation refs: [AT-P0-05], [AT-P0-06], [AT-P0-07], [AT-P1-06].
   - Priority: P2
   - DoD: status metadata includes deterministic `nextActionLabel` values so UI can replace generic status CTA hints with backend-owned copy.
   - Evidence target: `src/server/admin-sourcing-queue.ts`, `app/api/v1/admin/sourcing-requests/route.ts`, `tests/integration/admin-sourcing-queue-route.test.ts`, `docs/API_SPEC.md`.
-- [AT-AUTO-UI-23] Render API-provided status action labels in queue filter helper and card rows.
-  - Priority: P2
-  - DoD: queue UI consumes `statusMetadata.nextActionLabel` with deterministic fallback when metadata is absent.
-  - Evidence target: `app/admin/sourcing-requests/page.tsx`, `tests/integration/admin-sourcing-queue-page.test.ts`.
 
 ## RUN_UPDATE_2026-03-09T23:20:00+0100
 - [AT-AUTO-UI-24] Replace ambiguous report-fee pending fallback copy on timeline surfaces. ✅ DONE
@@ -510,6 +506,16 @@ Mitigation refs: [AT-P0-05], [AT-P0-06], [AT-P0-07], [AT-P1-06].
 - [AT-AUTO-BE-15] Guarantee report-fee amount completeness for payment-pending requests.
   - Priority: P1
   - DoD: sourcing-status payload either includes non-null `reportFee.feeCents` whenever `reportFee.required && paymentState === PENDING` or emits explicit API metadata reason code for pending pricing to keep UI copy audit-safe.
+
+## RUN_UPDATE_2026-03-16T17:29:29+0100
+- [AT-PREVIEW-003] Surface public preview URL in README. ✅ DONE
+  - Priority: P1
+  - DoD: README Public Preview section includes the stable public URL so RepoLoopHQ and reviewers can discover the live demo quickly.
+  - Evidence: `README.md` (Public Preview), `docs/PUBLIC_PREVIEW.md` (status updated, last verified timestamp).
+- [BH-20260316-DEDUP] Remove duplicate backlog entry for [AT-AUTO-UI-23]. ✅ DONE
+  - Priority: P1
+  - DoD: duplicate `AT-AUTO-UI-23` block removed to keep backlog concise; canonical DONE entry remains under the 2026-03-10 update section.
+  - Evidence: `plan/TASK_BACKLOG.md` (de-duplicated).
   - Evidence target: `src/server/sourcing-request-status.ts`, `tests/integration/sourcing-request-status.test.ts`, `docs/API_SPEC.md`.
 
 ## RUN_UPDATE_2026-03-10T08:45:00+0100

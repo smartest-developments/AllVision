@@ -90,5 +90,7 @@ The script mounts the repo into `node:22`, defaults `DATABASE_URL` to `host.dock
 
 - Demo-safe, read-only preview route: `/public-preview`
 - Local URL: http://localhost:3000/public-preview
+- Public URL: https://allvision.thinksmarter.uk/public-preview
 - Safety: Renders mock data only; no API or DB calls.
 - When deployed to a public host, update `docs/PUBLIC_PREVIEW.md` with the public URL.
+ - Robots: site-wide robots disallow with an allow-list exception for `/public-preview`; the page also sets `noindex, nofollow`.

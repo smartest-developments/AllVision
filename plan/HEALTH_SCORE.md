@@ -7,7 +7,7 @@ Score: 70 / 100
 
 - Product scope is clear: prescription intake, sourcing lifecycle, admin review, report delivery, and GDPR flows all exist in repository form.
 - User- and admin-facing App Router surfaces are present, with integration/unit coverage across core request/report behavior.
-- Formal readiness scoring inside `plan/PRODUCT_READINESS_SCORE.md` is stale and stops at `64/100` on 2026-02-21, while the repository now contains materially more implementation.
+- Formal readiness scoring inside `plan/PRODUCT_READINESS_SCORE.md` was refreshed to `75/100` on 2026-03-16, reflecting implemented MVP flows and a verified public preview URL.
 - Current workspace still lacks installed local dependencies for this repo, so `lint`, `typecheck`, `test`, and `build` were not re-verified in this pass.
 
 ## Improvement Levers
