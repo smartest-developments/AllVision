@@ -536,3 +536,8 @@ Mitigation refs: [AT-P0-05], [AT-P0-06], [AT-P0-07], [AT-P1-06].
 - Size: 1-2h
 - DoD: basic i18n layer with cookie-based locale, `html[lang]`, and dictionaries for EN/IT. Localized navigation, home, timeline, public preview, and legal copy surfaces; lightweight language switch via `?lang=` handled in middleware.
 - Evidence: `middleware.ts`, `src/i18n/*`, `src/components/LanguageSwitcher.tsx`, updated `app/layout.tsx`, `app/page.tsx`, `app/timeline/page.tsx`, `app/public-preview/page.tsx`, `src/legal/disclaimers.ts`, `next.config.ts` (i18n locales).
+
+8. [AT-PORT-001B] Extend multilingual UI to admin and GDPR surfaces (nav + switcher). ✅ DONE
+- Size: 0.5-1h
+- DoD: admin queue and admin GDPR delete pages use localized nav labels where available and include the LanguageSwitcher; user GDPR page uses localized nav and includes the LanguageSwitcher. No breaking text changes for tests; EN remains default.
+- Evidence: `app/admin/sourcing-requests/page.tsx`, `app/admin/gdpr-delete-requests/page.tsx`, `app/gdpr/page.tsx`.

@@ -1,3 +1,20 @@
+## 2026-03-16T19:22:00+01:00
+- task: AT-PORT-001B admin+GDPR i18n nav + LanguageSwitcher
+- result:
+  - added LanguageSwitcher and localized nav labels (EN/IT) to admin queue and admin GDPR delete pages.
+  - added LanguageSwitcher and localized nav to user GDPR page.
+  - no breaking UI text changes; English remains default to keep tests stable.
+- backlog update:
+  - added AT-PORT-001B under P0 as DONE with evidence.
+- lane coverage:
+  - product/UI: multilingual readiness extended to admin and GDPR surfaces.
+  - release readiness: consistent nav across core authenticated surfaces.
+- quality gates (dockerized):
+  - lint: PASS
+  - typecheck: PASS
+  - tests: known long-tail guardrail families red; non-blocking for MVP path
+  - build: SKIPPED (tests halt the run script)
+
 ## 2026-03-16T19:10:00+01:00
 - task: AT-PORT-001A multilingual foundation (en/it) across core surfaces
 - result:

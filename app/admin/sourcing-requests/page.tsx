@@ -16,6 +16,8 @@ import {
 } from "./filter-groups";
 import { listAdminThroughputRequests } from "@/server/admin-sourcing-queue";
 import { listAdminReportTemplateDrafts } from "@/server/report-template-drafts";
+import { getRequestLocale, getDictionary } from "@/i18n";
+import LanguageSwitcher from "@/components/LanguageSwitcher";
 
 type AdminQueueListItem = {
   requestId: string;
@@ -624,6 +626,8 @@ async function loadQueueFromApi(filters: QueueFilters, cookieHeader: string) {
 export default async function AdminSourcingQueuePage({
   searchParams,
 }: AdminQueuePageProps) {
+  const locale = await getRequestLocale();
+  const t = getDictionary(locale);
   const resolvedSearchParams = searchParams ? await searchParams : undefined;
   const filters: QueueFilters = {
     status: normalizeStatus(firstParam(resolvedSearchParams?.status)),
@@ -710,23 +714,23 @@ export default async function AdminSourcingQueuePage({
 
   return (
     <main className="mx-auto flex min-h-screen max-w-4xl flex-col gap-6 px-6 py-16">
-      <nav
-        aria-label="Admin navigation"
-        className="flex flex-wrap items-center gap-4 text-sm text-neutral-700"
-      >
-        <Link className="underline" href="/">
-          Home
-        </Link>
-        <Link className="underline" href="/timeline">
-          Timeline
-        </Link>
-        <Link className="underline" href="/admin/sourcing-requests">
-          Admin queue
-        </Link>
-        <Link className="underline" href="/admin/gdpr-delete-requests">
-          GDPR deletes
-        </Link>
-      </nav>
+      <div className="flex flex-wrap items-center gap-4 text-sm text-neutral-700">
+        <nav aria-label="Admin navigation" className="flex flex-wrap items-center gap-4">
+          <Link className="underline" href="/">
+            {t.nav.home}
+          </Link>
+          <Link className="underline" href="/timeline">
+            {t.nav.timeline}
+          </Link>
+          <Link className="underline" href="/admin/sourcing-requests">
+            Admin queue
+          </Link>
+          <Link className="underline" href="/admin/gdpr-delete-requests">
+            GDPR deletes
+          </Link>
+        </nav>
+        <LanguageSwitcher />
+      </div>
 
       <h1 className="text-4xl font-semibold">Admin sourcing queue</h1>
       <p className="text-sm text-neutral-700">

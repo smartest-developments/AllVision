@@ -2,8 +2,12 @@ import React from "react";
 import Link from "next/link";
 import { resolvePageSessionUserId } from "@/server/page-auth";
 import { listGdprRequestHistoryForUser } from "@/server/gdpr-request-history";
+import { getRequestLocale, getDictionary } from "@/i18n";
+import LanguageSwitcher from "@/components/LanguageSwitcher";
 
 export default async function GdprPage() {
+  const locale = await getRequestLocale();
+  const t = getDictionary(locale);
   const userId = await resolvePageSessionUserId();
   const history = userId ? await listGdprRequestHistoryForUser(userId) : [];
   const nextPath = "/gdpr";
@@ -12,20 +16,20 @@ export default async function GdprPage() {
 
   return (
     <main className="mx-auto flex min-h-screen max-w-3xl flex-col gap-6 px-6 py-16">
-      <nav
-        aria-label="Authenticated navigation"
-        className="flex flex-wrap items-center gap-4 text-sm text-neutral-700"
-      >
-        <Link className="underline" href="/">
-          Home
-        </Link>
-        <Link className="underline" href="/timeline">
-          Timeline
-        </Link>
-        <Link className="underline" href="/gdpr">
-          GDPR
-        </Link>
-      </nav>
+      <div className="flex flex-wrap items-center gap-4 text-sm text-neutral-700">
+        <nav aria-label="Authenticated navigation" className="flex flex-wrap items-center gap-4">
+          <Link className="underline" href="/">
+            {t.nav.home}
+          </Link>
+          <Link className="underline" href="/timeline">
+            {t.nav.timeline}
+          </Link>
+          <Link className="underline" href="/gdpr">
+            {t.nav.gdpr}
+          </Link>
+        </nav>
+        <LanguageSwitcher />
+      </div>
 
       <h1 className="text-4xl font-semibold">GDPR request history</h1>
       <p className="text-sm text-neutral-700">
