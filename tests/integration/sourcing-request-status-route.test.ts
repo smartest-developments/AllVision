@@ -131,6 +131,20 @@ describe("GET /api/v1/sourcing-requests", () => {
       requests: Array<{
         requestId: string;
         status: string;
+        reportFee: {
+          required: boolean;
+          feeCents: number | null;
+          currency: string;
+          paymentState: "NOT_REQUIRED" | "PENDING" | "SETTLED";
+          pendingReason: "PRICING_IN_PROGRESS" | null;
+          checkoutInitiatedAt: string | null;
+          settledAt: string | null;
+          settledByRole: "USER" | "ADMIN" | null;
+          settledByUserId: string | null;
+          settledByUserEmail: string | null;
+          settlementEventId: string | null;
+          settlementNote: string | null;
+        };
         timeline: Array<{
           fromStatus: string | null;
           toStatus: string;
@@ -149,6 +163,20 @@ describe("GET /api/v1/sourcing-requests", () => {
     expect(payload.requests[0]).toMatchObject({
       requestId: ownerRequest.id,
       status: "IN_REVIEW",
+      reportFee: {
+        required: false,
+        feeCents: null,
+        currency: "EUR",
+        paymentState: "NOT_REQUIRED",
+        pendingReason: null,
+        checkoutInitiatedAt: null,
+        settledAt: null,
+        settledByRole: null,
+        settledByUserId: null,
+        settledByUserEmail: null,
+        settlementEventId: null,
+        settlementNote: null,
+      },
       timeline: [{ fromStatus: "SUBMITTED", toStatus: "IN_REVIEW", note: "Admin started review" }]
     });
     expect(payload.requests[0]?.requestId).not.toBe(otherUser.id);

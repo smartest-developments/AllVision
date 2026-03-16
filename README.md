@@ -22,7 +22,7 @@ Users submit eyeglasses prescription data and receive an offshore sourcing repor
 
 ### Prerequisites
 
-- Node.js 20+
+- Node.js 22.x (>=22 <23)
 - npm 10+
 - Docker (for local PostgreSQL via Docker Compose)
 
@@ -40,6 +40,13 @@ Open `http://localhost:3000`.
 
 Run all compose commands from the repository root (where `docker-compose.yml` is located).
 
+### Local DB (quick bring-up)
+
+```bash
+docker compose up -d db && npm run prisma:migrate:deploy
+```
+
+
 ## Scripts
 
 - `npm run dev` - start local dev server
@@ -53,6 +60,16 @@ Run all compose commands from the repository root (where `docker-compose.yml` is
 - `npm run prisma:generate` - generate Prisma client
 - `npm run prisma:migrate:dev` - run local migrations
 - `npm run prisma:migrate:deploy` - run deploy migrations
+
+### Optional: Run gates in Docker (no local Node)
+
+If Node/npm aren’t installed locally, you can run the mandatory gates inside a Node 22 container. Ensure Postgres is up (`docker compose up -d db`), then:
+
+```bash
+scripts/run-gates-in-docker.sh
+```
+
+The script mounts the repo into `node:22`, defaults `DATABASE_URL` to `host.docker.internal:5433`, and runs: install, prisma generate, lint, typecheck, tests, and build.
 
 ## Documentation Index
 

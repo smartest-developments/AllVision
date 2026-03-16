@@ -63,3 +63,7 @@ AllVision reduces search complexity by packaging comparative information into a 
 - Legal positioning appears at critical surfaces and API contracts.
 - Lifecycle works end-to-end with auditability.
 - Lint, typecheck, tests, and build are green.
+
+## Session Note (2026-03-15T15:00:00+0100)
+- Extended post-ack settlement-note resilience guardrails to seventy-two-line trailing mixed-width separator variants.
+- Backend redirect metadata canonicalization and timeline payload precedence remain deterministic for long separator tails.

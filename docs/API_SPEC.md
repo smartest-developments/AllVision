@@ -71,6 +71,9 @@ All API surfaces must maintain these constraints:
 
 - Purpose: list authenticated user sourcing requests.
 - Notes: returns owner-only request timeline entries (`requestId`, `status`, `createdAt`, `updatedAt`, `latestEventAt`, `reportFee`, `timeline[]`) and includes `legal` copy for request-surface consistency.
+- `reportFee` contract: `{ required, feeCents, currency, paymentState, pendingReason, checkoutInitiatedAt, settledAt, settledByRole, settledByUserId, settledByUserEmail, settlementEventId, settlementNote }`.
+- `pendingReason` is `PRICING_IN_PROGRESS` only when `paymentState=PENDING` and `feeCents` is still unavailable; otherwise `null`.
+- `settledAt`/`settledByRole`/`settledByUserId`/`settledByUserEmail`/`settlementEventId`/`settlementNote` are derived from immutable `PAYMENT_SETTLED` status events (`null` when no settlement event is present, actor metadata is unavailable, or no transition note was stored).
 - Auth note: caller identity is resolved from session cookie only; `x-user-id` headers are ignored.
 - UI consumption note: home and `/timeline` load this owner-scoped payload from active session context (no `userId` query parameter requirement); `/timeline` supports optional `requestId` focus.
 - Responses: `200`, `401`.
@@ -85,7 +88,10 @@ All API surfaces must maintain these constraints:
 ### `GET /api/v1/sourcing-requests/:requestId/report`
 
 - Purpose: retrieve secure report link/download metadata for owner.
-- Success payload now includes `reportFee` metadata with deterministic report-service payment context: `{ product: "REPORT_SERVICE", required, feeCents, currency, paymentState }`.
+- Success payload now includes `reportFee` metadata with deterministic report-service payment context: `{ product: "REPORT_SERVICE", required, feeCents, currency, paymentState, pendingReason, checkoutInitiatedAt, settledAt, settledByRole, settledByUserId, settledByUserEmail, settlementEventId, settlementNote }`.
+- `pendingReason` follows the same semantics as `GET /api/v1/sourcing-requests` (`PRICING_IN_PROGRESS` only when `paymentState=PENDING` and `feeCents` is unavailable; otherwise `null`).
+- `checkoutInitiatedAt` is an ISO timestamp derived from the latest immutable `PAYMENT_PENDING` status event for the request; otherwise `null`.
+- `settledAt`, `settledByRole`, `settledByUserId`, `settledByUserEmail`, `settlementEventId`, and `settlementNote` are derived from immutable `PAYMENT_SETTLED` status events for the request; all are `null` when no settlement event is present (or actor metadata is unavailable / note is absent).
 - Success payload includes `legal` block (`title`, `bullets[]`, `surfaceNote`) for report-delivery legal copy consistency.
 - Responses: `200`, `401`, `403`, `404`, `429`, `501`.
 
@@ -96,7 +102,10 @@ All API surfaces must maintain these constraints:
   - owner-only endpoint.
   - when current state is `REPORT_READY` or `PAYMENT_SETTLED`, persists `REPORT_DELIVERY_ACKNOWLEDGED` audit marker and status event, then transitions request to `DELIVERED`.
   - idempotent when request is already `DELIVERED`.
-- Responses: `200`, `401`, `403`, `404`, `409`.
+  - `200` JSON payload includes `reportFee` settlement parity metadata: `{ required, feeCents, currency, paymentState, settledAt, settledByRole, settledByUserId, settledByUserEmail, settlementEventId, settlementNote }`.
+  - supports optional form-submit redirect via `redirectTo` path and returns `303` when provided.
+  - redirect responses append settlement query metadata when evidence is available: `settledByRole` (`USER|ADMIN`), `settledAt` (ISO timestamp), `settledByUserId` (actor id), `settledByUserEmail` (actor email), `settlementEventId` (immutable settlement status-event id), and `settlementNote` (transition note, trimmed; omitted when empty/whitespace-only).
+- Responses: `200`, `303`, `400`, `401`, `403`, `404`, `409`.
 
 ### `POST /api/v1/sourcing-requests/:requestId/report-fee/checkout`
 
@@ -106,7 +115,10 @@ All API surfaces must maintain these constraints:
   - when current state is `REPORT_READY` and `reportPaymentRequired=true`, transitions to `PAYMENT_PENDING`.
   - writes immutable `SourcingStatusEvent` (`REPORT_READY -> PAYMENT_PENDING`) and `REPORT_FEE_CHECKOUT_INITIATED` audit marker.
   - idempotent when request is already `PAYMENT_PENDING|PAYMENT_SETTLED|DELIVERED`.
+  - `200` JSON payload includes `reportFee.pendingReason` with parity semantics to owner status/report surfaces (`PRICING_IN_PROGRESS` only when payment is pending and fee amount is unavailable; otherwise `null`) plus `reportFee.checkoutInitiatedAt` ISO timestamp metadata derived from immutable `PAYMENT_PENDING` status events.
+  - checkout payload now includes settlement audit parity fields derived from immutable `PAYMENT_SETTLED` status events: `reportFee.settledAt`, `reportFee.settledByRole`, `reportFee.settledByUserId`, `reportFee.settledByUserEmail`, `reportFee.settlementEventId`, `reportFee.settlementNote` (all `null` when no settlement event exists).
   - supports form-submit flow via optional `redirectTo` path and returns `303` when provided.
+  - checkout redirect responses append settlement metadata when immutable evidence exists: `settledAt` (ISO timestamp), `settledByRole` (`USER|ADMIN`), `settledByUserId` (actor id), `settledByUserEmail` (actor email), `settlementEventId` (immutable settlement status-event id), and `settlementNote` (settlement transition note), enabling deterministic post-checkout fallback copy.
 - Responses: `200`, `303`, `401`, `403`, `404`, `409`.
 
 ### `POST /api/v1/admin/sourcing-requests/:requestId/report-fee/settle`

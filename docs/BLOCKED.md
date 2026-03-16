@@ -1,63 +1,44 @@
-# BLOCKED
+# Blocked: Local Toolchain Missing (2026-03-16)
 
-## 2026-03-06T00:58:00+0100
-- Scope: backlog/progress doc updates for `AT-P1-01` after RBAC middleware implementation.
-- Blocker: sandbox filesystem denies writes under `plan/` (`EPERM` on `plan/TASK_BACKLOG.md` and `plan/PROGRESS_LOG.md`).
-- Impact: code and tests are complete/green, but planning docs could not be synchronized in this run.
-- Next step: update `plan/TASK_BACKLOG.md` and `plan/PROGRESS_LOG.md` once write access to `plan/` is restored.
+This run is blocked from executing mandatory quality gates (lint, typecheck, tests, build) because Node.js and npm are not available on this workstation shell.
 
-## 2026-03-06T02:12:00+0100
-- Scope: prior plan-sync blocker for `AT-P1-01`.
-- Resolution: write access to `plan/` restored in this run; backlog/progress/docs synchronized.
-- Status: unblocked.
-- 2026-03-06T09:21:47+0100: automation sandbox cannot write in this repository (`Operation not permitted`), so backlog/code/doc updates were skipped this run.
+## Evidence
 
-## 2026-03-06T13:25:00+0100
-- Scope: integration tests for `AT-P1-05B` (`PATCH /api/v1/admin/sourcing-requests/:requestId/status`).
-- Blocker: sandbox cannot reach local PostgreSQL (`localhost:5433`) and Docker daemon access is denied (`/Users/simones/.docker/run/docker.sock`), so DB-backed Vitest suites cannot execute.
-- Impact: code/docs/backlog updates completed and non-DB gates are green; integration test execution remains pending in a DB-enabled environment.
-- Next step: run `npm run test -- tests/integration/admin-sourcing-queue-route.test.ts` once DB connectivity is available.
+```
+$ node -v
+zsh: command not found: node
 
-## 2026-03-06T13:22:42+0100 - Automation blocked
-- This run could not safely commit: planning/docs files are read-only and concurrent in-repo edits changed tracked files during execution.
+$ npm -v
+zsh: command not found: npm
 
-## 2026-03-06T20:31:36+0100
-- Automation blocker: repository is read-only in this environment (`Operation not permitted` on file writes), so AT-P1-10 CI workflow and backlog/progress updates could not be applied.
+$ docker compose version
+Docker Compose version v5.0.2
+```
 
-## 2026-03-07T01:40:00+0100
-- Scope: commit/push for `AT-AUTO-UI-08` admin queue review-action form increment.
-- Blocker: repository contains concurrent pre-existing in-flight changes outside this increment (`app/gdpr/page.tsx`, `src/server/gdpr-delete-requests.ts`, admin GDPR route/page files, and related tests), and full gates are red in current tree (`npm run typecheck` fails in `src/server/gdpr-delete-requests.ts`; `npm run test` fails in `tests/integration/report-ack-route.test.ts` and `tests/integration/prescription-detail-route.test.ts`).
-- Impact: new admin review-action UI/route/docs/backlog changes are implemented locally but not safe to commit alongside unrelated drift.
-- Next step: stabilize or isolate the unrelated GDPR/report-ack changes, rerun all gates, then commit this increment.
-- 2026-03-08T09:56:50+0100 — Blocked `AT-P2-01B` implementation because sandbox denied writes in this repo (`Operation not permitted`). Planned split: `AT-P2-01B1` payment-intent transition (`REPORT_READY -> PAYMENT_PENDING`) then `AT-P2-01B2` settlement transition (`PAYMENT_PENDING -> PAYMENT_SETTLED`).
+Postgres can be started via Docker, but without Node/npm we cannot install dependencies nor run `next`, `tsc`, `vitest`, or `prisma` CLI.
 
-## 2026-03-08T16:37:05+0100
-- Scope: quality-gate validation for `AT-AUTO-UI-10` settlement UI/route increment.
-- Blocking gate: `npm run test` fails with pre-existing integration regressions unrelated to this increment.
-- Failing suites observed:
-  - `tests/integration/admin-review-decision-route.test.ts` (`500` vs expected `303` in form redirect assertion)
-  - `tests/integration/admin-sourcing-queue-route.test.ts` (FK constraint on cleanup `prescription.deleteMany`)
-  - `tests/integration/report-ack-route.test.ts` (FK constraint on `sourcingRequest.create`)
-  - `tests/integration/sourcing-timeline-route-page.test.ts` (missing ack CTA render + FK constraint creating prescription)
-- Impact: lint/typecheck/build are green, but full test gate is red so commit/push is skipped this run.
-- Next step: stabilize failing integration fixtures/cleanup ordering and timeline expectations, rerun `npm run test`, then commit pending settlement UI changes.
+## Unblock Steps (local)
 
-## 2026-03-08T17:08:00+0100
-- Scope: quality-gate validation for `AT-AUTO-BE-04` settlement metadata envelope increment.
-- Blocking gate: `npm run test` fails in pre-existing integration suites not directly changed by this increment.
-- Failing suites observed:
-  - `tests/integration/admin-gdpr-delete-routes.test.ts` (empty pending queue + execute path 500).
-  - `tests/integration/admin-review-decision-route.test.ts` (`404` instead of expected `200/303`).
-  - `tests/integration/admin-sourcing-queue-page.test.ts`, `admin-sourcing-queue-route.test.ts`, `report-ack-route.test.ts`, `report-fee-checkout-route.test.ts`, `report-fee-settle-route.test.ts` (FK cleanup/seed violations).
-  - `tests/integration/sourcing-timeline-route-page.test.ts` (forbidden prescription assertion mismatch).
-- Impact: `lint`, `typecheck`, and `build` are green, but full test gate is red so commit/push is skipped.
-- Next step: stabilize integration fixture cleanup + seed ordering and review prescription-forbidden rendering expectations, then rerun full `npm run test`.
+1) Install Node.js 22.x LTS and npm
+   - With nvm: `brew install nvm && nvm install 22 && nvm use 22`
+   - Or with asdf: `asdf plugin add nodejs && asdf install nodejs latest && asdf global nodejs <version>`
 
-- 2026-03-08T22:42:00+0100 - Blocked in automation run: EPERM on tracked-file writes (`app/admin/sourcing-requests/page.tsx`, `tests/integration/admin-sourcing-queue-page.test.ts`) while implementing AT-AUTO-UI-15 status-filter guidance copy. Next action: restore write permissions, then apply UI copy + tests and backlog/progress updates.
+2) Install repo dependencies
+   - `npm ci` (preferred) or `npm install`
 
-## 2026-03-08T23:10:00+0100 - Push blocked by DNS
-- scope: `AT-AUTO-UI-15` changes committed locally as `1543a0c`.
-- blocker: `git push` failed (`ssh: Could not resolve hostname ssh.github.com`).
-- next: retry push when outbound DNS/network is available.
-- 2026-03-09T00:41:20+0100 - Automation blocked: sandbox denied write access in this run context (`operation not permitted`), so backlog/code/docs updates could not be applied.
-- 2026-03-09T00:41:20+0100 - Partial blocker: tracked planning files (including `plan/TASK_BACKLOG.md`) are write-restricted in this run context; unable to mark completed tasks in backlog despite code parity.
+3) Start local Postgres and apply migrations
+   - `docker compose up -d db`
+   - `npx prisma migrate deploy` (or `npm run prisma:migrate:deploy`)
+
+4) Verify local toolchain
+   - `npm run doctor:toolchain`
+
+5) Run mandatory gates
+   - `npm run lint && npm run typecheck && npm run test && npm run build`
+
+## Next Actions After Unblock
+
+- Re-run the gates above. If green, commit any pending changes and push.
+- Execute the paid report delivery flow test: `npm run test -- tests/integration/report-paid-delivery-flow.test.ts`.
+- Optional readiness follow-up (tracked as AT-OPS-002 in backlog): pin Node version via `.nvmrc`/`engines` and add a short setup alias for `docker compose up -d db`.
+

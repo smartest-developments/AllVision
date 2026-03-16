@@ -33,6 +33,7 @@ export async function GET(request: NextRequest) {
         createdAt: entry.createdAt,
         updatedAt: entry.updatedAt,
         latestEventAt: entry.latestEventAt,
+        reportFee: entry.reportFee,
         timeline: entry.timeline
       })),
       legal

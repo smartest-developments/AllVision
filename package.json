@@ -2,11 +2,13 @@
   "name": "allvision",
   "version": "0.1.0",
   "private": true,
+  "engines": { "node": ">=22 <23" },
   "description": "AllVision - informational price-comparison and sourcing reports for eyeglass lenses in EU + Switzerland",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
+    "doctor:toolchain": "node scripts/verify-local-toolchain.mjs",
     "lint": "next lint",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",

@@ -1,7 +1,13 @@
 import React from "react";
 import Link from "next/link";
 import { getLegalCopy } from "@/legal/disclaimers";
-import { formatReportFeeSummary } from "@/lib/report-fee";
+import {
+  formatReportFeeReadinessContext,
+  formatPostDeliveryAcknowledgmentConfirmation,
+  formatPostCheckoutPendingConfirmation,
+  formatPendingReportFeeMessage,
+  resolvePendingReportFeeHintBadge,
+} from "@/lib/report-fee";
 import { resolvePageSessionUserId } from "@/server/page-auth";
 import { listSourcingRequestStatusesForUser } from "@/server/sourcing-request-status";
 
@@ -13,7 +19,72 @@ function formatTimestamp(value: Date | null): string {
   return value.toISOString();
 }
 
-export default async function HomePage() {
+type HomePageProps = {
+  searchParams?: Promise<{
+    requestId?: string | string[];
+    checkout?: string | string[];
+    ack?: string | string[];
+    settledAt?: string | string[];
+    settledByRole?: string | string[];
+    settledByUserId?: string | string[];
+    settledByUserEmail?: string | string[];
+    settlementEventId?: string | string[];
+    settlementNote?: string | string[];
+  }>;
+};
+
+export default async function HomePage({ searchParams }: HomePageProps) {
+  const resolvedSearchParams = searchParams ? await searchParams : undefined;
+  const rawRequestId = resolvedSearchParams?.requestId;
+  const checkoutRequestId = typeof rawRequestId === "string" ? rawRequestId.trim() : "";
+  const rawCheckout = resolvedSearchParams?.checkout;
+  const checkoutCompleted = typeof rawCheckout === "string" && rawCheckout === "1";
+  const rawAck = resolvedSearchParams?.ack;
+  const acknowledgmentCompleted = typeof rawAck === "string" && rawAck === "1";
+  const rawSettledAt = resolvedSearchParams?.settledAt;
+  const redirectSettledAt =
+    typeof rawSettledAt === "string" && rawSettledAt.trim() !== ""
+      ? rawSettledAt.trim()
+      : null;
+  const rawSettledByRole = resolvedSearchParams?.settledByRole;
+  const redirectSettledByRole =
+    typeof rawSettledByRole === "string" &&
+    (rawSettledByRole === "USER" || rawSettledByRole === "ADMIN")
+      ? rawSettledByRole
+      : null;
+  const rawSettledByUserId = resolvedSearchParams?.settledByUserId;
+  const redirectSettledByUserId =
+    typeof rawSettledByUserId === "string" && rawSettledByUserId.trim() !== ""
+      ? rawSettledByUserId.trim()
+      : null;
+  const rawSettledByUserEmail = resolvedSearchParams?.settledByUserEmail;
+  const redirectSettledByUserEmail =
+    typeof rawSettledByUserEmail === "string" && rawSettledByUserEmail.trim() !== ""
+      ? rawSettledByUserEmail.trim()
+      : null;
+  const hasCompleteRedirectActorTrio =
+    redirectSettledByRole !== null &&
+    redirectSettledByUserId !== null &&
+    redirectSettledByUserEmail !== null;
+  const coherentRedirectSettledByRole = hasCompleteRedirectActorTrio
+    ? redirectSettledByRole
+    : null;
+  const coherentRedirectSettledByUserId = hasCompleteRedirectActorTrio
+    ? redirectSettledByUserId
+    : null;
+  const coherentRedirectSettledByUserEmail = hasCompleteRedirectActorTrio
+    ? redirectSettledByUserEmail
+    : null;
+  const rawSettlementEventId = resolvedSearchParams?.settlementEventId;
+  const redirectSettlementEventId =
+    typeof rawSettlementEventId === "string" && rawSettlementEventId.trim() !== ""
+      ? rawSettlementEventId.trim()
+      : null;
+  const rawSettlementNote = resolvedSearchParams?.settlementNote;
+  const redirectSettlementNote =
+    typeof rawSettlementNote === "string" && rawSettlementNote.trim() !== ""
+      ? rawSettlementNote.trim()
+      : null;
   const userId = await resolvePageSessionUserId();
   const legal = getLegalCopy("request");
   const requests = userId ? await listSourcingRequestStatusesForUser(userId) : [];
@@ -88,12 +159,65 @@ export default async function HomePage() {
             {requests.map((request) => {
               const reportFeeRequiresPayment =
                 request.reportFee.required && request.reportFee.paymentState === "PENDING";
+              const reportFeePendingReasonBadge = resolvePendingReportFeeHintBadge(
+                request.reportFee,
+              );
               const reportFeeCheckoutAction = `/api/v1/sourcing-requests/${encodeURIComponent(
                 request.requestId,
               )}/report-fee/checkout`;
-              const timelineRedirectTo = `/timeline?requestId=${encodeURIComponent(
+              const homeRedirectTo = `/?requestId=${encodeURIComponent(
                 request.requestId,
-              )}`;
+              )}&checkout=1`;
+              const checkoutForCurrentRequest =
+                checkoutCompleted &&
+                checkoutRequestId !== "" &&
+                checkoutRequestId === request.requestId;
+              const showCheckoutConfirmation =
+                checkoutForCurrentRequest && request.reportFee.required;
+              const checkoutConfirmationReportFee = showCheckoutConfirmation
+                ? {
+                    ...request.reportFee,
+                    settledAt: request.reportFee.settledAt ?? redirectSettledAt,
+                    settledByRole:
+                      request.reportFee.settledByRole ?? coherentRedirectSettledByRole,
+                    settledByUserId:
+                      request.reportFee.settledByUserId ?? coherentRedirectSettledByUserId,
+                    settledByUserEmail:
+                      request.reportFee.settledByUserEmail ??
+                      coherentRedirectSettledByUserEmail,
+                    settlementEventId:
+                      request.reportFee.settlementEventId ?? redirectSettlementEventId,
+                    settlementNote: request.reportFee.settlementNote ?? redirectSettlementNote,
+                  }
+                : request.reportFee;
+              const acknowledgmentForCurrentRequest =
+                acknowledgmentCompleted &&
+                checkoutRequestId !== "" &&
+                checkoutRequestId === request.requestId;
+              const showAcknowledgmentConfirmation =
+                acknowledgmentForCurrentRequest && request.status === "DELIVERED";
+              const acknowledgmentConfirmationReportFee = showAcknowledgmentConfirmation
+                ? {
+                    ...request.reportFee,
+                    settledAt: request.reportFee.settledAt ?? redirectSettledAt,
+                    settledByRole:
+                      request.reportFee.settledByRole ?? coherentRedirectSettledByRole,
+                    settledByUserId:
+                      request.reportFee.settledByUserId ?? coherentRedirectSettledByUserId,
+                    settledByUserEmail:
+                      request.reportFee.settledByUserEmail ??
+                      coherentRedirectSettledByUserEmail,
+                    settlementEventId:
+                      request.reportFee.settlementEventId ?? redirectSettlementEventId,
+                    settlementNote: request.reportFee.settlementNote ?? redirectSettlementNote,
+                  }
+                : request.reportFee;
+              const reportFeeReadinessContext = formatReportFeeReadinessContext(
+                request.reportFee,
+              );
+              const ackRedirectTo = `/?requestId=${encodeURIComponent(
+                request.requestId,
+              )}&ack=1`;
               return (
                 <li
                   key={request.requestId}
@@ -115,22 +239,40 @@ export default async function HomePage() {
                       Open focused timeline view
                     </Link>
                   </p>
+                  {showCheckoutConfirmation ? (
+                    <p className="mb-1 mt-2 rounded-md border border-emerald-300 bg-emerald-50 px-2 py-1 text-[11px] text-emerald-900">
+                      {formatPostCheckoutPendingConfirmation(checkoutConfirmationReportFee)}
+                    </p>
+                  ) : null}
+                  {showAcknowledgmentConfirmation ? (
+                    <p className="mb-1 mt-2 rounded-md border border-emerald-300 bg-emerald-50 px-2 py-1 text-[11px] text-emerald-900">
+                      {formatPostDeliveryAcknowledgmentConfirmation(
+                        acknowledgmentConfirmationReportFee,
+                      )}
+                    </p>
+                  ) : null}
                   {(request.status === "REPORT_READY" || request.status === "PAYMENT_SETTLED") &&
                   !reportFeeRequiresPayment ? (
-                    <form
-                      className="mt-2"
-                      action={`/api/v1/sourcing-requests/${encodeURIComponent(
-                        request.requestId,
-                      )}/report/ack`}
-                      method="post"
-                    >
-                      <button
-                        type="submit"
-                        className="rounded-md border border-neutral-400 px-2 py-1 text-xs text-neutral-900"
+                    <>
+                      {reportFeeReadinessContext ? (
+                        <p className="mt-2 text-xs text-neutral-700">{reportFeeReadinessContext}</p>
+                      ) : null}
+                      <form
+                        className="mt-2"
+                        action={`/api/v1/sourcing-requests/${encodeURIComponent(
+                          request.requestId,
+                        )}/report/ack`}
+                        method="post"
                       >
-                        Acknowledge report delivery
-                      </button>
-                    </form>
+                        <input type="hidden" name="redirectTo" value={ackRedirectTo} />
+                        <button
+                          type="submit"
+                          className="rounded-md border border-neutral-400 px-2 py-1 text-xs text-neutral-900"
+                        >
+                          Acknowledge report delivery
+                        </button>
+                      </form>
+                    </>
                   ) : null}
                   {reportFeeRequiresPayment ? (
                     <form
@@ -138,8 +280,13 @@ export default async function HomePage() {
                       action={reportFeeCheckoutAction}
                       method="post"
                     >
-                      <input type="hidden" name="redirectTo" value={timelineRedirectTo} />
-                      Report fee pending ({formatReportFeeSummary(request.reportFee)}).
+                      <input type="hidden" name="redirectTo" value={homeRedirectTo} />
+                      {reportFeePendingReasonBadge ? (
+                        <p className="mb-1 inline-flex rounded-full border border-neutral-300 px-2 py-0.5 text-[11px] font-medium uppercase tracking-wide text-neutral-700">
+                          {reportFeePendingReasonBadge}
+                        </p>
+                      ) : null}
+                      {formatPendingReportFeeMessage(request.reportFee)}
                       <button
                         type="submit"
                         className="ml-2 rounded-md border border-neutral-400 px-2 py-1 text-xs text-neutral-900"

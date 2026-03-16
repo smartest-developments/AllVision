@@ -5,6 +5,7 @@ import {
 } from "@/server/report-retrieval";
 import { getLegalCopy } from "@/legal/disclaimers";
 import { RequestAuthError, requireRequestUserId } from "@/server/request-auth";
+import { prisma } from "@/server/db";
 
 function resolveReportFeePaymentState(
   reportPaymentRequired: boolean,
@@ -19,6 +20,69 @@ function resolveReportFeePaymentState(
   }
 
   return "PENDING";
+}
+
+function resolveReportFeePendingReason(
+  required: boolean,
+  paymentState: "NOT_REQUIRED" | "PENDING" | "SETTLED",
+  feeCents: number | null,
+): "PRICING_IN_PROGRESS" | null {
+  if (!required || paymentState !== "PENDING" || feeCents !== null) {
+    return null;
+  }
+
+  return "PRICING_IN_PROGRESS";
+}
+
+async function readCheckoutInitiatedAt(requestId: string): Promise<string | null> {
+  const checkoutEvent = await prisma.sourcingStatusEvent.findFirst({
+    where: {
+      sourcingRequestId: requestId,
+      toStatus: "PAYMENT_PENDING",
+    },
+    orderBy: { createdAt: "desc" },
+    select: { createdAt: true },
+  });
+
+  return checkoutEvent?.createdAt.toISOString() ?? null;
+}
+
+async function readSettlementAuditMetadata(requestId: string): Promise<{
+  settledAt: string | null;
+  settledByRole: "USER" | "ADMIN" | null;
+  settledByUserId: string | null;
+  settledByUserEmail: string | null;
+  settlementEventId: string | null;
+  settlementNote: string | null;
+}> {
+  const settlementEvent = await prisma.sourcingStatusEvent.findFirst({
+    where: {
+      sourcingRequestId: requestId,
+      toStatus: "PAYMENT_SETTLED",
+    },
+    orderBy: { createdAt: "desc" },
+    select: {
+      id: true,
+      createdAt: true,
+      actor: {
+        select: {
+          id: true,
+          role: true,
+          email: true,
+        },
+      },
+      note: true,
+    },
+  });
+
+  return {
+    settledAt: settlementEvent?.createdAt.toISOString() ?? null,
+    settledByRole: settlementEvent?.actor?.role ?? null,
+    settledByUserId: settlementEvent?.actor?.id ?? null,
+    settledByUserEmail: settlementEvent?.actor?.email ?? null,
+    settlementEventId: settlementEvent?.id ?? null,
+    settlementNote: settlementEvent?.note ?? null,
+  };
 }
 
 export async function GET(
@@ -49,6 +113,12 @@ export async function GET(
       requestId,
       userId,
     });
+    const reportFeePaymentState = resolveReportFeePaymentState(
+      result.request.reportPaymentRequired,
+      result.request.status,
+    );
+    const checkoutInitiatedAt = await readCheckoutInitiatedAt(result.request.id);
+    const settlementAudit = await readSettlementAuditMetadata(result.request.id);
 
     return NextResponse.json(
       {
@@ -59,10 +129,19 @@ export async function GET(
           required: result.request.reportPaymentRequired,
           feeCents: result.request.reportFeeCents,
           currency: result.request.currency,
-          paymentState: resolveReportFeePaymentState(
+          paymentState: reportFeePaymentState,
+          pendingReason: resolveReportFeePendingReason(
             result.request.reportPaymentRequired,
-            result.request.status,
+            reportFeePaymentState,
+            result.request.reportFeeCents,
           ),
+          checkoutInitiatedAt,
+          settledAt: settlementAudit.settledAt,
+          settledByRole: settlementAudit.settledByRole,
+          settledByUserId: settlementAudit.settledByUserId,
+          settledByUserEmail: settlementAudit.settledByUserEmail,
+          settlementEventId: settlementAudit.settlementEventId,
+          settlementNote: settlementAudit.settlementNote,
         },
         artifact: {
           id: result.artifact.id,
