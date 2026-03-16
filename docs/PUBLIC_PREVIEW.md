@@ -1,8 +1,8 @@
 # Public Preview
 
 Title: AllVision Public Preview
-URL: http://localhost:3000/public-preview
-Status: local-only (public URL TBD)
+URL: https://allvision.thinksmarter.uk/public-preview
+Status: public preview via local app tunnel
 
 Notes:
 - `/public-preview` renders demo-safe, non-personal data.
